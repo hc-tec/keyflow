@@ -10,8 +10,14 @@ const registry = String(args.get("registry") ?? "https://registry.npmjs.org/");
 const dryRun = args.get("dry-run") === true;
 const kitFilter = typeof args.get("kit") === "string" ? String(args.get("kit")) : null;
 const otp = typeof args.get("otp") === "string" ? String(args.get("otp")) : null;
+const tokenFile = typeof args.get("token-file") === "string" ? String(args.get("token-file")) : null;
 
-const token = process.env.NPM_TOKEN || process.env.NODE_AUTH_TOKEN;
+let token = process.env.NPM_TOKEN || process.env.NODE_AUTH_TOKEN;
+if (!token && tokenFile) {
+  const tokenPath = path.resolve(repoRoot, tokenFile);
+  const raw = await fs.readFile(tokenPath, "utf8");
+  token = raw.startsWith("\uFEFF") ? raw.slice(1).trim() : raw.trim();
+}
 if (!dryRun && !token) {
   console.warn("[npm] NOTE: NPM_TOKEN not set; relying on existing npm login (~/.npmrc).");
   console.warn("[npm] If publish fails with ENEEDAUTH, run: npm login  (or set NPM_TOKEN) and retry.");

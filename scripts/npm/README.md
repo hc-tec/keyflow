@@ -55,6 +55,12 @@ node scripts/npm/generate-catalog.mjs
 node scripts/npm/publish-kits.mjs --registry https://registry.npmjs.org/
 ```
 
+如果你不想配置全局环境变量，也可以把 token 放到一个本地文件（建议放在 `tmp/`，已被 `.gitignore` 忽略）：
+
+```bash
+node scripts/npm/publish-kits.mjs --kit tone-rewrite --token-file tmp/npm-token.txt
+```
+
 只发布一个 kit：
 
 ```bash

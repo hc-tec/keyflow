@@ -61,6 +61,7 @@
 - 生成 npm catalog JSON：`scripts/npm/generate-catalog.mjs`（产物：`artifacts/npm/catalog.npm.json`）
 - 发布/演练：`scripts/npm/publish-kits.mjs`（支持 `--dry-run`；真实发布需 `NPM_TOKEN`）
 - 发布后下载验证：`scripts/npm/verify-npm-kit.mjs`（下载 tarball 并校验 `dist.integrity`）
+- 已发布（npmjs）：`keyflow-kit-tone-rewrite@0.2.0`（注：`@hc-tec/*` 需要先在 npm 创建同名 org/scope，否则会报 `Scope not found`）
 
 2026-04-01 下载中心/商店 UI 作为“内置 Store Kit（Web UI）”调研：
 - 可行性与接口提案（`kits.manage` / `catalog.*` / 资源下载代理等）：`TODO/function-kits/store/DOWNLOAD_CENTER_AS_KIT.md`

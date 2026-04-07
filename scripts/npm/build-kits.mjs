@@ -17,7 +17,14 @@ const repoRoot = getRepoRoot();
 const kitsRoot = path.join(repoRoot, "TODO", "function-kits");
 const outRoot = path.resolve(repoRoot, String(args.get("out") ?? "artifacts/npm"));
 
-const scope = args.get("scope") === true ? null : args.get("scope");
+const rawScope = args.get("scope");
+if (rawScope === true) {
+  console.error("[npm] ERROR: --scope requires a value.");
+  console.error("[npm] On PowerShell, avoid leading '@' (splat). Use: --scope keyflow2");
+  console.error("[npm] Or quote it: --scope '@keyflow2'");
+  process.exit(2);
+}
+const scope = rawScope === false ? null : rawScope;
 const prefix = args.get("prefix") === true ? "keyflow-kit-" : (args.get("prefix") ?? "keyflow-kit-");
 const pack = args.get("pack") !== false;
 
@@ -139,4 +146,3 @@ async function main() {
 }
 
 await main();
-

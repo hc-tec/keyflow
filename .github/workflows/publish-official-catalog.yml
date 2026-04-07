@@ -1,0 +1,61 @@
+name: publish-official-catalog
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "catalog/official.packages.json"
+      - "scripts/npm/**"
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate official catalog.json
+        run: node scripts/npm/generate-catalog-from-registry.mjs --packages-file catalog/official.packages.json --out-file catalog/official.catalog.json
+
+      - name: Publish catalog package to npm
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN_KEYFLOW2 }}
+        run: node scripts/npm/publish-catalog-package.mjs --catalog catalog/official.catalog.json --name @keyflow2/keyflow-kit-catalog --registry https://registry.npmjs.org/
+
+      - name: Verify published catalog (retry)
+        shell: bash
+        run: |
+          PKG=$(node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('artifacts/npm/catalog-package.json','utf8'));process.stdout.write(`${j.name}@${j.version}`);")
+          echo "Verifying: $PKG"
+          for i in {1..12}; do
+            if node scripts/npm/verify-npm-catalog.mjs --pkg "$PKG" --registry https://registry.npmjs.org/; then
+              exit 0
+            fi
+            echo "Retry $i/12 ... waiting 10s"
+            sleep 10
+          done
+          echo "Verification failed after retries"
+          exit 1
+
+      - name: Commit updated catalog.json
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add catalog/official.catalog.json
+          git commit -m "chore: update official catalog [skip ci]"
+          git push
+

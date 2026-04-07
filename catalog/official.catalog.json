@@ -1,0 +1,22 @@
+{
+  "kind": "keyflow.npm.catalog.v0",
+  "generatedAt": "2026-04-07T12:56:28.620Z",
+  "registry": "https://registry.npmjs.org/",
+  "packages": [
+    {
+      "kitId": "tone-rewrite",
+      "name": "语气改写",
+      "version": "0.2.0",
+      "npm": {
+        "name": "@keyflow2/keyflow-kit-tone-rewrite",
+        "version": "0.2.0"
+      },
+      "dist": {
+        "tarball": "https://registry.npmjs.org/@keyflow2/keyflow-kit-tone-rewrite/-/keyflow-kit-tone-rewrite-0.2.0.tgz",
+        "integrity": "sha512-1OJthgl6ahRpu1yFLw7313K85tRKqKGBhT7Ry3sMjzAMGss/asQI+ieEcY6d+x6PRvOeYHEaUCSADfboTfwyZg==",
+        "sha256": "a5e198379ac597110ba89bfb065d3a59be4c2111dbe5e3d1425cb9814d817b92",
+        "sizeBytes": 20611
+      }
+    }
+  ]
+}

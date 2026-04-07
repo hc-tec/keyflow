@@ -24,9 +24,11 @@ node scripts/npm/build-kits.mjs
 可选参数：
 
 - `--kit <kitId>`：只打包一个 kit
-- `--scope @hc-tec`：生成 scoped 包名（例如 `@hc-tec/keyflow-kit-tone-rewrite`）
+- `--scope <org>`：生成 scoped 包名（例如 `--scope keyflow2` → `@keyflow2/keyflow-kit-tone-rewrite`）
 - `--prefix keyflow-kit-`：包名前缀
 - `--out artifacts/npm`：输出目录
+
+> PowerShell 注意：不要直接写 `--scope @keyflow2`，`@xxx` 会被当成 splat；用 `--scope keyflow2` 或 `--scope '@keyflow2'`。
 
 ## 2) 校验本地 `.tgz`（是否包含 manifest、可解包）
 
@@ -41,6 +43,20 @@ node scripts/npm/generate-catalog.mjs
 ```
 
 输出：`artifacts/npm/catalog.npm.json`
+
+## 3.1) 从 registry 生成 catalog（给“官方/社区 catalog”用）
+
+把已发布到 npm 的包名列表变成一个 `catalog.json`：
+
+```bash
+node scripts/npm/generate-catalog-from-registry.mjs --packages-file catalog/official.packages.json --out-file catalog/official.catalog.json
+```
+
+一键生成 + 发布官方 catalog 包：
+
+```bash
+node scripts/npm/sync-official-catalog.mjs --packages-file catalog/official.packages.json --out-file catalog/official.catalog.json --catalog-name @keyflow2/keyflow-kit-catalog --token-file tmp/npm-token.txt
+```
 
 ## 4) 发布到 npm（需要 token）
 
@@ -78,7 +94,8 @@ node scripts/npm/publish-kits.mjs --dry-run
 ## 5) 从 registry 下载并验证（发布后）
 
 ```bash
-node scripts/npm/verify-npm-kit.mjs --pkg @hc-tec/keyflow-kit-tone-rewrite@0.2.0
+node scripts/npm/verify-npm-kit.mjs --pkg keyflow-kit-tone-rewrite@0.2.0
+node scripts/npm/verify-npm-kit.mjs --pkg @keyflow2/keyflow-kit-tone-rewrite@0.2.0
 ```
 
 国内网络建议在“下载/验证”阶段使用镜像 registry（发布仍必须走 npmjs.org）：
@@ -87,8 +104,22 @@ node scripts/npm/verify-npm-kit.mjs --pkg @hc-tec/keyflow-kit-tone-rewrite@0.2.0
 node scripts/npm/verify-npm-kit.mjs --registry https://registry.npmmirror.com/ --pkg <name>@<version>
 ```
 
+## 5.1) 发布 catalog 包到 npm（解决“没 VPS/域名也能分发 catalog.json”）
+
+把一个 `catalog.json` 发布成 npm 包（例如 `@keyflow2/keyflow-kit-catalog`）：
+
+```bash
+node scripts/npm/publish-catalog-package.mjs --catalog catalog/official.catalog.json --name @keyflow2/keyflow-kit-catalog --token-file tmp/npm-token.txt
+```
+
+发布后验证：
+
+```bash
+node scripts/npm/verify-npm-catalog.mjs --pkg @keyflow2/keyflow-kit-catalog@0.0.1
+```
+
 ## 6) 一键本地 Smoke Test（build + verify + npm install）
 
 ```bash
-node scripts/npm/smoke-local.mjs --kit tone-rewrite --scope @hc-tec
+node scripts/npm/smoke-local.mjs --kit tone-rewrite --scope keyflow2
 ```

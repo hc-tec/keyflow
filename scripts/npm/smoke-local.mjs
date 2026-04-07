@@ -8,7 +8,14 @@ const repoRoot = getRepoRoot();
 const outRoot = path.resolve(repoRoot, String(args.get("out") ?? "artifacts/npm"));
 
 const kitArg = typeof args.get("kit") === "string" ? String(args.get("kit")) : null;
-const scope = args.get("scope") === true ? null : args.get("scope");
+const rawScope = args.get("scope");
+if (rawScope === true) {
+  console.error("[npm] ERROR: --scope requires a value.");
+  console.error("[npm] On PowerShell, avoid leading '@' (splat). Use: --scope keyflow2");
+  console.error("[npm] Or quote it: --scope '@keyflow2'");
+  process.exit(2);
+}
+const scope = rawScope === false ? null : rawScope;
 const prefix = args.get("prefix") === true ? "keyflow-kit-" : (args.get("prefix") ?? "keyflow-kit-");
 
 function pkgNameToManifestPath(pkgName, installDir) {

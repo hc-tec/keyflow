@@ -1,0 +1,85 @@
+name: "Kit Submission (Catalog)"
+description: "Submit a Function Kit for inclusion in the official catalog"
+title: "[Kit] <kitId>: <short description>"
+labels:
+  - catalog
+  - kit
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for building a Function Kit!
+
+        If you want the kit to appear in the **official catalog**, submit your **npm package spec** here (or open a PR editing `catalog/official.packages.json`).
+
+        Notes:
+        - The official catalog is published to: `@keyflow2/keyflow-kit-catalog`
+        - Kit packages are expected to include: `manifest.json` + `ui/**` + static assets (no secrets).
+
+  - type: input
+    id: npm_package
+    attributes:
+      label: NPM package spec
+      description: "Example: @your-scope/keyflow-kit-your-kit@0.1.0"
+      placeholder: "@your-scope/keyflow-kit-xxx@0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: kit_id
+    attributes:
+      label: kitId (manifest.id)
+      placeholder: "tone-rewrite"
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: What does this kit do?
+      description: "1-3 sentences. Mention the core user value and the main surface (panel/headless)."
+    validations:
+      required: true
+
+  - type: textarea
+    id: permissions
+    attributes:
+      label: Runtime permissions requested
+      description: "Paste the `runtimePermissions` array from your manifest.json."
+      placeholder: |
+        [
+          "context.read",
+          "input.replace"
+        ]
+    validations:
+      required: true
+
+  - type: input
+    id: source_repo
+    attributes:
+      label: Source repo (optional)
+      description: "If the kit is open-source, link its repository."
+      placeholder: "https://github.com/<you>/<repo>"
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots / demo (optional)
+      description: "Drag & drop images/video or paste links."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: "The npm package installs cleanly and contains `manifest.json`."
+          required: true
+        - label: "No secrets (API keys/tokens) are shipped in the package."
+          required: true
+        - label: "I understand kit JS/HTML/CSS is extractable by end users (like browser extensions)."
+          required: true
+

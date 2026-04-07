@@ -59,9 +59,21 @@
 - 打包（本地生成 `.tgz`）：`scripts/npm/build-kits.mjs`（产物：`artifacts/npm/kit-packages.json`、`artifacts/npm/tarballs/<kitId>/*.tgz`）
 - 校验本地 `.tgz`：`scripts/npm/verify-kit-tgz.mjs`（校验包含 `package/manifest.json` + 可解包）
 - 生成 npm catalog JSON：`scripts/npm/generate-catalog.mjs`（产物：`artifacts/npm/catalog.npm.json`）
+- 从 registry 生成官方/社区 catalog：`scripts/npm/generate-catalog-from-registry.mjs`（产物：`catalog/official.catalog.json`）
 - 发布/演练：`scripts/npm/publish-kits.mjs`（支持 `--dry-run`；真实发布需 `NPM_TOKEN`）
 - 发布后下载验证：`scripts/npm/verify-npm-kit.mjs`（下载 tarball 并校验 `dist.integrity`）
-- 已发布（npmjs）：`keyflow-kit-tone-rewrite@0.2.0`（注：`@hc-tec/*` 需要先在 npm 创建同名 org/scope，否则会报 `Scope not found`）
+- 已发布（npmjs）：
+  - `keyflow-kit-tone-rewrite@0.2.0`
+  - `@keyflow2/keyflow-kit-tone-rewrite@0.2.0`
+- 官方 Catalog（npm 包分发 `catalog.json`）：
+  - 设计说明：`catalog/README.md`
+  - 包列表：`catalog/official.packages.json`
+  - 生成结果（可审计）：`catalog/official.catalog.json`
+  - 已发布（npmjs）：`@keyflow2/keyflow-kit-catalog@0.0.1`
+  - 发布脚本：`scripts/npm/publish-catalog-package.mjs`、`scripts/npm/sync-official-catalog.mjs`
+  - CI 校验：`.github/workflows/ci.yml`（`catalog-check`）
+  - 自动发布（需在 GitHub Secrets 配 `NPM_TOKEN_KEYFLOW2`）：`.github/workflows/publish-official-catalog.yml`
+  - 注：scope 必须在 npm 侧存在（否则会报 `Scope not found`）；PowerShell 传参避免 `--scope @xxx`（`@xxx` 会触发 splat），用 `--scope keyflow2` 或 `--scope '@keyflow2'`
 
 2026-04-01 下载中心/商店 UI 作为“内置 Store Kit（Web UI）”调研：
 - 可行性与接口提案（`kits.manage` / `catalog.*` / 资源下载代理等）：`TODO/function-kits/store/DOWNLOAD_CENTER_AS_KIT.md`

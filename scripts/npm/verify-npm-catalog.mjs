@@ -7,7 +7,9 @@ const { args, positional } = parseArgs(process.argv.slice(2));
 const repoRoot = getRepoRoot();
 const pkgArg = args.get("pkg") ?? positional[0];
 if (!pkgArg || typeof pkgArg !== "string") {
-  console.error("Usage: node scripts/npm/verify-npm-kit.mjs --pkg <name>@<version> [--registry <url>] [--out <dir>]");
+  console.error(
+    "Usage: node scripts/npm/verify-npm-catalog.mjs --pkg <name>@<version> [--registry <url>] [--out <dir>]"
+  );
   process.exit(2);
 }
 
@@ -45,4 +47,4 @@ if (actual.integrity !== integrity) {
 }
 console.log(`[npm] OK: integrity matched`);
 
-await run("node", [path.join(repoRoot, "scripts", "npm", "verify-kit-tgz.mjs"), "--tgz", tgzPath, "--out", outDir]);
+await run("node", [path.join(repoRoot, "scripts", "npm", "verify-catalog-tgz.mjs"), "--tgz", tgzPath, "--out", outDir]);

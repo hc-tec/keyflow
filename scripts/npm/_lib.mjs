@@ -140,6 +140,17 @@ export async function hashFile(filePath) {
   return { sizeBytes: buf.length, sha256, integrity };
 }
 
+export async function downloadToFile(url, filePath) {
+  const res = await fetch(url, { redirect: "follow" });
+  if (!res.ok) {
+    throw new Error(`[npm] download failed: ${res.status} ${res.statusText}: ${url}`);
+  }
+
+  const buf = Buffer.from(await res.arrayBuffer());
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, buf);
+}
+
 export function parseArgs(argv) {
   const args = new Map();
   const positional = [];

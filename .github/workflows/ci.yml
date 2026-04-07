@@ -24,3 +24,16 @@ jobs:
         working-directory: TODO/function-kit-runtime-sdk
         run: npm test
 
+  catalog-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate official catalog (sanity check)
+        run: node scripts/npm/generate-catalog-from-registry.mjs --packages-file catalog/official.packages.json --out-file artifacts/npm/official.catalog.json

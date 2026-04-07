@@ -67,6 +67,7 @@
   - `@keyflow2/keyflow-kit-tone-rewrite@0.2.0`
 - 官方 Catalog（npm 包分发 `catalog.json`）：
   - 设计说明：`catalog/README.md`
+  - 规范：`TODO/function-kits/KIT_CATALOG_NPM_SPEC.md`
   - 包列表：`catalog/official.packages.json`
   - 生成结果（可审计）：`catalog/official.catalog.json`
   - 已发布（npmjs）：`@keyflow2/keyflow-kit-catalog@0.0.1`

@@ -53,6 +53,8 @@
 
 推荐两种方式（二选一）：
 
+> 重要：请尽量使用**全局唯一**的 `kitId`（`manifest.id`），推荐格式：`"<npmScope>.<kitSlug>"`，避免用户同时订阅多个 catalog 时发生冲突。
+
 ### A. 提交 PR（推荐，自动化最好）
 
 1. 先把 kit 发布到 npm（你的包名通常类似：`@<your-scope>/keyflow-kit-<kitId>@<version>`）

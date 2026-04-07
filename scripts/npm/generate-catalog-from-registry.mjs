@@ -61,6 +61,89 @@ async function extractManifest(tgzPath, extractDir) {
   return path.join(extractDir, "package", "manifest.json");
 }
 
+function parseUserFromPersonString(s) {
+  // npm often returns "name <email>".
+  const raw = String(s ?? "").trim();
+  if (!raw) return null;
+  const m = /^([^<]+)</.exec(raw);
+  return (m ? m[1] : raw).trim() || null;
+}
+
+function listMaintainers(meta) {
+  const v = meta?.maintainers;
+  if (!v) return [];
+  const out = [];
+  if (Array.isArray(v)) {
+    for (const m of v) {
+      if (!m) continue;
+      if (typeof m === "string") {
+        const name = parseUserFromPersonString(m);
+        if (name) out.push(name);
+        continue;
+      }
+      if (typeof m === "object") {
+        const name = String(m.name ?? "").trim();
+        if (name) out.push(name);
+      }
+    }
+  }
+  return [...new Set(out)];
+}
+
+function parsePublisher(meta) {
+  const u = meta?._npmUser;
+  if (!u) return null;
+  if (typeof u === "string") return parseUserFromPersonString(u);
+  if (typeof u === "object") {
+    const name = String(u.name ?? "").trim();
+    if (name) return name;
+  }
+  return null;
+}
+
+function parseScope(pkgName) {
+  const s = String(pkgName ?? "");
+  if (!s.startsWith("@")) return null;
+  const slash = s.indexOf("/");
+  if (slash <= 1) return null;
+  return s.slice(1, slash);
+}
+
+function collectBindingCategories(manifest) {
+  const bindings = Array.isArray(manifest?.bindings) ? manifest.bindings : [];
+  const set = new Set();
+  for (const b of bindings) {
+    const cats = Array.isArray(b?.categories) ? b.categories : [];
+    for (const c of cats) {
+      if (typeof c === "string" && c.trim()) set.add(c.trim());
+    }
+  }
+  return [...set].sort((a, b) => a.localeCompare(b));
+}
+
+function validateKitIdOrThrow(kitId, pkg) {
+  const id = String(kitId ?? "");
+  if (!id || !id.trim()) throw new Error(`[npm] Invalid kitId (empty) for ${pkg}`);
+  if (id !== id.trim()) throw new Error(`[npm] Invalid kitId (leading/trailing spaces) for ${pkg}: "${id}"`);
+  if (id.includes("/") || id.includes("\\")) {
+    throw new Error(`[npm] Invalid kitId (must not contain '/' or '\\\\') for ${pkg}: "${id}"`);
+  }
+  if (id.includes("..")) {
+    throw new Error(`[npm] Invalid kitId (must not contain '..') for ${pkg}: "${id}"`);
+  }
+  if (id.includes(":")) {
+    throw new Error(`[npm] Invalid kitId (must not contain ':') for ${pkg}: "${id}"`);
+  }
+  if (id.includes("@")) {
+    throw new Error(`[npm] Invalid kitId (must not contain '@') for ${pkg}: "${id}"`);
+  }
+  if (!/^[a-z0-9][a-z0-9._-]{0,127}$/.test(id)) {
+    throw new Error(
+      `[npm] Invalid kitId (allowed: lowercase letters, digits, '.', '_', '-') for ${pkg}: "${id}"`
+    );
+  }
+}
+
 async function main() {
   const entries = [];
 
@@ -97,6 +180,7 @@ async function main() {
 
     const kitId = String(manifest?.id ?? "");
     if (!kitId) throw new Error(`[npm] Missing manifest.id in ${pkgName}@${pkgVersion}`);
+    validateKitIdOrThrow(kitId, `${pkgName}@${pkgVersion}`);
 
     const manifestVersion = manifest?.version != null ? String(manifest.version) : null;
     if (manifestVersion && manifestVersion !== pkgVersion) {
@@ -105,18 +189,87 @@ async function main() {
       );
     }
 
+    const categories = collectBindingCategories(manifest);
+    const platforms = Array.isArray(manifest?.platforms) ? manifest.platforms.map((p) => String(p)) : null;
+    const runtimePermissions = Array.isArray(manifest?.runtimePermissions)
+      ? manifest.runtimePermissions.map((p) => String(p))
+      : null;
+
+    const publisher = parsePublisher(meta);
+    const maintainers = listMaintainers(meta);
+    const scope = parseScope(pkgName);
+
+    const publishedAt = meta?.time?.[pkgVersion] ? String(meta.time[pkgVersion]) : null;
+
     entries.push({
       kitId,
       name: String(manifest?.name ?? kitId),
+      description: String(manifest?.description ?? meta?.description ?? ""),
       version: pkgVersion,
-      npm: { name: pkgName, version: pkgVersion },
+      npm: {
+        name: pkgName,
+        version: pkgVersion,
+        scope,
+        keywords: Array.isArray(meta?.keywords) ? meta.keywords.map((k) => String(k)) : null,
+        publisher,
+        maintainers,
+        publishedAt,
+      },
+      platforms,
+      runtimePermissions,
+      categories,
+      bindingCount: Array.isArray(manifest?.bindings) ? manifest.bindings.length : null,
+      links: {
+        homepage: meta?.homepage ? String(meta.homepage) : null,
+        repository:
+          typeof meta?.repository === "string"
+            ? String(meta.repository)
+            : meta?.repository?.url
+              ? String(meta.repository.url)
+              : null,
+        bugs:
+          typeof meta?.bugs === "string" ? String(meta.bugs) : meta?.bugs?.url ? String(meta.bugs.url) : null,
+      },
       dist: {
         tarball: tarballUrl,
         integrity: expectedIntegrity,
         sha256: actual.sha256,
         sizeBytes: actual.sizeBytes,
+        unpackedSize: dist?.unpackedSize ?? null,
+        fileCount: dist?.fileCount ?? null,
       },
     });
+  }
+
+  // Ensure no collisions inside one catalog.
+  const byKitId = new Map();
+  const byNpmName = new Map();
+  for (const e of entries) {
+    const kitKey = String(e.kitId);
+    const npmKey = String(e?.npm?.name ?? "");
+    const npmSpec = `${npmKey}@${String(e?.npm?.version ?? "")}`;
+    byKitId.set(kitKey, [...(byKitId.get(kitKey) ?? []), npmSpec]);
+    byNpmName.set(npmKey, [...(byNpmName.get(npmKey) ?? []), npmSpec]);
+  }
+
+  const kitIdDups = [...byKitId.entries()].filter(([, list]) => list.length > 1);
+  if (kitIdDups.length > 0) {
+    console.error("[npm] ERROR: kitId collision(s) detected inside this catalog:");
+    for (const [kitId, specs] of kitIdDups) {
+      console.error(`  - kitId="${kitId}" used by: ${specs.join(", ")}`);
+    }
+    console.error('[npm] Fix: ensure each kit has a globally-unique manifest.id (recommended: "<publisher>.<kitName>").');
+    process.exit(1);
+  }
+
+  const npmNameDups = [...byNpmName.entries()].filter(([, list]) => list.length > 1);
+  if (npmNameDups.length > 0) {
+    console.error("[npm] ERROR: duplicate npm package(s) detected inside this catalog (multiple versions listed):");
+    for (const [name, specs] of npmNameDups) {
+      console.error(`  - npm.name="${name}" specs: ${specs.join(", ")}`);
+    }
+    console.error("[npm] Fix: keep only ONE version per npm package in packages-file.");
+    process.exit(1);
   }
 
   // Deterministic order for stable diffs.

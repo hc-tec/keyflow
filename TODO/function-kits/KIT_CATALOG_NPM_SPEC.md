@@ -36,31 +36,68 @@
 {
   "kitId": "tone-rewrite",
   "name": "语气改写",
+  "description": "一键把聊天内容改成更短、更长、更礼貌、更口语，或加上合适 emoji。",
   "version": "0.2.0",
   "npm": {
     "name": "@keyflow2/keyflow-kit-tone-rewrite",
-    "version": "0.2.0"
+    "version": "0.2.0",
+    "scope": "keyflow2",
+    "keywords": ["keyflow", "function-kit", "ime", "webview"],
+    "publisher": "ncu-titto",
+    "maintainers": ["ncu-titto"],
+    "publishedAt": "2026-04-07T12:40:25.132Z"
+  },
+  "platforms": ["android"],
+  "runtimePermissions": ["context.read", "input.replace", "ai.request"],
+  "categories": ["chat", "rewrite", "tone", "writing"],
+  "bindingCount": 6,
+  "links": {
+    "homepage": "https://github.com/hc-tec/keyflow#readme",
+    "repository": "git+https://github.com/hc-tec/keyflow.git",
+    "bugs": "https://github.com/hc-tec/keyflow/issues"
   },
   "dist": {
     "tarball": "https://registry.npmjs.org/@keyflow2/keyflow-kit-tone-rewrite/-/keyflow-kit-tone-rewrite-0.2.0.tgz",
     "integrity": "sha512-...",
     "sha256": "64-hex...",
-    "sizeBytes": 20610
+    "sizeBytes": 20610,
+    "unpackedSize": 63826,
+    "fileCount": 7
   }
 }
 ```
 
 - `kitId`（string，必填）：功能件 id（应与 kit 的 `manifest.json` 中 `id` 一致）
 - `name`（string，可选）：展示名（通常来自 `manifest.name`）
+- `description`（string，可选）：一句话简介（通常来自 `manifest.description`，可用于列表展示/搜索）
 - `version`（string，必填）：版本号（应与 npm 包版本一致）
 - `npm`（object，必填）
   - `name`（string，必填）：npm 包名
   - `version`（string，必填）：npm 版本（建议固定版本，避免 `latest` 引起不可预期更新）
+- `platforms`（string[]，可选）：支持平台（通常来自 `manifest.platforms`）
+- `runtimePermissions`（string[]，可选）：运行时权限（来自 `manifest.runtimePermissions`，强烈建议在 UI 中展示）
+- `categories`（string[]，可选）：分类/标签（推荐从 `manifest.bindings[].categories` 聚合去重；也可由 catalog 维护者补充/覆盖）
+- `bindingCount`（number/int，可选）：该 kit 暴露的 binding 数量（便于在目录中快速评估“有多少动作”）
+- `links`（object，可选）：相关链接（通常来自 npm 元数据 `homepage/repository/bugs`）
 - `dist`（object，可选但强烈建议）
   - `tarball`（string，必填）：可下载的 `.tgz` URL
   - `integrity`（string，必填）：npm `dist.integrity`（SRI，sha512-base64）
   - `sha256`（string，必填）：对 `.tgz` 文件内容计算的 sha256（hex）
   - `sizeBytes`（number，必填）：`.tgz` 文件大小
+  - `unpackedSize`（number，可选）：npm 元数据中的解包大小（展示用）
+  - `fileCount`（number，可选）：文件数量（展示用）
+
+### 3) `kitId` 的唯一性与命名（强烈建议）
+
+`kitId` 一旦发布就应该视为**永久标识**（会被用于安装目录、配置/缓存键、UI 展示等）。如果 `kitId` 重复，会带来：覆盖安装、更新混乱、用户难以分辨来源等问题。
+
+建议规则：
+
+- **全局唯一**：把 `kitId` 当成 “包名级别” 的唯一键来设计。
+- **推荐命名**：`"<npmScope>.<kitSlug>"`（scope 来自 npm scope/账号名；slug 用 kebab-case）。
+  - 例：`keyflow2.tone-rewrite`、`alice.clipboard-tools`
+- **字符约束（跨平台/Windows 安全）**：只用小写字母/数字/`.`/`_`/`-`，且不包含 `/`、`\\`、`..`、`:`、`@`。
+- **不要改 id**：如果要做重大重构，请通过版本号演进；`kitId` 改动会导致“新 kit”被当成另一个包。
 
 ## Catalog 的分发方式（无 VPS）
 
@@ -93,4 +130,3 @@
 2. **上架官方 catalog**：发布 kit 包到 npm → 通过 PR/Issue 提交包名+版本 → 维护者审核后合入官方列表并发布官方 catalog。
 
 官方/社区流程说明：`catalog/README.md`
-

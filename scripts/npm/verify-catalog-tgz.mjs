@@ -43,6 +43,21 @@ if (!catalog || typeof catalog !== "object" || !Array.isArray(catalog.packages))
   process.exit(1);
 }
 
+if (String(catalog.kind ?? "") !== "keyflow.npm.catalog.v0") {
+  console.error(`[npm] ERROR: unexpected catalog.kind: ${String(catalog.kind ?? "")}`);
+  process.exit(1);
+}
+
+for (const p of catalog.packages) {
+  const kitId = String(p?.kitId ?? "");
+  const npmName = String(p?.npm?.name ?? "");
+  const npmVersion = String(p?.npm?.version ?? "");
+  if (!kitId || !npmName || !npmVersion) {
+    console.error(`[npm] ERROR: invalid package entry (need kitId + npm.name + npm.version)`);
+    console.error(JSON.stringify(p, null, 2));
+    process.exit(1);
+  }
+}
+
 console.log(`[npm] OK: catalog.json parsed (packages=${catalog.packages.length})`);
 console.log(`[npm] extracted to: ${path.relative(repoRoot, extractDir)}`);
-

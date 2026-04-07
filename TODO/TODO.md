@@ -75,6 +75,10 @@
   - CI 校验：`.github/workflows/ci.yml`（`catalog-check`）
   - 自动发布（需在 GitHub Secrets 配 `NPM_TOKEN_KEYFLOW2`）：`.github/workflows/publish-official-catalog.yml`
   - 注：scope 必须在 npm 侧存在（否则会报 `Scope not found`）；PowerShell 传参避免 `--scope @xxx`（`@xxx` 会触发 splat），用 `--scope keyflow2` 或 `--scope '@keyflow2'`
+- kitId 冲突风险补充：增加 `kitId` 全局唯一命名建议（`<npmScope>.<kitSlug>`）与校验（生成 catalog 时检测冲突/非法字符）：
+  - 规范：`TODO/function-kits/KIT_CATALOG_NPM_SPEC.md`
+  - 工具：`scripts/npm/generate-catalog-from-registry.mjs`
+  - 提交流程提示：`catalog/README.md`、`.github/ISSUE_TEMPLATE/kit_submission.yml`
 
 2026-04-01 下载中心/商店 UI 作为“内置 Store Kit（Web UI）”调研：
 - 可行性与接口提案（`kits.manage` / `catalog.*` / 资源下载代理等）：`TODO/function-kits/store/DOWNLOAD_CENTER_AS_KIT.md`

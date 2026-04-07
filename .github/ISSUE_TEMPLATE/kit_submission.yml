@@ -29,7 +29,8 @@ body:
     id: kit_id
     attributes:
       label: kitId (manifest.id)
-      placeholder: "tone-rewrite"
+      description: "Recommended: <npmScope>.<kitSlug> (e.g. alice.tone-rewrite). This avoids collisions when users subscribe to multiple catalogs."
+      placeholder: "your-scope.tone-rewrite"
     validations:
       required: true
 
@@ -82,4 +83,3 @@ body:
           required: true
         - label: "I understand kit JS/HTML/CSS is extractable by end users (like browser extensions)."
           required: true
-

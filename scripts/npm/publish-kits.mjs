@@ -39,7 +39,9 @@ for (const kit of kits) {
 
   const pkg = `${kit.packageName}@${kit.version}`;
   console.log(`[npm] publish: ${pkg}`);
-  const publishArgs = ["publish", "--registry", registry, "--access", "public"];
+  const isScoped = String(kit.packageName).startsWith("@");
+  const publishArgs = ["publish", "--registry", registry];
+  if (isScoped) publishArgs.push("--access", "public");
   if (dryRun) publishArgs.push("--dry-run");
   if (otp) publishArgs.push("--otp", otp);
 

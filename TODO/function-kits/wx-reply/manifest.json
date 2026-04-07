@@ -1,0 +1,60 @@
+﻿{
+  "id": "wx-reply",
+  "name": "WX 回复",
+  "version": "0.2.9",
+  "description": "微信聊天回复助手：先选联系人，再基于真实会话与宿主 AI 生成两条可直接发送的回复候选。",
+  "icons": {
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png",
+    "128": "icons/icon-128.png"
+  },
+  "entry": {
+    "bundle": { "html": "ui/app/index.html" }
+  },
+  "runtimePermissions": [
+    "input.insert",
+    "storage.read",
+    "storage.write",
+    "network.fetch",
+    "ai.request",
+    "panel.state.write"
+  ],
+  "network": {
+    "mode": "host-proxy",
+    "allowAbsoluteUrls": true
+  },
+  "bindings": [
+    {
+      "id": "wx.reply",
+      "title": "微信回复",
+      "triggers": ["manual"],
+      "categories": ["chat", "wechat", "reply"],
+      "preferredPresentation": "panel.compose",
+      "entry": { "view": "picker", "defaultAction": "insert" }
+    }
+  ],
+  "discovery": {
+    "launchMode": "panel-first",
+    "slash": {
+      "enabled": true,
+      "commands": ["wx"],
+      "aliases": ["w"],
+      "tags": ["wechat", "reply", "chat"]
+    }
+  },
+  "ai": {
+    "executionMode": "direct-model",
+    "backendHints": {
+      "preferredBackendClass": "direct-model",
+      "latencyTier": "interactive",
+      "latencyBudgetMs": 2200,
+      "requireStructuredJson": true,
+      "requiredCapabilities": [],
+      "notes": [
+        "Generate two concise WeChat replies.",
+        "Prefer strict JSON output.",
+        "Use selected contact context when available."
+      ]
+    }
+  }
+}

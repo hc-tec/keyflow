@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0",
+  "messageId": "host-permissions-001",
+  "timestamp": "2026-03-21T21:35:02+08:00",
+  "kitId": "chat-auto-reply",
+  "surface": "panel",
+  "source": "host-adapter",
+  "target": "function-kit-ui",
+  "type": "permissions.sync",
+  "payload": {
+    "grantedPermissions": [
+      "context.read",
+      "input.insert",
+      "input.replace",
+      "candidates.regenerate",
+      "settings.open",
+      "storage.read",
+      "storage.write",
+      "panel.state.write"
+    ]
+  }
+}

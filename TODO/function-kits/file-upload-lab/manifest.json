@@ -1,0 +1,99 @@
+{
+  "id": "file-upload-lab",
+  "name": "File Upload Lab",
+  "version": "0.1.0",
+  "description": "Devtools kit for picking a local file via host and uploading it with network.fetch bodyRef.",
+  "platforms": [
+    "android"
+  ],
+  "entry": {
+    "type": "browser-app",
+    "bundle": {
+      "html": "ui/app/index.html",
+      "script": "ui/app/main.js",
+      "style": "ui/app/styles.css"
+    },
+    "sdk": {
+      "project": "../../function-kit-runtime-sdk/package.json",
+      "browserBundle": "../../function-kit-runtime-sdk/dist/function-kit-runtime.js"
+    },
+    "surfaces": {
+      "android": {
+        "preferred": "bottom-sheet",
+        "fallback": "full-screen",
+        "peekHeightDp": 320
+      }
+    },
+    "bridgeDoc": "ui/README.md"
+  },
+  "triggers": {
+    "manual": true,
+    "selectionRequired": false,
+    "contextTypes": [
+      "message-compose",
+      "generic-text"
+    ]
+  },
+  "discovery": {
+    "pinnable": false,
+    "recentEnabled": true,
+    "launchMode": "quick-action",
+    "slash": {
+      "enabled": true,
+      "commands": [
+        "upload"
+      ],
+      "aliases": [
+        "file-upload-lab",
+        "file-upload",
+        "upload-lab"
+      ],
+      "tags": [
+        "debug",
+        "network",
+        "upload"
+      ],
+      "minQueryLength": 1
+    }
+  },
+  "network": {
+    "mode": "host-proxy",
+    "allowAbsoluteUrls": true
+  },
+  "permissions": {
+    "needsActiveInputContext": false,
+    "needsPersonaContext": false,
+    "needsNetwork": true,
+    "needsAiAccess": false
+  },
+  "runtimePermissions": [
+    "storage.read",
+    "storage.write",
+    "files.pick",
+    "network.fetch",
+    "settings.open"
+  ],
+  "hostBridge": {
+    "protocolVersion": "1.0.0",
+    "envelopeSchema": "../host-bridge/message-envelope.schema.json",
+    "errorSchema": "../host-bridge/error.schema.json",
+    "uiToHost": [
+      "bridge.ready",
+      "files.pick",
+      "network.fetch",
+      "settings.open",
+      "storage.get",
+      "storage.set"
+    ],
+    "hostToUi": [
+      "bridge.ready.ack",
+      "permissions.sync",
+      "files.pick.result",
+      "network.fetch.result",
+      "storage.sync",
+      "host.state.update",
+      "permission.denied",
+      "bridge.error"
+    ]
+  }
+}

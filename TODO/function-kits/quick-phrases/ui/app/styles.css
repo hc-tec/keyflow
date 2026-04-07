@@ -1,0 +1,86 @@
+:root {
+  /* kit overrides */
+}
+
+.shell {
+  width: min(100vw, 720px);
+  margin: 0 auto;
+}
+
+.views {
+  display: grid;
+  gap: var(--kit-space-2);
+}
+
+.view {
+  display: none;
+  gap: var(--kit-space-2);
+}
+
+.view--active {
+  display: grid;
+}
+
+.context-message {
+  padding: 10px 12px;
+  border-radius: calc(var(--radius) - 2px);
+  background: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  line-height: 1.6;
+}
+
+.context-meta {
+  margin-top: 10px;
+  color: hsl(var(--muted-foreground));
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.phrase-list {
+  display: grid;
+  gap: 12px;
+}
+
+.phrase-card {
+  padding: 12px;
+  border-radius: var(--radius);
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+}
+
+.phrase-card__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: hsl(var(--muted-foreground));
+}
+
+.phrase-card__badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: hsl(var(--muted));
+  border: 1px solid hsl(var(--border));
+  color: hsl(var(--foreground));
+  font-size: 12px;
+}
+
+.phrase-card__input {
+  min-height: 58px;
+  resize: vertical;
+}
+
+.phrase-card__actions {
+  margin-top: 12px;
+}
+
+@media (max-height: 560px) {
+  .subtitle {
+    display: none;
+  }
+
+  .phrase-card__input {
+    min-height: 48px;
+  }
+}

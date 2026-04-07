@@ -1,0 +1,130 @@
+{
+  "id": "ime-hooks",
+  "name": "IME Hooks",
+  "version": "0.1.0",
+  "description": "Devtools kit to test best-effort input observation and IME action send interception.",
+  "icons": {
+    "64": "icons/ime-hooks.png"
+  },
+  "platforms": [
+    "android"
+  ],
+  "entry": {
+    "type": "browser-app",
+    "bundle": {
+      "html": "ui/app/index.html",
+      "script": "ui/app/main.js",
+      "style": "ui/app/styles.css"
+    },
+    "sdk": {
+      "project": "../../function-kit-runtime-sdk/package.json",
+      "browserBundle": "../../function-kit-runtime-sdk/dist/function-kit-runtime.js"
+    },
+    "surfaces": {
+      "android": {
+        "preferred": "bottom-sheet",
+        "fallback": "full-screen",
+        "peekHeightDp": 320
+      }
+    },
+    "bridgeDoc": "ui/README.md"
+  },
+  "triggers": {
+    "manual": true,
+    "selectionRequired": false,
+    "contextTypes": [
+      "message-compose",
+      "generic-text"
+    ]
+  },
+  "discovery": {
+    "pinnable": false,
+    "recentEnabled": true,
+    "launchMode": "quick-action",
+    "slash": {
+      "enabled": true,
+      "commands": [
+        "hooks"
+      ],
+      "aliases": [
+        "ime-hooks",
+        "ime-hook",
+        "devtools"
+      ],
+      "tags": [
+        "debug",
+        "ime",
+        "hooks"
+      ],
+      "minQueryLength": 1
+    }
+  },
+  "ai": {
+    "executionMode": "none",
+    "backendHints": {
+      "preferredBackendClass": "none",
+      "requiredCapabilities": [],
+      "latencyTier": "instant",
+      "latencyBudgetMs": 120,
+      "allowFallbacks": false,
+      "allowBackgroundPreparation": false,
+      "requireStructuredJson": false,
+      "maxToolCalls": 0,
+      "maxReasoningSteps": 0,
+      "notes": [
+        "Debug-only kit. No remote AI requests."
+      ]
+    }
+  },
+  "network": {
+    "mode": "disabled",
+    "allowAbsoluteUrls": false
+  },
+  "permissions": {
+    "needsActiveInputContext": true,
+    "needsPersonaContext": false,
+    "needsNetwork": false,
+    "needsAiAccess": false
+  },
+  "runtimePermissions": [
+    "context.read",
+    "input.observe.best_effort",
+    "send.intercept.ime_action",
+    "settings.open",
+    "storage.read",
+    "storage.write"
+  ],
+  "hostBridge": {
+    "protocolVersion": "1.0.0",
+    "envelopeSchema": "../host-bridge/message-envelope.schema.json",
+    "errorSchema": "../host-bridge/error.schema.json",
+    "uiToHost": [
+      "bridge.ready",
+      "context.request",
+      "input.observe.best_effort.start",
+      "input.observe.best_effort.stop",
+      "send.intercept.ime_action.register",
+      "send.intercept.ime_action.unregister",
+      "send.intercept.ime_action.result",
+      "settings.open",
+      "storage.get",
+      "storage.set"
+    ],
+    "hostToUi": [
+      "bridge.ready.ack",
+      "permissions.sync",
+      "context.sync",
+      "input.observe.best_effort.ack",
+      "send.intercept.ime_action.ack",
+      "send.intercept.ime_action.intent",
+      "storage.sync",
+      "host.state.update",
+      "permission.denied",
+      "bridge.error"
+    ]
+  },
+  "tests": {
+    "readme": "tests/README.md"
+  }
+}
+

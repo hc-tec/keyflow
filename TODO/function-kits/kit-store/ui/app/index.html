@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>下载中心</title>
+    <link rel="stylesheet" href="../../../shared/ui/ime-panel.css" />
+    <link rel="stylesheet" href="../../../shared/ui/kit-shadcn.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="store-shell" id="app" v-cloak :data-route="route" :data-tab="tab" :data-detail-tab="detailTab">
+      <header class="store-topbar" :hidden="route !== 'home' || searchOpen">
+        <div class="store-tabs" role="tablist" aria-label="store tabs">
+          <button class="store-tab" type="button" :aria-selected="tab === 'discover' ? 'true' : 'false'" @click="setTab('discover')">
+            发现
+          </button>
+          <button class="store-tab" type="button" :aria-selected="tab === 'manage' ? 'true' : 'false'" @click="setTab('manage')">
+            管理
+          </button>
+        </div>
+        <div class="store-actions" aria-label="actions">
+          <button class="icon-button" type="button" aria-label="search" @click="openSearch">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Zm6.7 1.4-4.1-4.1"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+          <button class="icon-button" type="button" aria-label="settings" @click="openSettings">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <path
+                d="M19.4 12a7.6 7.6 0 0 0-.1-1.3l2-1.6-2-3.4-2.5 1a7.8 7.8 0 0 0-2.2-1.3l-.4-2.7H10l-.4 2.7a7.8 7.8 0 0 0-2.2 1.3l-2.5-1-2 3.4 2 1.6a7.6 7.6 0 0 0-.1 1.3c0 .4 0 .9.1 1.3l-2 1.6 2 3.4 2.5-1a7.8 7.8 0 0 0 2.2 1.3l.4 2.7h4.2l.4-2.7a7.8 7.8 0 0 0 2.2-1.3l2.5 1 2-3.4-2-1.6c.1-.4.1-.9.1-1.3Z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+          <button class="icon-button" type="button" aria-label="import" @click="openImport">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 5v14M5 12h14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+          <button class="icon-button" type="button" aria-label="collapse" @click="collapsePanel">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="m6 14 6-6 6 6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <header class="search-topbar" :hidden="route !== 'home' || !searchOpen">
+        <label class="search-field">
+          <span class="search-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Zm6.7 1.4-4.1-4.1"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </span>
+          <input id="searchInput" type="search" placeholder="搜索名称或标签..." autocomplete="off" v-model="searchQuery" />
+        </label>
+        <button class="text-button" type="button" @click="closeSearch">取消</button>
+      </header>
+
+      <main class="store-main" id="homeView" :hidden="route !== 'home'">
+        <section class="store-list" aria-label="discover list" :hidden="tab !== 'discover' || searchOpen">
+          <div class="empty" v-if="discoverItems.length === 0">暂无可用目录，请先在设置里添加 Catalog 源</div>
+          <article class="kit-card" v-for="item in discoverItems" :key="item.kitId" :data-kit-id="item.kitId" @click="openDetail(item)">
+            <div class="ribbon" v-if="item.featured">精选</div>
+            <div class="kit-icon" :class="item.iconClass">
+              <img v-if="item.iconUrl" :src="item.iconUrl" alt="" decoding="async" loading="lazy" />
+              <span v-else>{{ emojiFor(item.kitId) }}</span>
+            </div>
+            <div class="kit-info">
+              <h3 class="kit-title">{{ item.title }}</h3>
+              <div class="kit-subline">
+                <span class="tag-row" v-if="item.sub && item.sub.tags && item.sub.tags.length">
+                  <span class="tag" v-for="tagText in item.sub.tags.slice(0, 2)" :key="tagText">{{ tagText }}</span>
+                </span>
+                <span class="tag-row" v-else-if="item.sub && item.sub.tag">
+                  <span class="tag">{{ item.sub.tag }}</span>
+                </span>
+                <span class="subtext">{{ (item.sub && item.sub.desc) || '' }}</span>
+              </div>
+            </div>
+            <button
+              class="kit-action"
+              type="button"
+              :class="item.action && item.action.kind === 'install' ? 'kit-action--get' : 'kit-action--open'"
+              @click.stop="handleCardAction(item)"
+            >
+              {{ (item.action && item.action.label) || '打开' }}
+            </button>
+          </article>
+        </section>
+
+        <section class="store-list" aria-label="manage list" :hidden="tab !== 'manage' || searchOpen">
+          <div class="empty" v-if="manageItems.length === 0">暂无已安装功能件</div>
+          <article class="kit-card" v-for="item in manageItems" :key="item.kitId" :data-kit-id="item.kitId" @click="openDetail(item)">
+            <div class="ribbon" v-if="item.featured">精选</div>
+            <div class="kit-icon" :class="item.iconClass">
+              <img v-if="item.iconUrl" :src="item.iconUrl" alt="" decoding="async" loading="lazy" />
+              <span v-else>{{ emojiFor(item.kitId) }}</span>
+            </div>
+            <div class="kit-info">
+              <h3 class="kit-title">{{ item.title }}</h3>
+              <div class="kit-subline">
+                <span class="tag-row" v-if="item.sub && item.sub.tags && item.sub.tags.length">
+                  <span class="tag" v-for="tagText in item.sub.tags.slice(0, 2)" :key="tagText">{{ tagText }}</span>
+                </span>
+                <span class="tag-row" v-else-if="item.sub && item.sub.tag">
+                  <span class="tag">{{ item.sub.tag }}</span>
+                </span>
+                <span class="subtext">{{ (item.sub && item.sub.desc) || '' }}</span>
+              </div>
+            </div>
+            <button
+              class="kit-action kit-action--open"
+              type="button"
+              @click.stop="handleCardAction(item)"
+            >
+              {{ (item.action && item.action.label) || '打开' }}
+            </button>
+          </article>
+        </section>
+
+        <section class="store-list" aria-label="search list" :hidden="!searchOpen">
+          <div class="empty" v-if="searchItems.length === 0">{{ searchQuery.trim() ? '没有找到匹配结果' : '暂无内容' }}</div>
+          <article
+            class="kit-card"
+            v-for="item in searchItems"
+            :key="item.kind + ':' + item.kitId"
+            :data-kit-id="item.kitId"
+            @click="openDetail(item)"
+          >
+            <div class="ribbon" v-if="item.featured">精选</div>
+            <div class="kit-icon" :class="item.iconClass">
+              <img v-if="item.iconUrl" :src="item.iconUrl" alt="" decoding="async" loading="lazy" />
+              <span v-else>{{ emojiFor(item.kitId) }}</span>
+            </div>
+            <div class="kit-info">
+              <h3 class="kit-title">{{ item.title }}</h3>
+              <div class="kit-subline">
+                <span class="tag-row" v-if="item.sub && item.sub.tags && item.sub.tags.length">
+                  <span class="tag" v-for="tagText in item.sub.tags.slice(0, 2)" :key="tagText">{{ tagText }}</span>
+                </span>
+                <span class="tag-row" v-else-if="item.sub && item.sub.tag">
+                  <span class="tag">{{ item.sub.tag }}</span>
+                </span>
+                <span class="subtext">{{ (item.sub && item.sub.desc) || '' }}</span>
+              </div>
+            </div>
+            <button
+              class="kit-action"
+              type="button"
+              :class="item.action && item.action.kind === 'install' ? 'kit-action--get' : 'kit-action--open'"
+              @click.stop="handleCardAction(item)"
+            >
+              {{ (item.action && item.action.label) || '打开' }}
+            </button>
+          </article>
+        </section>
+      </main>
+
+      <footer class="store-pager" aria-label="pages" :hidden="route !== 'home'">
+        <button class="pager-dot" type="button" aria-label="发现" :aria-selected="tab === 'discover' ? 'true' : 'false'" @click="setTab('discover')"></button>
+        <button class="pager-dot" type="button" aria-label="管理" :aria-selected="tab === 'manage' ? 'true' : 'false'" @click="setTab('manage')"></button>
+      </footer>
+
+      <main class="store-main" :hidden="route !== 'settings'">
+        <header class="sub-topbar">
+          <button class="back-button" type="button" aria-label="back" @click="backFromSubView">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="m14 6-6 6 6 6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+          <div class="sub-title">设置中心</div>
+          <div class="sub-spacer"></div>
+        </header>
+
+        <section class="settings-section">
+          <div class="settings-label">Catalog 源管理</div>
+          <div class="settings-list">
+            <div class="settings-item" v-for="source in catalogSources" :key="source.url">
+              <div class="settings-url">{{ source.url }}</div>
+              <button class="settings-remove" type="button" @click="removeCatalogSource(source.url)">移除</button>
+            </div>
+          </div>
+
+          <div class="settings-row settings-row--add">
+            <input class="settings-input" placeholder="新 JSON 源" v-model="catalogAddUrl" />
+            <button class="pill pill--primary" type="button" @click="addCatalogSource">添加</button>
+          </div>
+
+          <button class="danger-link" type="button" @click="resetCatalogSources">恢复兜底默认设置</button>
+        </section>
+      </main>
+
+      <main class="store-main" :hidden="route !== 'import'">
+        <header class="sub-topbar sub-topbar--import">
+          <button class="text-button" type="button" @click="backFromSubView">取消</button>
+          <div class="sub-title">导入外部功能</div>
+          <button class="text-button text-button--disabled" type="button" disabled>完成</button>
+        </header>
+
+        <section class="import-section">
+          <input class="import-input" placeholder="https://...(.zip)" v-model="importUrl" />
+          <button class="primary-wide" type="button" @click="installImportUrl">验证并安装 URL</button>
+          <div class="or-divider">
+            <span>OR</span>
+          </div>
+          <button class="secondary-wide" type="button" @click="installFromZip">
+            <span class="plus" aria-hidden="true">＋</span>
+            从本地选择 ZIP
+          </button>
+        </section>
+      </main>
+
+      <main class="store-main" :hidden="route !== 'detail'">
+        <header class="detail-topbar">
+          <button class="detail-back" type="button" @click="backFromDetail">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="m14 6-6 6 6 6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            返回
+          </button>
+          <div class="detail-more" aria-hidden="true"></div>
+        </header>
+
+        <div class="detail-scroll">
+          <section class="detail-header" v-if="selectedItem">
+            <div class="detail-icon">
+              <img v-if="selectedItem.iconUrl" :src="selectedItem.iconUrl" alt="" decoding="async" loading="lazy" />
+              <span v-else>{{ emojiFor(selectedItem.kitId) }}</span>
+            </div>
+
+            <div class="detail-headline">
+              <div class="detail-title-row">
+                <h2 class="detail-title">{{ selectedItem.title }}</h2>
+                <span class="detail-badge" :style="{ visibility: selectedItem.featured ? 'visible' : 'hidden' }">精选</span>
+              </div>
+              <div class="detail-meta">{{ detailMeta }}</div>
+            </div>
+          </section>
+
+          <nav class="segmented" aria-label="detail tabs">
+            <button class="segment" type="button" :aria-selected="detailTab === 'overview' ? 'true' : 'false'" @click="setDetailTab('overview')">
+              概览
+            </button>
+            <button class="segment" type="button" :aria-selected="detailTab === 'permissions' ? 'true' : 'false'" @click="setDetailTab('permissions')">
+              权限
+            </button>
+            <button class="segment" type="button" :aria-selected="detailTab === 'reviews' ? 'true' : 'false'" @click="setDetailTab('reviews')">
+              评价
+            </button>
+            <button class="segment" type="button" :aria-selected="detailTab === 'security' ? 'true' : 'false'" @click="setDetailTab('security')">
+              安全
+            </button>
+          </nav>
+
+          <section class="detail-body" v-if="selectedItem">
+            <section class="detail-card overview-card" v-if="detailTab === 'overview'">
+              <div class="overview-text">{{ overviewText }}</div>
+              <div>
+                <div class="version-row">
+                  <div class="version-title">{{ versionTitle }}</div>
+                  <div class="version-size">{{ versionSize }}</div>
+                </div>
+                <div class="version-note">{{ selectedItem.kitId }}</div>
+              </div>
+            </section>
+
+            <section class="detail-card" v-if="detailTab === 'permissions'">
+              <div class="list-header">
+                <span>声明权限</span>
+                <span class="risk" v-if="permissionRisky">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M12 3 1.8 20.2c-.5.9.1 1.8 1.2 1.8h18c1.1 0 1.7-.9 1.2-1.8L12 3Z"
+                      fill="none"
+                      stroke="#FF3B30"
+                      stroke-width="2"
+                    />
+                    <path d="M12 9v5" stroke="#FF3B30" stroke-width="2" stroke-linecap="round" />
+                    <path d="M12 17.2h.01" stroke="#FF3B30" stroke-width="3" stroke-linecap="round" />
+                  </svg>
+                  高风险
+                </span>
+              </div>
+
+              <div class="list-row" v-for="perm in detailPermissions" :key="perm">
+                <div>{{ permissionLabel(perm) }}</div>
+                <div class="row-dot"></div>
+              </div>
+            </section>
+
+            <section class="detail-card" v-if="detailTab === 'reviews'">
+              <div class="rating-head">
+                <div class="rating-left">
+                  <div class="rating-score">4.8</div>
+                  <div class="rating-meta">满分 5.0 (1250人)</div>
+                </div>
+                <button class="rating-action" type="button" @click="showToast('写评价')">写评价</button>
+              </div>
+
+              <div class="review-item" v-for="review in reviews" :key="review.name">
+                <div>
+                  <div class="review-name">{{ review.name }}</div>
+                  <div class="review-text">{{ review.text }}</div>
+                </div>
+                <div class="stars">{{ stars(review.stars) }}</div>
+              </div>
+            </section>
+
+            <section class="detail-card" v-if="detailTab === 'security'">
+              <div
+                class="link-row"
+                v-for="link in securityLinks"
+                :key="link.label"
+                :class="{ 'link-row--danger': link.kind === 'danger' }"
+                @click="showToast(link.label)"
+              >
+                <div>{{ link.label }}</div>
+                <span class="link-arrow" aria-hidden="true">
+                  <svg v-if="link.icon === 'upright'" viewBox="0 0 24 24">
+                    <path d="M7 17 17 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+                    <path
+                      d="M10 7h7v7"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.4"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <svg v-else viewBox="0 0 24 24">
+                    <path d="M6 12h12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+                    <path
+                      d="m14 7 5 5-5 5"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.4"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
+              </div>
+
+              <button class="uninstall" type="button" @click="uninstallSelected">卸载组件</button>
+            </section>
+          </section>
+        </div>
+      </main>
+
+      <div class="toast" id="toast" :hidden="!toast.open">{{ toast.text }}</div>
+    </div>
+
+    <script src="../../../../function-kit-runtime-sdk/dist/function-kit-runtime.js"></script>
+    <script src="../../../shared/vendor/petite-vue/petite-vue.iife.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>

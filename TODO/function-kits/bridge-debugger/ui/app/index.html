@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bridge Debugger</title>
+    <link rel="stylesheet" href="../../../shared/ui/ime-panel.css" />
+    <link rel="stylesheet" href="../../../shared/ui/kit-shadcn.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app" class="shell kit-shell" v-cloak>
+      <header class="topbar">
+        <div class="kit-row">
+          <div>
+            <strong class="title">Bridge Debugger</strong>
+            <span class="subtitle">用于验证 bindings / observe / ime_action 拦截等桥能力</span>
+          </div>
+          <div class="kit-actions">
+            <button class="ghost" type="button" @click="refreshContext">刷新</button>
+            <button class="ghost" type="button" @click="openSettings">设置</button>
+          </div>
+        </div>
+      </header>
+
+      <section class="statusbar" :data-state="status.state">
+        <span>{{ status.text }}</span>
+        <span>{{ statusMetaText }}</span>
+      </section>
+
+      <nav class="tabs" aria-label="views">
+        <button class="tab" type="button" :class="{ 'tab--active': activeView === 'binding' }" @click="setView('binding')">
+          Binding
+        </button>
+        <button class="tab" type="button" :class="{ 'tab--active': activeView === 'context' }" @click="setView('context')">
+          Context
+        </button>
+        <button class="tab" type="button" :class="{ 'tab--active': activeView === 'observe' }" @click="setView('observe')">
+          Observe
+        </button>
+        <button
+          class="tab"
+          type="button"
+          :class="{ 'tab--active': activeView === 'intercept' }"
+          @click="setView('intercept')"
+        >
+          Intercept
+        </button>
+        <button class="tab" type="button" :class="{ 'tab--active': activeView === 'trace' }" @click="setView('trace')">Trace</button>
+      </nav>
+
+      <main class="views kit-scroll">
+        <section class="view" :class="{ 'view--active': activeView === 'binding' }">
+          <section class="card">
+            <div class="card__header">
+              <h2>已授权能力</h2>
+            </div>
+            <div class="chips">
+              <span class="chip" v-if="permissions.length === 0">等待权限同步</span>
+              <span class="chip" v-for="permission in permissions" :key="permission">{{ permission }}</span>
+            </div>
+          </section>
+
+          <details class="details card">
+            <summary>怎么用（最短路径）</summary>
+            <ol class="steps">
+              <li>在任意 App 复制一段文字（聊天记录/网页正文都行）。</li>
+              <li>点输入框唤起 IME，点击剪贴板提示，进入「剪贴板动作」菜单。</li>
+              <li>选择 <span class="mono">Bridge Debugger · Inspect Clipboard</span>。</li>
+              <li>
+                回到本页面：应收到 <span class="mono">binding.invoke</span>，且下方「测试文本」会自动填入
+                <span class="mono">clipboardText</span>。
+              </li>
+            </ol>
+            <p class="hint">说明：这是调试功能件，用来验证宿主桥协议/权限/数据形状是否正确，不是业务功能件。</p>
+          </details>
+
+          <section class="card" id="bindingCard" :class="{ 'card--highlight': binding.highlight }">
+            <div class="card__header">
+              <h2>binding.invoke（宿主触发的动作）</h2>
+              <button class="ghost" type="button" @click="clearBinding">清空</button>
+            </div>
+            <div class="kv">
+              <div class="kv__row">
+                <span class="kv__key">trigger</span>
+                <span class="kv__value kv__value--mono">{{ bindingTrigger }}</span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">binding</span>
+                <span class="kv__value">{{ bindingName }}</span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">clipboardText</span>
+                <span class="kv__value kv__value--mono">{{ bindingClipboardText }}</span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">selectedText</span>
+                <span class="kv__value kv__value--mono">{{ bindingSelectedText }}</span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">pkg</span>
+                <span class="kv__value kv__value--mono">{{ bindingSourcePackage }}</span>
+              </div>
+            </div>
+            <div class="actions actions--tight">
+              <button class="ghost" type="button" @click="copyClipboardText">复制 clipboardText</button>
+              <button class="ghost" type="button" @click="copyBindingEnvelope">复制 raw envelope</button>
+            </div>
+            <details class="details" id="bindingDetails">
+              <summary>查看 raw envelope</summary>
+              <pre class="code code--scroll">{{ bindingPayloadText }}</pre>
+            </details>
+          </section>
+
+          <section class="card">
+            <div class="card__header">
+              <h2>输入回写 + 设置存储</h2>
+              <div class="card__actions">
+                <button class="ghost" type="button" @click="loadSettings" :disabled="!caps.canReadStorage">读取设置</button>
+                <button class="ghost" type="button" @click="saveSettings" :disabled="!caps.canWriteStorage">保存设置</button>
+              </div>
+            </div>
+            <label class="field">
+              <span class="field__label">测试文本</span>
+              <textarea
+                class="field__control field__control--textarea"
+                placeholder="写一段文本后，点击插入或替换，验证 input.insert / input.replace"
+                v-model="commitText"
+              ></textarea>
+            </label>
+            <div class="actions">
+              <button class="primary" type="button" @click="insertCommitText" :disabled="!caps.canInsert">插入</button>
+              <button class="ghost" type="button" @click="replaceCommitText" :disabled="!caps.canReplace">替换</button>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" :class="{ 'view--active': activeView === 'context' }">
+          <section class="card">
+            <div class="card__header">
+              <h2>上下文快照</h2>
+              <button class="ghost" type="button" @click="copyContextEnvelope">复制 JSON</button>
+            </div>
+            <pre class="code code--scroll">{{ contextPayloadText }}</pre>
+            <div class="context-meta">{{ contextMetaText }}</div>
+          </section>
+        </section>
+
+        <section class="view" :class="{ 'view--active': activeView === 'observe' }">
+          <section class="card">
+            <div class="card__header">
+              <h2>input.observe.best_effort</h2>
+            </div>
+            <div class="grid">
+              <label class="field">
+                <span class="field__label">throttleMs</span>
+                <input class="field__control" type="number" min="16" max="2000" v-model="observe.throttleMs" />
+              </label>
+              <label class="field">
+                <span class="field__label">maxChars</span>
+                <input class="field__control" type="number" min="16" max="1024" v-model="observe.maxChars" />
+              </label>
+            </div>
+            <div class="actions actions--tight">
+              <button class="primary" type="button" @click="startObserve" :disabled="observe.running || !caps.canObserve">Start</button>
+              <button class="ghost" type="button" @click="stopObserve" :disabled="!observe.running">Stop</button>
+              <span class="badge">{{ observe.running ? "running" : "stopped" }}</span>
+              <span class="badge badge--muted">context.sync={{ observe.contextSyncCount }}</span>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" :class="{ 'view--active': activeView === 'intercept' }">
+          <section class="card">
+            <div class="card__header">
+              <h2>send.intercept.ime_action</h2>
+            </div>
+            <div class="grid">
+              <label class="field">
+                <span class="field__label">timeoutMs</span>
+                <input class="field__control" type="number" min="100" max="5000" v-model="intercept.timeoutMs" />
+              </label>
+              <label class="field">
+                <span class="field__label">blockRegex（可选）</span>
+                <input class="field__control" type="text" placeholder="例如：泄密|转账" v-model="intercept.regex" />
+              </label>
+            </div>
+            <div class="grid">
+              <label class="field">
+                <span class="field__label">默认策略</span>
+                <div class="field__control kit-segmented" role="radiogroup" aria-label="interceptPolicy">
+                  <button
+                    class="kit-segmented__button"
+                    type="button"
+                    role="radio"
+                    :aria-checked="intercept.policy === 'allow' ? 'true' : 'false'"
+                    @click="setInterceptPolicy('allow')"
+                  >
+                    Allow
+                  </button>
+                  <button
+                    class="kit-segmented__button"
+                    type="button"
+                    role="radio"
+                    :aria-checked="intercept.policy === 'block' ? 'true' : 'false'"
+                    @click="setInterceptPolicy('block')"
+                  >
+                    Block
+                  </button>
+                  <button
+                    class="kit-segmented__button"
+                    type="button"
+                    role="radio"
+                    :aria-checked="intercept.policy === 'regex' ? 'true' : 'false'"
+                    @click="setInterceptPolicy('regex')"
+                  >
+                    Block if regex matches
+                  </button>
+                  <button
+                    class="kit-segmented__button"
+                    type="button"
+                    role="radio"
+                    :aria-checked="intercept.policy === 'manual' ? 'true' : 'false'"
+                    @click="setInterceptPolicy('manual')"
+                  >
+                    Manual per intent
+                  </button>
+                </div>
+              </label>
+              <div class="field field--inline">
+                <span class="field__label">本次 intent 决策</span>
+                <div class="actions actions--tight">
+                  <button class="primary" type="button" @click="resolvePendingDecision(true)" :disabled="!intercept.pendingDecision">
+                    Allow
+                  </button>
+                  <button class="ghost" type="button" @click="resolvePendingDecision(false)" :disabled="!intercept.pendingDecision">
+                    Block
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="actions actions--tight">
+              <button class="primary" type="button" @click="registerSendIntercept" :disabled="intercept.registered || !caps.canIntercept">
+                Register
+              </button>
+              <button class="ghost" type="button" @click="unregisterSendIntercept" :disabled="!intercept.registered">Unregister</button>
+              <span class="badge">{{ intercept.registered ? "registered" : "unregistered" }}</span>
+            </div>
+            <pre class="code code--scroll">{{ interceptLogText }}</pre>
+          </section>
+        </section>
+
+        <section class="view" :class="{ 'view--active': activeView === 'trace' }">
+          <section class="card" id="traceCard">
+            <div class="card__header">
+              <h2>Bridge Trace（raw envelopes）</h2>
+              <div class="card__actions">
+                <button class="ghost" type="button" @click="copyTrace">复制 JSON</button>
+                <button class="ghost" type="button" @click="clearTrace">清空</button>
+              </div>
+            </div>
+            <pre class="code code--scroll">{{ traceText }}</pre>
+            <p class="hint">
+              这里会记录宿主发来的所有桥接消息（含握手、权限同步、上下文同步、binding.invoke 等），便于把 raw 数据直接复制进 bug
+              报告。
+            </p>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../../../function-kit-runtime-sdk/dist/function-kit-runtime.js"></script>
+    <script src="../../../shared/vendor/petite-vue/petite-vue.iife.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>

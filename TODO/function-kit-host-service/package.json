@@ -1,0 +1,13 @@
+{
+  "name": "function-kit-host-service",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local HTTP host service for Function Kit chat auto reply via OpenClaw",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=22.16"
+  }
+}

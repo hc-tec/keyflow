@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "function-kit.ai-backend.response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "requestId",
+    "mode",
+    "backendClass",
+    "executionMode"
+  ],
+  "properties": {
+    "requestId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "responseId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "candidate-list",
+        "action-list",
+        "tool-result",
+        "blocked",
+        "error"
+      ]
+    },
+    "backendClass": {
+      "$ref": "./ai-backend-common.schema.json#/$defs/backendClass"
+    },
+    "executionMode": {
+      "$ref": "./ai-backend-common.schema.json#/$defs/executionMode"
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "$ref": "./ai-backend-common.schema.json#/$defs/candidate"
+      }
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "$ref": "./ai-backend-common.schema.json#/$defs/action"
+      }
+    },
+    "requiresConfirmation": {
+      "type": "boolean"
+    },
+    "toolCalls": {
+      "type": "array",
+      "items": {
+        "$ref": "./ai-backend-common.schema.json#/$defs/toolCall"
+      }
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "$ref": "./ai-backend-common.schema.json#/$defs/citation"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "usage": {
+      "$ref": "./ai-backend-common.schema.json#/$defs/usage"
+    },
+    "debugInfo": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "error": {
+      "$ref": "./ai-backend-common.schema.json#/$defs/backendError"
+    }
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "id": "tone-rewrite",
+  "name": "语气改写",
+  "version": "0.2.0",
+  "description": "一键把聊天内容改成更短、更长、更礼貌、更口语，或加上合适 emoji。",
+  "platforms": [
+    "android"
+  ],
+  "entry": {
+    "type": "browser-app",
+    "bundle": {
+      "html": "ui/app/index.html",
+      "script": "ui/app/main.js",
+      "style": "ui/app/styles.css"
+    },
+    "sdk": {
+      "project": "../../function-kit-runtime-sdk/package.json",
+      "browserBundle": "../../function-kit-runtime-sdk/dist/function-kit-runtime.js"
+    },
+    "surfaces": {
+      "android": {
+        "preferred": "bottom-sheet",
+        "fallback": "full-screen",
+        "peekHeightDp": 320
+      }
+    }
+  },
+  "runtimePermissions": [
+    "context.read",
+    "input.replace",
+    "ai.request"
+  ],
+  "bindings": [
+    {
+      "id": "tone.shorter",
+      "title": "更短",
+      "triggers": [
+        "manual",
+        "selection"
+      ],
+      "requestedPayloads": [
+        "selection.text",
+        "selection.beforeCursor",
+        "selection.afterCursor"
+      ],
+      "categories": [
+        "chat",
+        "writing",
+        "tone",
+        "rewrite"
+      ],
+      "preferredPresentation": "apply.headless",
+      "entry": {
+        "tone": "shorter",
+        "view": "apply"
+      }
+    },
+    {
+      "id": "tone.longer",
+      "title": "更长",
+      "triggers": [
+        "manual",
+        "selection"
+      ],
+      "requestedPayloads": [
+        "selection.text",
+        "selection.beforeCursor",
+        "selection.afterCursor"
+      ],
+      "categories": [
+        "chat",
+        "writing",
+        "tone",
+        "rewrite"
+      ],
+      "preferredPresentation": "panel.preview",
+      "entry": {
+        "tone": "longer",
+        "view": "preview"
+      }
+    },
+    {
+      "id": "tone.polite",
+      "title": "更礼貌",
+      "triggers": [
+        "manual",
+        "selection"
+      ],
+      "requestedPayloads": [
+        "selection.text",
+        "selection.beforeCursor",
+        "selection.afterCursor"
+      ],
+      "categories": [
+        "chat",
+        "writing",
+        "tone",
+        "rewrite"
+      ],
+      "preferredPresentation": "panel.preview",
+      "entry": {
+        "tone": "polite",
+        "view": "preview"
+      }
+    },
+    {
+      "id": "tone.casual",
+      "title": "更口语",
+      "triggers": [
+        "manual",
+        "selection"
+      ],
+      "requestedPayloads": [
+        "selection.text",
+        "selection.beforeCursor",
+        "selection.afterCursor"
+      ],
+      "categories": [
+        "chat",
+        "writing",
+        "tone",
+        "rewrite"
+      ],
+      "preferredPresentation": "panel",
+      "entry": {
+        "tone": "casual",
+        "view": "panel"
+      }
+    },
+    {
+      "id": "tone.emoji",
+      "title": "加个 emoji",
+      "triggers": [
+        "manual",
+        "selection"
+      ],
+      "requestedPayloads": [
+        "selection.text",
+        "selection.beforeCursor",
+        "selection.afterCursor"
+      ],
+      "categories": [
+        "chat",
+        "writing",
+        "tone",
+        "rewrite"
+      ],
+      "preferredPresentation": "panel.preview",
+      "entry": {
+        "tone": "emoji",
+        "view": "preview"
+      }
+    }
+  ],
+  "discovery": {
+    "launchMode": "panel-first",
+    "slash": {
+      "enabled": false
+    }
+  }
+}

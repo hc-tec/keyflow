@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "reply-generator.input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "current_message",
+    "conversation_context",
+    "persona"
+  ],
+  "properties": {
+    "current_message": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sender_role",
+        "text"
+      ],
+      "properties": {
+        "sender_role": {
+          "type": "string",
+          "enum": [
+            "other",
+            "self",
+            "system"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      }
+    },
+    "conversation_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recent_messages"
+      ],
+      "properties": {
+        "recent_messages": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "sender_role",
+              "text"
+            ],
+            "properties": {
+              "sender_role": {
+                "type": "string",
+                "enum": [
+                  "other",
+                  "self",
+                  "system"
+                ]
+              },
+              "text": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "contact_profile": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "persona": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tone"
+      ],
+      "properties": {
+        "tone": {
+          "type": "string"
+        },
+        "forbidden_promises": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "must_include": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "candidate_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "max_chars_per_candidate": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+:root {
+  /* kit overrides */
+}
+
+.shell {
+  width: min(100vw, 820px);
+  margin: 0 auto;
+}
+
+.code--scroll {
+  max-height: 340px;
+}
+
+@media (max-height: 560px) {
+  .eyebrow,
+  .subtitle {
+    display: none;
+  }
+}

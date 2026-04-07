@@ -1,0 +1,38 @@
+{
+  "current_message": {
+    "sender_role": "other",
+    "text": "今晚方便把方案发我吗？"
+  },
+  "conversation_context": {
+    "recent_messages": [
+      {
+        "sender_role": "self",
+        "text": "我下午还在改最后一版。"
+      },
+      {
+        "sender_role": "other",
+        "text": "行，那你改完同步我。"
+      }
+    ],
+    "contact_profile": {
+      "relationship": "coworker",
+      "prefers": [
+        "明确时间",
+        "简洁"
+      ]
+    }
+  },
+  "persona": {
+    "tone": "professional-friendly",
+    "forbidden_promises": [
+      "绝不承诺未确认的交付时间"
+    ],
+    "must_include": [
+      "如果给时间就要具体"
+    ]
+  },
+  "constraints": {
+    "candidate_count": 3,
+    "max_chars_per_candidate": 60
+  }
+}

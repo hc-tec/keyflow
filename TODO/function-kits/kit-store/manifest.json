@@ -1,0 +1,79 @@
+{
+  "id": "kit-store",
+  "name": "下载中心",
+  "version": "0.1.0",
+  "description": "发现、安装、卸载与管理 Function Kits。",
+  "platforms": ["android", "windows"],
+  "entry": {
+    "type": "browser-app",
+    "bundle": {
+      "html": "ui/app/index.html",
+      "script": "ui/app/main.js",
+      "style": "ui/app/styles.css"
+    },
+    "sdk": {
+      "project": "../../function-kit-runtime-sdk/package.json",
+      "browserBundle": "../../function-kit-runtime-sdk/dist/function-kit-runtime.js"
+    },
+    "surfaces": {
+      "windows": {
+        "preferred": "side-panel",
+        "fallback": "popup",
+        "minWidth": 360
+      },
+      "android": {
+        "preferred": "bottom-sheet",
+        "fallback": "full-screen",
+        "peekHeightDp": 360
+      }
+    },
+    "bridgeDoc": "ui/README.md"
+  },
+  "triggers": {
+    "manual": true,
+    "selectionRequired": false,
+    "contextTypes": ["system"]
+  },
+  "bindings": [
+    {
+      "id": "store.open",
+      "title": "打开下载中心",
+      "triggers": ["manual"],
+      "categories": ["store", "manage"],
+      "preferredPresentation": "panel"
+    }
+  ],
+  "discovery": {
+    "pinnable": true,
+    "recentEnabled": true,
+    "launchMode": "panel",
+    "slash": {
+      "enabled": true,
+      "commands": ["store"],
+      "aliases": ["kit-store", "download-center"],
+      "tags": ["store", "download", "install", "kits"],
+      "minQueryLength": 1
+    },
+    "ranking": {
+      "baseWeight": 1,
+      "recentBoost": 0.25,
+      "pinnedBoost": 0.35,
+      "contextBoost": 0,
+      "blockedPenalty": 0.6
+    }
+  },
+  "network": {
+    "mode": "host-proxy",
+    "allowAbsoluteUrls": true
+  },
+  "runtimePermissions": [
+    "storage.read",
+    "storage.write",
+    "network.fetch",
+    "files.pick",
+    "files.download",
+    "kits.manage",
+    "panel.state.write"
+  ]
+}
+

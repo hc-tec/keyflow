@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "messageId": "host-ready-ack-001",
+  "timestamp": "2026-03-21T20:45:00+08:00",
+  "kitId": "chat-auto-reply",
+  "surface": "panel",
+  "source": "host-adapter",
+  "target": "function-kit-ui",
+  "type": "bridge.ready.ack",
+  "payload": {
+    "sessionId": "session-chat-auto-reply-001",
+    "grantedPermissions": [
+      "context.read",
+      "input.insert",
+      "input.replace",
+      "candidates.regenerate",
+      "settings.open",
+      "storage.read",
+      "storage.write",
+      "panel.state.write"
+    ],
+    "hostInfo": {
+      "platform": "windows",
+      "runtime": "webview2",
+      "hostVersion": "0.1.0"
+    }
+  }
+}

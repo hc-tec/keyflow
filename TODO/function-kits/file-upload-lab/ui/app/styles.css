@@ -1,0 +1,24 @@
+:root {
+  /* kit overrides */
+}
+
+.shell {
+  width: min(100vw, 720px);
+  margin: 0 auto;
+}
+
+.views {
+  display: grid;
+  gap: var(--kit-space-2);
+}
+
+.log {
+  min-height: 120px;
+  max-height: 240px;
+}
+
+@media (max-height: 560px) {
+  .subtitle {
+    display: none;
+  }
+}

@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Auto Reply</title>
+    <link rel="stylesheet" href="../../../shared/ui/ime-panel.css" />
+    <link rel="stylesheet" href="../../../shared/ui/kit-shadcn.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app" class="shell kit-shell" v-cloak>
+      <header class="topbar">
+        <div class="kit-row">
+          <div>
+            <strong class="title">自动回复</strong>
+            <span class="subtitle">候选卡片 · 一键插入/替换 · 支持 AI 生成与手动改写</span>
+          </div>
+          <div class="kit-actions">
+            <button class="primary" type="button" @click="startAiChat" :disabled="!caps.canAiRequest">
+              {{ aiBusy ? "生成中..." : "AI 生成" }}
+            </button>
+            <button class="ghost" type="button" @click="refreshCandidates" :disabled="!caps.canRegenerate">换一批</button>
+          </div>
+        </div>
+      </header>
+
+      <section class="statusbar" :data-state="status.state">
+        <span>{{ status.text }}</span>
+        <span>{{ metaText }}</span>
+      </section>
+
+      <nav class="tabs" aria-label="views">
+        <button class="tab" type="button" :class="{ 'tab--active': activeTab === 'candidates' }" @click="setActiveTab('candidates')">
+          候选
+        </button>
+        <button class="tab" type="button" :class="{ 'tab--active': activeTab === 'context' }" @click="setActiveTab('context')">
+          上下文
+        </button>
+        <button class="tab" type="button" :class="{ 'tab--active': activeTab === 'settings' }" @click="setActiveTab('settings')">
+          设定
+        </button>
+      </nav>
+
+      <main class="views kit-scroll">
+        <section class="view" :class="{ 'view--active': activeTab === 'candidates' }">
+          <section class="card" v-if="hostModeNotice.visible">
+            <div class="card__header">
+              <h2>{{ hostModeNotice.badge }}</h2>
+            </div>
+            <p class="hint">{{ hostModeNotice.text }}</p>
+          </section>
+
+          <section class="card">
+            <div class="card__header">
+              <h2>已授权能力</h2>
+              <button class="ghost" type="button" @click="requestContext" :disabled="!caps.canContext">同步上下文</button>
+            </div>
+            <div class="chips chips--dense">
+              <span class="chip chip--empty" v-if="permissions.length === 0">暂无</span>
+              <span class="chip chip--granted" v-for="permission in permissions" :key="permission">{{ permission }}</span>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card__header">
+              <h2>当前消息</h2>
+              <span class="badge badge--muted" v-if="!context">等待宿主</span>
+            </div>
+            <div class="context-message">{{ context?.sourceMessage ?? "等待宿主上下文" }}</div>
+            <div class="context-meta">{{ context?.conversationSummary ?? "会话摘要将在这里显示。" }}</div>
+            <div class="chips">
+              <span class="chip chip--empty" v-if="personaChips.length === 0">暂无 persona</span>
+              <span class="chip" v-for="chip in personaChips" :key="chip">{{ chip }}</span>
+            </div>
+          </section>
+
+          <section class="card" v-if="candidatePanel.mode !== 'list'">
+            <div class="card__header">
+              <h2>{{ candidatePanel.title }}</h2>
+            </div>
+            <p class="hint">{{ candidatePanel.message }}</p>
+            <details class="details" v-if="candidatePanel.meta">
+              <summary>查看详情</summary>
+              <pre class="code code--scroll">{{ candidatePanel.meta }}</pre>
+            </details>
+          </section>
+
+          <section class="candidate-list" v-else>
+            <article class="card candidate-card" v-for="candidate in renderedCandidates" :key="candidate.id">
+              <div class="candidate-card__meta">
+                <span class="badge badge--muted">{{ candidate.tone }}</span>
+                <span class="badge badge--muted">{{ candidate.risk }}</span>
+              </div>
+              <p class="candidate-card__text">{{ candidate.text }}</p>
+              <p class="candidate-card__rationale" v-if="candidate.rationale">{{ candidate.rationale }}</p>
+              <div class="actions">
+                <button
+                  v-for="action in candidate.actions"
+                  :key="action.type"
+                  type="button"
+                  :class="action.type === 'replace' ? 'primary' : 'ghost'"
+                  :disabled="isCandidateActionDisabled(action.type)"
+                  @click="runCandidateAction(candidate, action)"
+                >
+                  {{ resolveActionLabel(action) }}
+                </button>
+              </div>
+            </article>
+          </section>
+        </section>
+
+        <section class="view" :class="{ 'view--active': activeTab === 'context' }">
+          <section class="card">
+            <div class="card__header">
+              <h2>上下文快照</h2>
+              <button class="ghost" type="button" @click="requestContext" :disabled="!caps.canContext">重新同步</button>
+            </div>
+            <div class="kv">
+              <div class="kv__row">
+                <span class="kv__key">当前消息</span>
+                <span class="kv__value">{{ context?.sourceMessage ?? "暂无" }}</span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">会话摘要</span>
+                <span class="kv__value">{{ context?.conversationSummary ?? "暂无" }}</span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">Persona</span>
+                <span class="kv__value">
+                  <span class="chips">
+                    <span class="chip chip--empty" v-if="personaChips.length === 0">暂无</span>
+                    <span class="chip" v-for="chip in personaChips" :key="chip">{{ chip }}</span>
+                  </span>
+                </span>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card__header">
+              <h2>即时指令</h2>
+            </div>
+            <label class="field">
+              <span class="field__label">改写方向</span>
+              <textarea
+                class="field__control field__control--textarea"
+                placeholder="例如：更短一点、强调时间边界、不要太强硬"
+                v-model="modifierText"
+              ></textarea>
+            </label>
+            <div class="actions">
+              <button class="primary" type="button" @click="applyModifier" :disabled="!caps.canRegenerate">按指令换一批</button>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" :class="{ 'view--active': activeTab === 'settings' }">
+          <section class="card">
+            <div class="card__header">
+              <h2>功能件设置</h2>
+              <button class="ghost" type="button" @click="loadStoredSettings" :disabled="!caps.canReadStorage">读取已保存设置</button>
+            </div>
+            <label class="field">
+              <span class="field__label">偏好语气</span>
+              <div class="field__control kit-segmented" role="radiogroup" aria-label="preferredTone">
+                <button
+                  class="kit-segmented__button"
+                  type="button"
+                  role="radio"
+                  :aria-checked="settings.preferredTone === 'balanced' ? 'true' : 'false'"
+                  @click="setPreferredTone('balanced')"
+                >
+                  平衡
+                </button>
+                <button
+                  class="kit-segmented__button"
+                  type="button"
+                  role="radio"
+                  :aria-checked="settings.preferredTone === 'direct' ? 'true' : 'false'"
+                  @click="setPreferredTone('direct')"
+                >
+                  更直接
+                </button>
+                <button
+                  class="kit-segmented__button"
+                  type="button"
+                  role="radio"
+                  :aria-checked="settings.preferredTone === 'warm' ? 'true' : 'false'"
+                  @click="setPreferredTone('warm')"
+                >
+                  更温和
+                </button>
+              </div>
+            </label>
+            <label class="field">
+              <span class="field__label">长期 persona 备注</span>
+              <textarea
+                class="field__control field__control--textarea"
+                placeholder="例如：对领导不要随便承诺时间；对亲密联系人可以更口语化"
+                v-model="settings.personaNote"
+              ></textarea>
+            </label>
+            <label class="field field--toggle">
+              <span class="field__label">默认把“替换”放在首位</span>
+              <input type="checkbox" v-model="settings.autoReplace" @change="onAutoReplaceChanged" />
+            </label>
+            <div class="actions">
+              <button class="primary" type="button" @click="saveSettings" :disabled="!caps.canWriteStorage">保存到功能件存储</button>
+              <button class="ghost" type="button" @click="openSettings" :disabled="!caps.canOpenSettings">打开宿主设置</button>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card__header">
+              <h2>宿主能力</h2>
+            </div>
+            <p class="hint">{{ hostCapabilitiesText }}</p>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../../../function-kit-runtime-sdk/dist/function-kit-runtime.js"></script>
+    <script src="../../../shared/vendor/petite-vue/petite-vue.iife.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>

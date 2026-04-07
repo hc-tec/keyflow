@@ -1,0 +1,1728 @@
+﻿完成任务记得git提交
+完成任务记得git提交
+完成任务记得git提交
+完成任务记得git提交
+完成任务记得git提交
+
+你可以启动multi-agent功能并行执行任务以及子任务
+你可以启动multi-agent功能并行执行任务以及子任务
+你可以启动multi-agent功能并行执行任务以及子任务
+你可以启动multi-agent功能并行执行任务以及子任务
+你可以启动multi-agent功能并行执行任务以及子任务
+
+            阅读文件必须采用utf-8
+我需要保持住任务进展的追踪，每完成一项任务，你记得记录下来各种文档路径
+别去看根目录下面的md啊！那是OpenClaw的md啊！！不是你要读取的
+
+2026-03-30 文档整理（Function Kit 制作流程）：
+- 总手册（做什么/怎么做/怎么验收/怎么推广/怎么维护 SDK 文档）：`TODO/function-kits/PLAYBOOK.md`
+- 场景与选题库：`TODO/function-kits/IDEA_BANK.md`
+- Brief 模板（写代码前必填）：`TODO/function-kits/BRIEF_TEMPLATE.md`
+- 宣发与增长流程：`TODO/function-kits/LAUNCH_PLAYBOOK.md`
+- Runtime SDK 文档索引（维护入口）：`TODO/function-kit-runtime-sdk/docs/INDEX.md`
+- 索引更新：
+  - `TODO/function-kits/INDEX.md`
+  - `TODO/function-kit-runtime-sdk/README.md`
+  - `product-thinking/INDEX.md`
+
+2026-03-31 功能件产品调研（20 个候选功能件）：
+- 调研包索引（总览 + 评分标尺 + 20 篇入口）：`TODO/function-kits/product-research/20260331/INDEX.md`
+- 产品设计/增长/用户研究 Skills 调研：`TODO/function-kits/product-research/20260331/00_product_design_skills_survey.md`
+- 20 个候选功能件的逐个调研文档：`TODO/function-kits/product-research/20260331/01_*.md` ~ `20_*.md`
+- SDK 文档修正（对齐当前事件名与 payload 形状）：`TODO/function-kit-runtime-sdk/docs/BROWSER_EXTENSION_STYLE_API_V2.md`
+- Bindings 入口与结果呈现调研（推荐 apply/preview/panel 三类呈现）：`TODO/function-kits/BINDINGS_UX_RESEARCH.md`
+- Bindings “结果呈现/多页面”补充（对标浏览器扩展，多 HTML 不做 P0）：
+  - 方案说明：`TODO/function-kits/BINDINGS_UX_RESEARCH.md`
+  - SDK 补充：`TODO/function-kit-runtime-sdk/docs/BINDINGS.md`
+- Android Host：headless binding 的 snackbar「打开」会下发 `intent.kind=open_invocation`（带 `invocationId/bindingId`），方便 kit 面板定位到这次执行：
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindow.kt`
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/status/StatusAreaWindow.kt`
+- 功能件中心（设置页）：按类别筛选 + 显示 categories + 展示 kit 的 bindings 列表（并支持按类别筛选 bindings）：
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitManagerFragment.kt`
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitDetailFragment.kt`
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values/strings.xml`
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values-zh-rCN/strings.xml`
+- 功能件动作（星星）窗口 UI 重写：横向类别 chips + 动作列表（subtitle 含 kitLabel + categories）：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindow.kt`（fcitx5-android commit `374ab0c`）
+- 功能件下载中心（安装/卸载/加载）：Settings → Function Kit → Download Center（支持 zip/URL 安装；Kit 详情页支持卸载；WebView `function-kits/<kitId>/...` 路径“用户安装优先，否则回退 assets 内置”）： 
+  - 安装器：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitPackageManager.kt`
+  - Registry 合并（assets + user-installed）：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitRegistry.kt`
+  - WebView 资源加载 override：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWebViewHost.kt`
+  - 下载中心 UI：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitDownloadCenterFragment.kt`
+  - 分发/IP（zip 可读的现实 + 对标浏览器扩展 + 建议路线）：`TODO/function-kits/DISTRIBUTION_AND_IP.md`
+  - fcitx5-android commit `75e6435`
+- 下载中心补充：Catalog（索引）安装模式：设置 Catalog URL（如 KitStudio `/api/kit-packages`）→ 刷新列表 → 一键安装（支持 sha256 校验 + 96MB 上限）：fcitx5-android commit `b89d7b7`
+- Catalog API 规范（供 KitStudio/服务端实现）：`TODO/function-kits/KIT_CATALOG_SPEC.md`
+
+2026-04-01 下载中心/商店 UI 作为“内置 Store Kit（Web UI）”调研：
+- 可行性与接口提案（`kits.manage` / `catalog.*` / 资源下载代理等）：`TODO/function-kits/store/DOWNLOAD_CENTER_AS_KIT.md`
+- 下载中心能力清单（P0/P1/P2 + API 映射 + 验收）：`TODO/function-kits/store/DOWNLOAD_CENTER_CAPABILITIES.md`
+- WebView 外部资源加载调研（WebView 能；宿主策略可控）：`TODO/function-kits/store/WEBVIEW_EXTERNAL_RESOURCES_RESEARCH.md`
+  - 2026-04-01 补充：补齐官方证据（Remote URLs、`loadUrl("https://...")` + `android.permission.INTERNET`、`setBlockNetworkLoads`、`WebViewAssetLoader` fall back to network）
+  - 2026-04-01 修正：统一文档措辞，把“WebView 禁外网”改成“Host 默认阻断 WebView 外网”（避免继续误导）
+  - 2026-04-01 进展：Android Host 已改为“允许外网子资源（图片/样式）+ CSP 默认禁外链脚本 + 外链在系统浏览器打开”：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWebViewHost.kt`
+- Kit UI 技术栈调研（Vue/组件库/构建产物本地化 + CSP 约束）：`TODO/function-kits/store/VUE_AND_COMPONENT_LIBS_IN_KIT_UI.md`
+- Runtime SDK：补齐 Store Kit 所需 API（`kit.kits.* / kit.catalog.* / kit.files.download/getUrl`）与协议枚举：
+  - SDK 实现：`TODO/function-kit-runtime-sdk/src/index.js`
+  - 类型声明：`TODO/function-kit-runtime-sdk/src/index.d.ts`
+  - SDK 文档：`TODO/function-kit-runtime-sdk/docs/STORE_KIT_APIS.md`
+  - 能力/权限清单：`TODO/function-kit-runtime-sdk/docs/CAPABILITIES_AND_PERMISSIONS.md`
+  - Host Bridge schema 扩展（新增 message types）：`TODO/function-kits/host-bridge/message-envelope.schema.json`
+- [ ] 功能件商店（Kit Store，真正可用的公共分发）：目录/搜索/下载/审核/下架/签名路线（优先无 VPS）
+  - 索引：`TODO/function-kits/store/INDEX.md`
+  - 方案与路线：`TODO/function-kits/store/STORE_PLAN.md`
+  - 依赖规范：`TODO/function-kits/KIT_CATALOG_SPEC.md`、`TODO/function-kits/KIT_PACKAGE_SPEC.md`、`TODO/function-kits/DISTRIBUTION_AND_IP.md`
+  - P0（无 VPS）：GitHub Store Repo（PR 审核）+ Actions 生成 `catalog.json/store-index.json` + Pages 托管 + Releases/Pages 托管 zip
+  - P1（真正信任锚）：商店签名（Host 安装前验签；类似浏览器扩展商店）
+- 已安装到真机：`adb -s <DEVICE_SERIAL> install -r -d --no-incremental "<WORKSPACE_ROOT>\\TODO\\ime-research\\repos\\fcitx5-android\\app\\build\\outputs\\apk\\debug\\org.fcitx.fcitx5.android-75e6435-arm64-v8a-debug.apk"`（versionName=75e6435）
+- 2026-03-31 构建 Catalog 版 APK：`TODO/ime-research/repos/fcitx5-android/app/build/outputs/apk/debug/org.fcitx.fcitx5.android-b89d7b7-arm64-v8a-debug.apk`（versionName=b89d7b7；若 `adb install` 报 `User rejected permissions`，按 2026-03-28 的 push+系统安装器流程处理）
+- 2026-04-01 真机脚本收敛/稳定性修复：
+  - `TODO/ime-research/scripts/run_fcitx5_android_real_device.ps1`：新增 core data 自检自愈（避免“键盘不可用/core data missing”；新增 `-SkipCoreDataSelfHeal` / `-CoreDataSelfHealTimeoutSeconds`）
+  - 文档同步：`TODO/ime-research/notes/20260322_android_real_device_runbook.md`、`TODO/ime-research/notes/INDEX.md`
+  - 删除未引用脚本：`TODO/ime-research/scripts/collect_apks.ps1`、`TODO/ime-research/scripts/docker_diag_fcitx5_android_wrapper.sh`
+
+2026-04-03 Tone Rewrite binding 对齐：
+- Host：为 `requestOpenInvocation` 增加 URL hash 冗余（`#fk_intent=open_invocation&invocationId=...&bindingId=...`），并在 attach/bridge.ready/headless 统一 flush，避免 binding.invoke 偶发丢失导致「语气/原文」错位：
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+- Host：补齐 “首次打开面板” 的 hash 传递（`host.initialize(entry + hash)`，避免先加载再 `loadUrl` 造成二次导航）；并在面板已加载时优先用 `evaluateJavascript` 更新 `location.hash`（避免整页 reload 丢 invocation）：
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+- Host：修复「功能件已启动并在后台缓存时，点击 binding 偶发无效」：此前 Host 在收到任意 UI envelope 后，会改用 `evaluateJavascript` 注入分发 host→ui envelope；但 WebView pause/后台时该注入并不可靠，导致 `binding.invoke`/`host.state.update` 丢失。现在强制始终走 `postWebMessage`（失败再 fallback 到 JS），保证缓存窗口也能稳定收到 binding 调用：
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWebViewHost.kt`
+- Host：补齐 kit 版本与安装来源（`manifest.version` + `isUserInstalled`），并做“bundled vs user-installed 按版本择新”；同时让 WebView 资源加载跟随该选择（bundled-only / installed-first），避免旧 installed 覆盖新 bundled：
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitManifest.kt`
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitRegistry.kt`
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWebViewHost.kt`
+- Kit：`tone-rewrite` 支持从 URL hash 解析 `open_invocation` 并自动读取当前输入 + 自动生成；同时修正 `useCurrentInput` 对 `selectedText` 的优先级：
+  - `TODO/function-kits/tone-rewrite/ui/app/main.js`
+- Kit 版本升级：`tone-rewrite` `0.1.6`；打包 zip：`TODO/function-kits/tmp/tone-rewrite-0.1.6.zip`（sha256=`9f78bdf06ea2d1474b8de3ccb90c7f132b30f7856094e059804da933eb24f581`）
+- Kit 版本升级：`tone-rewrite` `0.1.7`；打包 zip：`TODO/function-kits/tmp/tone-rewrite-0.1.7.zip`（已推送 `/sdcard/Download/tone-rewrite-0.1.7.zip`）
+- 真机核对：发现已安装的 `tone-rewrite` 仍停留在 `0.1.4`（`/data/user_de/0/org.fcitx.fcitx5.android.debug/files/function-kits/tone-rewrite/manifest.json`），会导致 binding 行为仍按旧逻辑表现；已通过 `adb push` 到 `/data/local/tmp/` + `adb shell run-as ... cp -r` 强制覆盖为 `0.1.7`，并 `adb shell am force-stop org.fcitx.fcitx5.android.debug` 重启使其生效
+- 已构建并推送修复版 APK：`TODO/ime-research/repos/fcitx5-android/app/build/outputs/apk/debug/org.fcitx.fcitx5.android-2a16026-arm64-v8a-debug.apk`（vivo 走 push+系统安装器）：`adb -s <DEVICE_SERIAL> push <apk> /sdcard/Download/fcitx-debug.apk` + `adb -s <DEVICE_SERIAL> shell am start -a android.intent.action.VIEW -d file:///sdcard/Download/fcitx-debug.apk -t application/vnd.android.package-archive`
+- 2026-04-04 继续修复：定位到“看起来没变化”并不等于链路没跑通；真机日志已出现 `binding.invoke -> context.request -> ai.request`，但缓存面板/重开时仍可能被旧 invocation 干扰。为此新增两层兜底：
+  - Host：binding 捕获显式带上 `preeditText`，并保留最近 16 条 binding invocation；`requestOpenInvocation(...)` 时若原 invocation 已经 headless 跑过，也会按 `invocationId` 重新入队并重新下发给面板，避免“打开后只剩 intent，没有原始文本参数”：
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingInvocationContext.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+  - Host 日志补强：`Enqueued binding invocation` / `Context request snapshot` 现都输出 `preeditLen`，方便继续核对“到底是 surrounding text 空，还是 preedit 丢了”：
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+  - Kit：`tone-rewrite` 增加 `expectedInvocationId` 防串台；`open_invocation` 先清掉旧结果，再只接受当前目标 invocation；若没有匹配的 `lastInvocation`，则回退读取当前输入并重新生成，避免后台缓存页被上一次动作污染：
+    - `TODO/function-kits/tone-rewrite/ui/app/main.js`
+  - Kit 版本升级：`tone-rewrite` `0.1.11`：
+    - `TODO/function-kits/tone-rewrite/manifest.json`
+    - ZIP：`TODO/function-kits/tmp/tone-rewrite-0.1.11.zip`（sha256=`EC52FCCDF377197EF257EC22BDFF8C667DF056DD58CAA12E25582EE9082CBC42`）
+  - 真机已重新安装：
+    - APK：`adb -s <DEVICE_SERIAL> push "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-cb929da-arm64-v8a-debug.apk" /data/local/tmp/fcitx-debug.apk` + `adb -s <DEVICE_SERIAL> shell pm install -r -d -g /data/local/tmp/fcitx-debug.apk`
+    - Kit：`adb -s <DEVICE_SERIAL> push "<WORKSPACE_ROOT>\TODO\function-kits\tone-rewrite" /data/local/tmp/tone-rewrite` + `adb -s <DEVICE_SERIAL> shell run-as org.fcitx.fcitx5.android.debug cp -r /data/local/tmp/tone-rewrite /data/user_de/0/org.fcitx.fcitx5.android.debug/files/function-kits/tone-rewrite`
+    - 当前真机 `tone-rewrite` 版本已核对为 `0.1.11`
+- 2026-04-04 Emulator 可视化复测（不再依赖用户做真机回归）：
+  - 手动验证产物：`TODO/ime-research/artifacts/manual/emulator/20260404_100141_tone_binding_manual/NOTES.md`
+  - 关键截图：
+    - `TODO/ime-research/artifacts/manual/emulator/20260404_100141_tone_binding_manual/screen_230_headless_open_corrected.png`
+    - `TODO/ime-research/artifacts/manual/emulator/20260404_100141_tone_binding_manual/screen_240_warm_try_concise.png`
+  - 关键日志：`TODO/ime-research/artifacts/manual/emulator/20260404_100141_tone_binding_manual/logcat_functionkit_round3.txt`
+  - 真正根因不是 Host 没传参数，而是 `tone-rewrite` UI 用了 `v-scope="App()"`，导致 petite-vue 把初始化对象拷进 scope 后，`binding.invoke/open_invocation` 回调还在修改原对象，页面自然一直停在默认态。
+  - Kit 修复：
+    - `TODO/function-kits/tone-rewrite/ui/app/index.html`
+    - `TODO/function-kits/tone-rewrite/ui/app/main.js`
+    - `TODO/function-kits/tone-rewrite/manifest.json`
+  - 修复后结果（模拟器已人工确认）：
+    - `更礼貌` headless 点击后，`OPEN` 进入页面时会显示 `动作：更礼貌`，并自动带入原文
+    - `tone-rewrite` 已在后台缓存时，点击 `更简短` 会正确选中 `更简短` Tab，并自动带入原文
+  - Kit 版本升级：`tone-rewrite` `0.1.16`
+- 2026-04-04 Binding 触发语义收敛（不再把“手动 / 复制 / 选中”硬拆成三套动作库存）：
+  - Host：文本型 binding（声明文本 payload，或声明 `selection/clipboard` trigger）现在默认三入口统一暴露：`manual + selection + clipboard`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingRegistry.kt`
+  - Host：文本型 binding 在触发时默认同时携带 `selection.* + clipboard.text`，不再按 trigger 先砍掉一半上下文
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+  - Kit：`tone-rewrite` 现在会按本次 `trigger` 选择主输入源；若是 `clipboard` 触发则优先用剪贴板文本
+    - `TODO/function-kits/tone-rewrite/ui/app/main.js`
+    - `TODO/function-kits/tone-rewrite/ui/app/index.html`
+    - `TODO/function-kits/tone-rewrite/manifest.json`
+  - SDK 文档同步：`TODO/function-kit-runtime-sdk/docs/BINDINGS.md`
+  - Kit 版本升级：`tone-rewrite` `0.1.17`
+  - 真机已更新：
+    - APK：`adb -s <DEVICE_SERIAL> install --no-incremental -r -d "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-cb929da-arm64-v8a-debug.apk"`（成功；`lastUpdateTime=2026-04-04 13:50:34`）
+    - Kit：`adb -s <DEVICE_SERIAL> push "<WORKSPACE_ROOT>\TODO\function-kits\tone-rewrite" /data/local/tmp/tone-rewrite` + `adb -s <DEVICE_SERIAL> shell run-as org.fcitx.fcitx5.android.debug cp -r /data/local/tmp/tone-rewrite files/function-kits/tone-rewrite`
+    - 当前真机 `tone-rewrite` 版本已核对为 `0.1.17`
+
+2026-03-24 调试补充：
+- Android 远程调试设备已确认可用：`adb connect <DEVICE_SERIAL>
+- 当前已验证设备标识：`<DEVICE_SERIAL>`，机型 `V2244A`
+- 后续 Android 真机安装、`logcat`、崩溃复现优先走该远程 adb 入口
+- 2026-03-24 进一步确认：远程设备在重装前实际上没有安装当前 debug 包，之前读取到的是旧 `crash` buffer，不是新复现
+- 已执行：`adb -s <DEVICE_SERIAL> install --no-incremental -r -d "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-9fa072d-arm64-v8a-debug.apk"`
+- 2026-03-25 已执行：`adb -s <DEVICE_SERIAL> install --no-incremental -r -d "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-aa5c0cb-arm64-v8a-debug.apk"`
+- 2026-03-25 已执行：`adb -s <DEVICE_SERIAL> install --no-incremental -r -d "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-3331502-arm64-v8a-debug.apk"`（功能件工具栏：固定尺寸 + 超出水平滚动，避免图标被挤压；fcitx5-android commit `512bcd8`）
+- 2026-03-27 已执行：`.\gradlew.bat :app:assembleDebug`（fcitx5-android commit `fbefb16`）
+- 2026-03-27 已执行：`adb -s <DEVICE_SERIAL> install --no-incremental -r -d "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-fbefb16-arm64-v8a-debug.apk"`（包含：功能件窗口「界面放大」按钮、IME 收起/离开自动复位、`File Upload Lab` 功能件、`files.pick` + `network.fetch bodyRef`）
+- 2026-03-27 bugfix：`files.pick` 不再因 IME 收起/窗口 detach 被取消；文件选择器 Activity 独立 task，选择文件后不会落回 IME 主界面；并已重新安装到真机：`adb -s <DEVICE_SERIAL> install --no-incremental -r -d "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-fbefb16-arm64-v8a-debug.apk"`
+- 2026-03-27 修复：复制 chip 改为“底部附近”后在 IME 显示时会被键盘盖住（看起来像消失）；现在改为：IME 显示时 chip 自动定位在 IME 上沿之上，IME 未显示时贴近屏幕底部（snackbar 风格）
+- 2026-03-27 修复：`files.pick` 选择文件完成后不再 `moveTaskToBack(true)`，避免“选完文件跳到 IME App / QQ 键盘被关 / 选择被取消”的体验问题；并已重新装机（fcitx5-android `7082d42`）：`adb -s <DEVICE_SERIAL> push "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-7082d42-arm64-v8a-debug.apk" /data/local/tmp/fcitx-debug.apk` + `adb -s <DEVICE_SERIAL> shell pm install -r -d -g /data/local/tmp/fcitx-debug.apk`
+- 2026-03-27 修复：当通过“复制悬浮窗/通知”拉起 IME（focus bridge overlay EditText）时，所有 `commitText` 都写进了不可见的 bridge 输入框，用户感觉“点击剪贴板条目/候选卡片完全没反应”。现改为：bridge 模式下点击“插入/替换/粘贴”会先提示并缓存文本，等用户点到真实输入框后自动写回；同时在进入真实 editor 时自动移除 bridge overlay，避免后续误写。fcitx5-android commit `365b558`，对应 APK：`org.fcitx.fcitx5.android-365b558-arm64-v8a-debug.apk`（vivo 若 adb install 报 `User rejected permissions`，可用 `adb push` 到 `/sdcard/Download/fcitx-debug.apk` 后在手机上点安装）
+- 2026-03-27 bugfix：Function Kit 在 Android 打包时遗漏了共享 UI 样式，导致 WebView 运行时报 `WebViewAssetLoader FileNotFound: function-kits/_shared/ui/ime-panel.css`（File Upload Lab 等 kit 直接报错）。后续发现 Android 资产打包会忽略以下划线开头的目录，因此已将 `_shared` 目录更名为 `shared` 并同步更新所有 kit 的引用与 `syncFunctionKitAssets`（见 2026-03-28 记录）。
+- 2026-03-28 bugfix：修复 `File Upload Lab` / `network.fetch` 在 JS 侧出现 `request timeout` 时 Android 侧可能“无响应”的问题：`network.fetch` 现在会捕获所有异常并返回 `bridge.error`（避免 UI 永久等不到回包）；同时对响应 body 做 512KB 截断并返回 `bodyBytes/bodyTruncated`，避免大 payload 导致 WebView bridge 丢消息。fcitx5-android commit `c19109a`，APK：`org.fcitx.fcitx5.android-c19109a-arm64-v8a-debug.apk`
+- 2026-03-28 Runtime SDK：为长耗时请求提供更合理的默认超时（`network.fetch` 60s、`files.pick` 5min、`ai.*` 放宽），避免真实网络/文件操作被 8s 默认值误杀。OpenClaw repo commit `ba30364`
+- 2026-03-28 bugfix：Android 资产打包会忽略以下划线开头的目录，导致 `function-kits/_shared/...` 永远进不了 APK（WebViewAssetLoader 反复报 FileNotFound）。现将 `_shared` 更名为 `shared` 并更新所有 kit 引用，同时更新 `syncFunctionKitAssets` 同步路径：fcitx5-android commit `21989d7` + OpenClaw repo commit `acf9a78`
+- 2026-03-28 vivo 真机（V2244A）安装补充：`adb install` 可能被系统安全弹窗拦截并返回 `INSTALL_FAILED_ABORTED: User rejected permissions`；此时可改用“推送到 Download + 拉起系统安装器 UI”的方式：`adb -s <DEVICE_SERIAL> push <apk> /sdcard/Download/fcitx-debug.apk` + `adb -s <DEVICE_SERIAL> shell am start -a android.intent.action.VIEW -d file:///sdcard/Download/fcitx-debug.apk -t application/vnd.android.package-archive`（用户在手机上点安装）
+- 2026-03-28 已构建并推送修复版 APK（含 `assets/function-kits/shared/ui/ime-panel.css`）：`.\gradlew.bat :app:assembleDebug -PbuildABI=arm64-v8a`（fcitx5-android `21989d7`）
+  - 真机推送：`adb -s <DEVICE_SERIAL> push "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-21989d7-arm64-v8a-debug.apk" /sdcard/Download/fcitx-debug.apk` + `adb -s <DEVICE_SERIAL> shell am start -a android.intent.action.VIEW -d file:///sdcard/Download/fcitx-debug.apk -t application/vnd.android.package-archive`
+- 新鲜启动日志已确认当前 build 能正常加载 `androidfrontend` / `androidkeyboard` / `quickphrase` / `clipboard` / `unicode` / `notifications` / `pinyinhelper` / `pinyin`，当前这台远程设备上未复现先前那条启动即闪退
+- 2026-03-29 构建补充：若 `:app:assembleDebug` 报 `Could NOT find Gettext (missing: msgmerge/msgfmt)`，临时在当前 shell 注入 MSYS2 路径即可：`$env:PATH = "C:\msys64\ucrt64\bin;$env:PATH"`
+- 2026-03-29 已执行：`adb -s <DEVICE_SERIAL> install --no-incremental -r -d "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-7758293-arm64-v8a-debug.apk"`（功能件：移除设置页「远程推理」；per-kit 权限/固定；固定优先 + LRU；任务中心一键入口 + badge + 用户视图）
+- 2026-03-29 已执行：`adb -s <DEVICE_SERIAL> install --no-incremental -r -d "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-10a2021-arm64-v8a-debug.apk"`（修复：功能件启用/禁用、固定/取消固定后，IME 工具栏入口不刷新的问题）
+
+
+TODO中，你需要非常仔细的完成任务，下面每一个任务都是十分有挑战性的，最后的结果非常不容易得到，你需要全心全意的去完成这些任务。任务可能会被拆分成若干个子任务，你可以在TODO目录下面继续创建新的目录结构以及TODO.md以此来跟踪任务进展。总之，一切方便与任务规划的、任务执行的、任务跟踪的你都有十足的自主性。完成任务记得git提交。
+
+完成任务记得git提交
+
+- [x] 接下来你需要根据你所说的具体去调研，你可以去github上找找看相关的输入法开源项目，也可以看看有没有AI输入法的都可以去看看，接着就是一个非常非常耗时间的可行性研究过程。你需要切切实实的拉取项目，在本地运行！这可能非常耗时，但是你必须得去做的任务。为了不影响本地环境，你可以用docker来运行项目。
+
+  - 入口索引：`TODO/ime-research/notes/INDEX.md`
+  - 关键成果（Docker 实测可复现）：
+    - Trime（arm64-v8a）Debug APK 构建成功：`TODO/ime-research/logs/20260320_trime_assembleDebug_docker_arm64_live.log`
+    - Fcitx5-Android（arm64-v8a）Debug APK 构建成功：`TODO/ime-research/logs/20260320_fcitx5-android_assembleDebug_docker_arm64_fix-boostinclude2_live.log`
+
+- [x] 我还想到一种应用场景，那就是输入法插件的接入。总体来说，输入法既可以接入插件，比如微信聊天记录获取以及日程管理、用户画像，输入法提供一个便捷入口，可以快速打开用户画像以及最近与该用户聊过的内容或者说注意事项，任务进度跟踪（日程管理类型）等等；还可以提供笔记库接入，选中的任何文字都可以右键立即保存到知识库中，PC端和手机端皆是如此。这些内容的接入都是以插件的形式接入的，既可以是api接入，也可以是UI形式的接入，能够灵活的利用上输入法自带的任何功能。用户可以自由安装需要的插件。你需要帮我看看这类场景到底合不合理，可行性是什么，杀手级别场景是什么（需要真正通用的场景）。
+
+  - 分析文档：`product-thinking/ime-plugin-ecosystem.md`
+
+- [x] 上一个任务不是提到了插件系统吗？那么问题来了，对于跨平台的话有没有好的方案？毕竟，要是一套插件，windows版本输入法和android端输入法不支持的话，那开发的复杂度岂不是相当相当高？一个插件还得开发两次？那怎么可行？
+
+  - 方案草案：`product-thinking/ime-plugin-cross-platform.md`
+
+- [x] 你忘记了AI Agent了吗？你再仔细看看我最初与AI是如何探讨的，看看OpenClaw的集成如何工作，skills又是如何适应进插件系统的。尤其是场景，你别忘了场景的魔力！
+
+  - 产出：`product-thinking/ime-agent-openclaw-integration.md`
+
+- [x] 接下来的问题是，怎么跑，跑什么，这是个大问题！一旦失去你的上下文清空，你会丢失掉所有记忆！所以你必须在本文件中记录下来到底是跑哪个项目，然后又是如何跑的。windows以及android端目前先支持上来，插件，我还是叫它功能件吧，避免它与输入法的插件混淆了。功能件你可以理解为一个类似于浏览器插件的一个东西，它可以拥有自己的UI，执行自己的功能，比如说后续的一个插件可能是微信自动回复插件，它可以利用一个skills来完成功能，首先是微信消息获取的skills，再就是当前用户的个性化skills（全局个性化以及与某不同人聊天发的内容不一样！！！），利用这类能力，功能件把最终的结果json拿到手来，进行候选展示，点击其中一个按钮就可以把消息添加到输入框中，用户后续可以发送或者修改，或者说用户觉得不满意就换一批。这就是一个功能件，后续还可以有非常非常之多的功能件，比如说，连接到codex cli，输入法中点击对应的按钮进入对应的面板栏。其中有非常多的问题需要解决，我目前仅仅想到两个，1. 跨平台问题，插件通用问题，2. 输入法中的功能件如果也有输入框需要输入的话，这种情况如何处理得好。其他问题还多的是。除此之外，还有个极其重要的问题亟需解决，那就是自动化测试问题。自动化测试永远都是一个非常非常关键的问题，你必须要支持！自动化测试不仅仅是基础的单元测试！还有真正的端到端测试，你需要想办法实现真正的模拟环境，而不是每次都由我运行来找bug！
+
+  - 主线运行/功能件/测试总方案：`TODO/ime-research/notes/20260321_run_baseline_functionkit_testing.md`
+  - 当前固定主线：
+    - Android：`TODO/ime-research/repos/fcitx5-android`
+    - Windows：`TODO/ime-research/repos/rime-weasel`
+    - Agent/Skills：`TODO/ime-research/repos/openclaw`（只用 Agent，不接 Channel）
+  - 固定入口脚本（收敛后）：
+    - Android 真机部署 / 调试（唯一推荐入口）：`TODO/ime-research/scripts/run_fcitx5_android_real_device.ps1`
+      - 说明：脚本内会自动选择本地 Gradle 或 Docker；并在 `run` 模式做 core data 自检自愈（避免“键盘不可用/core data missing”）。
+    - Android Function Kit contract automation（自动化/CI）：`TODO/ime-research/scripts/run_fcitx5_android_functionkit_contract.ps1`
+    - Windows：`TODO/ime-research/scripts/run_rime_weasel_build.ps1`
+    - Agent-only：`TODO/ime-research/scripts/run_openclaw_agent_only.ps1`
+  - 构建后端（一般不直接运行，供入口脚本调用）：
+    - Android 本地 Gradle：`TODO/ime-research/scripts/run_fcitx5_android_debug_local.ps1`
+    - Android Docker：`TODO/ime-research/scripts/run_fcitx5_android_debug_docker.ps1`
+  - KitStudio（类似“微信开发者工具”的 Function Kit 调试器 / 宿主模拟器 / DevTools）：
+    - repo：`TODO/ime-research/repos/kit-studio`
+    - 启动：`powershell -ExecutionPolicy Bypass -File .\\scripts\\dev.ps1`
+    - E2E（agent-browser / vercel-labs）：`powershell -ExecutionPolicy Bypass -File .\\scripts\\e2e.ps1`（说明：脚本内部用 `npx agent-browser` 跑 CLI E2E；不是 Codex skills）
+    - UI：shadcn/ui 风格（Tailwind + tokens）+ Light/Dark/System 主题切换：`TODO/ime-research/repos/kit-studio/web/index.html`
+    - Runner（IME 视角拟真）：视角预设 + 假手机屏幕 + Host Events（`binding.invoke` / `send.intercept.ime_action.intent`）+ best-effort `context.sync` + `composer.state.sync`：`TODO/ime-research/repos/kit-studio/web/app.js`
+    - Remote Attach（HTTP/SSE 骨架）：`TODO/ime-research/repos/kit-studio/src/server.mjs`
+    - E2E 证据（多截图 + `--annotate`）：`TODO/ime-research/repos/kit-studio/scripts/e2e.ps1`
+    - E2E 证据（截图，已忽略）：`TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e.png`
+  - Android 自动化测试实证：
+    - `doctor`：`TODO/ime-research/logs/20260322_013016_fcitx5-android_functionkit_contract_doctor.log`
+    - `build`：`TODO/ime-research/logs/20260322_030629_fcitx5-android_functionkit_contract_build.log`
+    - `run`：`TODO/ime-research/logs/20260322_031725_fcitx5-android_functionkit_contract_run.log`
+    - `result`：`TODO/ime-research/logs/20260322_031725_fcitx5-android_functionkit_contract_result.json`
+
+- [ ] 把 Windows 安装验证、TestHost 与 OpenClaw auth 真正闭环
+
+  - 已完成的新增落点：
+    - Windows 安装 / 注册验证文档：`TODO/ime-research/notes/20260321_windows_install_validation.md`
+    - Windows 安装验证脚本：`TODO/ime-research/scripts/verify_rime_weasel_install.ps1`
+    - Windows TestHost 基线文档：`TODO/ime-research/notes/20260321_windows_testhost_baseline.md`
+    - Windows TestHost 固定脚本：`TODO/ime-research/scripts/run_windows_testhost.ps1`
+    - Windows IME E2E 基线文档：`TODO/ime-research/notes/20260321_windows_ime_e2e_baseline.md`
+    - Windows IME E2E 固定脚本：`TODO/ime-research/scripts/run_windows_ime_e2e.ps1`
+    - OpenClaw auth/status 入口：`TODO/ime-research/scripts/run_openclaw_agent_only.ps1 -Mode status`
+    - 当前机器验证证据：`TODO/ime-research/logs/20260321_rime-weasel_install_validation.json`
+    - OpenClaw agent-only 最小调用面：`TODO/ime-research/notes/20260321_openclaw_agent_only_surface.md`
+  - 当前真实状态：
+    - `rime-weasel` 已完成构建、installer 打包、机器级安装 / 注册验证
+    - Windows `TestHost` 已完成最小可构建基线并跑通 smoke
+    - Windows 真打字 E2E 骨架已补上：自动聚焦 + live snapshot + 按键诊断都已落地
+    - `2026-03-22` 已补上 `WeaselImeProfileActivator` 修正并验证：
+      - 记录：`TODO/ime-research/notes/20260322_windows_ime_e2e_activator_fix.md`
+      - build：`TODO/ime-research/logs/20260322_windows_ime_e2e_build_after_activator_fix.log`
+      - run：`TODO/ime-research/logs/20260322_windows_ime_e2e_run_after_activator_fix.log`
+      - result：`TODO/ime-research/logs/20260322_windows_ime_e2e_result_after_activator_fix.json`
+    - `activation_before_launch` / `activation_after_focus` 现在都已转绿：
+      - `Succeeded=true`
+      - `HResultHex=0x00000000`
+      - 激活后 profile 已明确匹配小狼毫 CLSID / GUID
+    - 用户已手工确认：当前会话消息已可通过小狼毫输入
+    - 小狼毫已经进入当前用户输入法列表，但默认输入法覆盖仍是搜狗
+    - `OpenClaw` auth / `status` / host service 已经转绿，不再是当前 Windows 闭环阻塞
+  - 还没完成的关键点：
+    - Windows IME 激活 helper 的“COM 定义错误”已修掉，但 Windows 真打字 E2E 仍未闭环：
+      - 当前已不再是 `0x80070057`
+      - 现在剩余的是输入组合/候选上屏与焦点稳定性问题
+    - Windows 真正打字上屏 E2E 仍未完成：
+      - `keybd_event` 已不再是完全打空，部分尝试已能让 `TestHost` 收到 `KeyPress`
+      - 但结果仍然没有形成 `nihao -> 你好`
+      - 某些尝试里焦点会漂移到 `multi-line` 或直接掉到 `none`
+      - 2026-03-22 焦点就绪修正后，runner 已改为等待 `browser_ready=true` + `form_contains_focus=true` + `active_host==startupFocusTarget` 再开始打字，详见：`TODO/ime-research/notes/20260322_windows_focus_readiness_fix.md`
+      - 不切换 IME 的注入验证里，`sendkeys-direct-number-1` 已能在稳定焦点下把输入送进 `TestHost`，结果见：`TODO/ime-research/logs/20260322_windows_testhost_focus_injection_result_v2.json`
+    - `SendKeys` 的 `SHIFT` 尝试当前仍是脚本错误：
+      - `System.ArgumentException: 关键字“SHIFT”无效。`
+    - Windows IME 激活 + 真打字 E2E 仍未闭环；最新验证见：
+      - `TODO/ime-research/notes/20260322_windows_focus_readiness_fix.md`
+      - `TODO/ime-research/notes/20260322_windows_ime_e2e_activator_fix.md`
+      - `TODO/ime-research/notes/20260322_openclaw_deepseek_setup.md`
+      - `TODO/ime-research/notes/20260322_functionkit_host_service_android_validation.md`
+      - `TODO/ime-research/logs/20260322_functionkit_host_service_openclaw_status.json`
+      - `TODO/ime-research/logs/20260322_functionkit_host_service_render_smoke.json`
+
+- [x] UI我希望能够像浏览器UI那样子的！而不是UI schema这种东西
+
+  - 调研与结论：`TODO/ime-research/notes/20260321_browser_like_functionkit_ui_research.md`
+  - 功能件索引：`TODO/function-kits/INDEX.md`
+  - 首个浏览器式功能件骨架：`TODO/function-kits/chat-auto-reply/README.md`
+  - Runtime SDK 仓库种子：`TODO/function-kit-runtime-sdk/README.md`
+  - Windows WebView2 Host PoC：`TODO/ime-research/notes/20260321_windows_functionkit_host_poc.md`
+  - Windows Function Kit contract runner：`TODO/ime-research/notes/20260321_windows_functionkit_contract_runner.md`
+  - 固定入口脚本：`TODO/ime-research/scripts/run_windows_functionkit_host.ps1`
+  - Android `fcitx5-android` Function Kit 窗口基线：`TODO/ime-research/notes/20260322_android_functionkit_window_baseline.md`
+  - Android Function Kit contract runner：`TODO/ime-research/notes/20260322_android_functionkit_contract_runner.md`
+  - Android 真机运行手册：`TODO/ime-research/notes/20260322_android_real_device_runbook.md`
+
+- [x] 我已经看到了隐藏得非常深的Function Kit了，隐藏的太深了属实，android的这个键盘，在【更多】这一块不是可以展开 
+  吗？然后这一行的内容非常非常重要！！！1. 默认就应该展开，或者说可以用户自己设置好来 2. 展开之后若干Function 
+  Kit应该和什么剪切板、向左、向右的功能是并列关系，3. 每个Function Kit都应该有一个图标，就像浏览器插件那样子  
+  4. 目前的自动回复功能件似乎完全不管用，是怎么回事？网络问题吗？还是什么问题，目前的项目部署在主机上，而不是 
+  android上，这里涉及到一个远程连接问题，是不是有这个可能？ 5. 如何给Function Kit设置各种权限，目前也没有看到 
+  任何入口 6. 实际体验下来目前的问题相当相当多，你看看如何解决好来
+
+  - 2026-03-23 当前执行中：
+    - [x] 重构 Android 键盘中的 Function Kit 快捷入口，使其在工具栏中成为更显式的一等入口，而不是继续弱化为 `More` 兜底入口
+    - [x] 统一 Function Kit 快捷入口在工具栏与 `More` 面板中的图标/文案语义，改成更贴近“浏览器扩展/功能件”的表达
+    - [x] 为入口排序/展示逻辑补上 JVM 单元测试，避免后续改动再次把 Function Kit 藏回去
+    - [x] 完成 Android 编译验证，并把本轮实现文档、验证记录、提交记录回填到 `TODO/TODO.md`
+    - [x] 把“默认展开工具栏”直接接入 Function Kit 设置页，避免用户还要绕到键盘设置里找
+    - [x] 让 Function Kit 设置页明确区分“入口已固定但默认仍隐藏”与“键盘打开即能看到”这两种状态
+    - [x] 为默认展开可见性逻辑补上 JVM 单元测试，并完成编译验证
+    - [x] 拆掉 Android `FunctionKitDefaults` 对单一样板 `chat-auto-reply` 的硬编码，为多 Function Kit 并列入口准备注册/发现基础
+    - [x] 让多个固定 Function Kit 真正与 `Clipboard / Text Editing / Undo / Redo` 并列展示，而不是仍然只有一个总入口按钮
+    - [x] 补一个第二真实 Function Kit 样板，让多入口在真机上真正可见，而不是继续停留在结构准备阶段
+    - [x] 让多个 Function Kit 工具栏按钮具备可区分的可视 monogram，而不是仍然全部显示成同一扩展图标
+    - [x] 让 Function Kit 支持浏览器插件式图标资产，至少能在 Android 原生入口里读取并显示 `ico/png` 等常见图片格式
+
+  - 2026-03-22 追加验证：
+    - `Function Kit host service` 已能经由 `OpenClaw main agent` 返回真实 DeepSeek 候选：`TODO/ime-research/logs/20260322_functionkit_host_service_render_smoke.json`
+    - Android 主线脚本已重新跑通 `arm64-v8a` / `x86_64` Docker Debug 构建：
+      - `TODO/ime-research/logs/20260322_fcitx5-android_app_assembleDebug_docker_arm64-v8a_rerun.log`
+      - `TODO/ime-research/logs/20260322_fcitx5-android_app_assembleDebug_docker_x86_64_rerun.log`
+    - Android 接入脚本已在当前环境的 `emulator-5554` 上完成启用/切换/启动：`TODO/ime-research/logs/20260322_155630_fcitx5-android_real_device_run.json`
+    - 但 Android 侧远程推理默认仍关闭，真机 / 模拟器要先做 `adb reverse tcp:18789 tcp:18789`，再在 AI 设置页开启 `Enable remote inference`
+    - 最新联调记录：`TODO/ime-research/notes/20260322_functionkit_host_service_android_validation.md`
+  - 2026-03-23 追加进展：
+    - Android `Function Kit` 设置页已补上“当前运行方式 / 远程宿主路由 / 键盘入口 / 已授予能力”状态总览，不再只是通用开关列表
+    - 远程接入提示已明确区分 `localhost/adb reverse` 与 `Tailscale/LAN` 两种接入方式，降低 Android 访问主机宿主服务的理解成本
+    - 权限摘要已按 `本地 / 远程与 AI / 独立编辑框` 三组展示，并直接显示哪些能力被关掉
+    - Android 主设置已新增共享 `AI` 入口，Function Kit 可直接跳转到 AI 设置页
+    - `ai.chat` 不再是占位符；当远程宿主关闭但 Android 共享 AI 已配置完成时，`chat-auto-reply` 可直接走 Android 本地配置的大模型接口
+    - `network.fetch`、`ai.chat`、`ai.agent.*` 已拆成独立权限语义：前两者不再被电脑远程宿主开关错误绑死，`agent` 仍保持远程依赖
+    - 2026-03-25 方向调整：Detached Composer（可见草稿 UI）已从主线撤回，当前改为 Embedded Input Bridge（功能件输入框可输入）
+      - 说明文档：`TODO/ime-research/notes/20260325_functionkit_input_bridge.md`
+      - `composer.*` 仅作为内部桥接协议，不再属于 `runtimePermissions`，也不会出现在“已授权能力”chips
+      - `composer.apply.*` 已从 Host Bridge schema、Runtime SDK 与 Android 宿主全部移除
+      - `chat-auto-reply` UI 已迁移到 `FunctionKitRuntimeSDK.createKit(...)`（不再手写 `requestedPermissions` / 协议 switch）：
+        - `TODO/function-kits/chat-auto-reply/ui/app/main.js`
+      - Runtime SDK 验证：`npm test` 全绿，并修复 browser bundle build 脚本能正确 strip `export async function`：
+        - `TODO/function-kit-runtime-sdk/scripts/build-browser-bundle.mjs`
+        - `TODO/function-kit-runtime-sdk/src/index.js`
+        - `TODO/function-kit-runtime-sdk/dist/function-kit-runtime.js`
+    - Detached Composer MVP 已接上 Android 宿主：功能件面板上方出现原生草稿编辑区，`composer.*` 不再只是 JSON 状态同步（ARCHIVED：2026-03-25 已撤回）
+    - 当 Detached Composer 聚焦时，键盘输入会重定向到 `kit_draft`，`commitText/backspace/左右移动` 等基础编辑动作不再直接写进外部输入框（ARCHIVED）
+    - 写回外部目标仍然保持显式 `Insert / Replace`；如果原目标输入框失效，写回按钮会禁用（ARCHIVED）
+    - `chat-auto-reply` 样板前端 Detached Composer 入口（ARCHIVED：2026-03-25 已删除入口，改为 createKit + embedded input bridge）
+    - 新增 JVM 单元测试：`TODO/ime-research/repos/fcitx5-android/app/src/test/java/org/fcitx/fcitx5/android/ui/main/settings/behavior/FunctionKitSettingsStatusResolverTest.kt`
+    - 新增 JVM 单元测试：`TODO/ime-research/repos/fcitx5-android/app/src/test/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitAiChatBackendTest.kt`
+    - 新增 JVM 单元测试：`TODO/ime-research/repos/fcitx5-android/app/src/test/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitComposerDraftBufferTest.kt`
+    - Android 工具栏快捷入口已抽成统一 `FunctionKitQuickAccessSpec`，不再把图标、排序、`More` 面板入口散落硬编码
+    - 展开工具栏后，`Function Kit` 现在会排在 `Clipboard / Text Editing / Undo / Redo / More` 之前，成为更显式的一等入口
+    - `More` 面板首项与 Android 主设置入口都已统一成 `Function Kit` 语义，不再继续把一级入口写成单一样板 `聊天自动回复`
+    - 新增 JVM 单元测试：`TODO/ime-research/repos/fcitx5-android/app/src/test/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitQuickAccessSpecTest.kt`
+    - `Function Kit` 设置页已额外镜像全局 `默认展开工具栏` 开关，不再要求用户跳到键盘设置页里找这个选项
+    - `Function Kit` 设置页的“键盘入口”状态现在会明确区分“已固定且启动即见”与“已固定但启动时仍被收起”这两种情况
+    - Android Gradle 资产同步已从“只同步 `chat-auto-reply`”改成“扫描并同步整个 `TODO/function-kits/*` 目录”
+    - Android 运行时已补上 `FunctionKitRegistry`，窗口和设置页不再继续从固定 `chat-auto-reply/manifest.json` 直接加载
+    - `More` 面板已具备按注册表列出多个已安装功能件并按 `kitId` 打开的基础
+    - 新增 JVM 单元测试：`TODO/ime-research/repos/fcitx5-android/app/src/test/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitRegistryTest.kt`
+    - Android 工具栏已从“单个 `functionKitButton`”重构为“动态功能件按钮 + 固定工具按钮”组合式布局
+    - 只要 catalog 中注册了多个功能件，它们现在就会被插入到 `Clipboard / Text Editing / Undo / Redo / More` 之前，而不是继续共用一个总入口按钮
+    - `quick-phrases` 已作为第二个真实 Function Kit 样板接入 catalog，Android 真机现在不再只有 `chat-auto-reply` 一个入口
+    - Function Kit 工具栏按钮已改成按显示名称生成 monogram，`Chat Auto Reply / Quick Phrases` 不会再显示成两个完全相同的扩展图标
+    - Android 侧 manifest 已支持 `icon` / `icons` 字段，原生宿主入口现在可直接读取功能件目录中的浏览器插件式图标资产
+    - 当前 Android 原生入口已支持读取 `png / jpg / jpeg / webp / bmp / ico`；其中 `chat-auto-reply` 已接入 `.ico`，`quick-phrases` 已接入 `.png`
+    - 工具栏按钮会优先显示图标图片，加载失败再回落到 monogram；`More` 面板会优先显示图标图片，失败再回落到默认扩展图标
+    - `TODO/function-kits/INDEX.md` 已修正为“本地 kit 可不依赖 skills/tools”，不再错误要求所有功能件都必须绑定 Agent 资产
+    - 当前剩余缺口已经进一步收敛为“pinning / ordering / recent 策略仍未落地，以及更多真实业务 kit 仍待补齐”
+    - 实现记录：`TODO/ime-research/notes/20260323_android_functionkit_shared_ai_chat.md`
+    - 实现记录：`TODO/ime-research/notes/20260323_android_detached_composer_mvp.md`
+    - 实现记录：`TODO/ime-research/notes/20260323_android_functionkit_quick_access_refactor.md`
+    - 实现记录：`TODO/ime-research/notes/20260323_android_functionkit_toolbar_default_visibility.md`
+    - 实现记录：`TODO/ime-research/notes/20260323_android_functionkit_registry_baseline.md`
+    - 实现记录：`TODO/ime-research/notes/20260323_android_functionkit_multi_toolbar_slots.md`
+    - 实现记录：`TODO/ime-research/notes/20260323_android_functionkit_multi_kit_visibility.md`
+    - 实现记录：`TODO/ime-research/notes/20260323_android_functionkit_icon_assets.md`
+    - 本轮修改文档清单：
+      - `TODO/ime-research/notes/20260323_android_functionkit_shared_ai_chat.md`
+      - `TODO/ime-research/notes/20260323_android_detached_composer_mvp.md`
+      - `TODO/ime-research/notes/20260323_android_functionkit_quick_access_refactor.md`
+      - `TODO/ime-research/notes/20260323_android_functionkit_toolbar_default_visibility.md`
+      - `TODO/ime-research/notes/20260323_android_functionkit_registry_baseline.md`
+      - `TODO/ime-research/notes/20260323_android_functionkit_multi_toolbar_slots.md`
+      - `TODO/ime-research/notes/20260323_android_functionkit_multi_kit_visibility.md`
+      - `TODO/ime-research/notes/20260323_android_functionkit_icon_assets.md`
+      - `product-thinking/20260323_functionkit_detached_composer_design.md`
+      - `TODO/function-kits/chat-auto-reply/icons/chat-auto-reply.ico`
+      - `TODO/function-kits/chat-auto-reply/manifest.json`
+      - `TODO/function-kits/quick-phrases/README.md`
+      - `TODO/function-kits/quick-phrases/icons/quick-phrases.png`
+      - `TODO/function-kits/quick-phrases/manifest.json`
+      - `TODO/function-kits/quick-phrases/ui/README.md`
+      - `TODO/function-kits/chat-auto-reply/ui/README.md`
+      - `TODO/function-kits/INDEX.md`
+      - `TODO/ime-research/notes/INDEX.md`
+      - `TODO/TODO.md`
+    - 本轮提交记录：
+      - inner repo `fcitx5-android`: `fa20168` `feat: add shared android ai chat for function kits`
+      - inner repo `fcitx5-android`: `6ffb56e` `feat: add detached composer draft routing`
+      - inner repo `fcitx5-android`: `9d7a514` `feat: prioritize function kit quick access entry`
+      - inner repo `fcitx5-android`: `92fda00` `feat: expose toolbar expansion in function kit settings`
+      - inner repo `fcitx5-android`: `e815e68` `feat: add android function kit registry baseline`
+      - inner repo `fcitx5-android`: `8026c2e` `feat: support multiple function kit toolbar slots`
+      - inner repo `fcitx5-android`: `76d122f` `feat: distinguish function kit toolbar buttons`
+      - inner repo `fcitx5-android`: `9fa072d` `feat: support custom function kit icon assets`
+      - outer repo root: `e7b0bfb` `docs: record detached composer progress`
+      - outer repo root: `1a234bb` `feat: wire chat auto reply composer entry`
+      - outer repo root: `06f88cb` `docs: record function kit quick access refactor`
+      - outer repo root: `96f76f6` `docs: record function kit toolbar visibility work`
+      - outer repo root: `33bfebe` `docs: update todo after toolbar visibility work`
+      - outer repo root: `33d403a` `docs: queue multi-kit registry follow-up`
+      - outer repo root: `b9c8abb` `docs: record function kit registry baseline`
+      - outer repo root: `caf4a4f` `docs: update todo after registry baseline`
+      - outer repo root: `73138f5` `docs: record function kit multi toolbar slots`
+      - outer repo root: `bce997b` `feat: add quick phrases function kit sample`
+      - outer repo root: `03d5131` `docs: record function kit multi kit visibility`
+      - outer repo root: `3f40a86` `feat: add function kit icon assets`
+      - outer repo root: `370b156` `docs: record function kit icon assets`
+    - 验证：
+      - `.\gradlew.bat :app:testDebugUnitTest --tests org.fcitx.fcitx5.android.input.functionkit.FunctionKitComposerDraftBufferTest --tests org.fcitx.fcitx5.android.input.functionkit.FunctionKitAiChatBackendTest --tests org.fcitx.fcitx5.android.ui.main.settings.behavior.FunctionKitSettingsStatusResolverTest --console=plain --warning-mode=all`
+      - `.\gradlew.bat :app:compileDebugKotlin --console=plain --warning-mode=all`
+      - `.\gradlew.bat :app:testDebugUnitTest --tests org.fcitx.fcitx5.android.input.functionkit.FunctionKitQuickAccessSpecTest --tests org.fcitx.fcitx5.android.ui.main.settings.behavior.FunctionKitSettingsStatusResolverTest :app:compileDebugKotlin --console=plain --warning-mode=all`
+      - `.\gradlew.bat :app:testDebugUnitTest --tests org.fcitx.fcitx5.android.ui.main.settings.behavior.FunctionKitSettingsStatusResolverTest --tests org.fcitx.fcitx5.android.input.functionkit.FunctionKitQuickAccessSpecTest :app:compileDebugKotlin --console=plain --warning-mode=all`
+      - `.\gradlew.bat :app:testDebugUnitTest --tests org.fcitx.fcitx5.android.input.functionkit.FunctionKitRegistryTest --tests org.fcitx.fcitx5.android.input.functionkit.FunctionKitQuickAccessSpecTest --tests org.fcitx.fcitx5.android.ui.main.settings.behavior.FunctionKitSettingsStatusResolverTest :app:compileDebugKotlin --console=plain --warning-mode=all`
+      - `node --check TODO/function-kits/quick-phrases/ui/app/main.js`
+      - `.\gradlew.bat :app:testDebugUnitTest --tests org.fcitx.fcitx5.android.input.functionkit.FunctionKitManifestTest --tests org.fcitx.fcitx5.android.input.functionkit.FunctionKitQuickAccessSpecTest --tests org.fcitx.fcitx5.android.input.functionkit.FunctionKitRegistryTest :app:compileDebugKotlin --console=plain --warning-mode=all`
+
+- [x] OpenClaw 已切到本机 DeepSeek provider
+
+  - 固定脚本：`TODO/ime-research/scripts/configure_openclaw_deepseek.ps1`
+  - 运行记录：`TODO/ime-research/notes/20260322_openclaw_deepseek_setup.md`
+  - 当前默认模型：`deepseek/deepseek-chat`
+  - 当前可选模型：`deepseek/deepseek-reasoner`
+  - 真实 key 已迁移到本机 `<USER_HOME>\.openclaw\.env`，不再继续保留在仓库文本里
+
+- [x] 我又想到了一种触发功能件的方式，那就是利用正则表达式来搜索功能件，功能件的布局就可以改变了，比如说，可以有三种，固定功能件、最近使用功能件、搜索出来的功能件，其中，“搜索“出来表示的是，用户输入的内容匹配上了功能件内容。然后，如何才能够触发搜索呢，我想的是利用/斜杠，后面跟着的内容就是搜索或者说需要匹配的内容，输入法的功能件布局那一栏就可以展示出固定功能件+搜索出来的功能件。这只是一个非常非常浅显的思想，你需要更多的思考，更加客观的考虑这些功能，更加实用的角度考虑这个功能，同时内容并不受限。输出一份详细的方案。
+  - 详细方案：`TODO/ime-research/notes/20260322_functionkit_slash_trigger_design.md`
+
+- [x] 还有一个非常非常重要的功能，那就是功能件如何去利用上AI功能，一种是功能件直接利用网络接口去请求作者自己自定义的大模型或者AI Agent；另一种是利用上OpenClaw，它与输入法绑定起来，这同样是一个重大问题，我到底要不要真的跟所谓的OpenClaw绑定起来，github上还有nanobot呢，这可比OpenClaw这种庞然大物，token疯狂吸取物牛逼，而且还有个大问题，那就是输入法+功能件的这种形式，适合哪一种AI Agent呢？总之这是一个非常非常值得去思考的问题，你看看怎么个应对。
+  - 详细方案：`product-thinking/20260322_ime-ai-backend-strategy.md`
+
+- [x] 目前仍然需要开放网络接口给功能件，为什么？因为往后我已经预见，功能件开发更倾向于适配，也就是说，用户会接入很多一直在用的软件，只是说写个功能件，让以前的软件上的信息接入到输入法功能件中。这其中的具体问题你有权限去考虑好来。
+
+  - 详细方案：`product-thinking/20260322_functionkit_network_surface_strategy.md`
+
+- [x] 让功能件接入AI，我认为需要提供好相应的优秀设计的接口，你之前已经分过AI类别了，在之前的设计方案中。现在你需要设计好该提供哪些接口给功能件，保持住足够灵活性功能的同时，也可以提供额外服务。还有一些是skills提供的能力，比如提供文件读写能力，微信消息读取能力，浏览器访问能力等等，有些能力依赖于skills，这类能力的扩展又该以何种方式提供给功能件？而且宿主主机是否支持这类能力也是个问题，总之，这是个大麻烦，如何处理好是个大问题。
+
+  - 详细方案：`product-thinking/20260322_functionkit_ai_skills_capability_interfaces.md`
+
+- [x] 0323-2205编译出来的版本我测试过了，发现下面的问题： 1. AI回复没有接入真实的场景中去，我已经提供给你了大模型api啊，具体你可以看看TODO.md的deepseek配置。 2. 如果功能件存在输入框，目前压根就无法输入，点击之后没有任何反应。并没有出现，下面是输入法，上面是功能件页面的情况，总之问题很大
+
+  - 本轮已完成落点：
+    - AI bootstrap 跟进记录：`TODO/ime-research/notes/20260323_android_functionkit_ai_bootstrap_followup.md`
+    - Detached composer runtime 自动桥接记录：`TODO/ime-research/notes/20260323_functionkit_runtime_detached_composer_autobind.md`
+    - Android Function Kit 桥接消息风暴修复记录：`TODO/ime-research/notes/20260323_android_functionkit_bridge_message_storm_fix.md`
+    - `chat-auto-reply` 已补握手权限：`TODO/function-kits/chat-auto-reply/ui/app/main.js`
+    - `quick-phrases` 已在 `bridge.ready.ack` 时立即同步授权与首次 bootstrap：`TODO/function-kits/quick-phrases/ui/app/main.js`
+    - runtime 已补 Android bridge 延迟可用时的 outbound 队列：`TODO/function-kit-runtime-sdk/src/index.js`
+    - Android 权限策略已补 `ai.chat.status.request`：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitPermissionPolicy.kt`
+    - Android 权限策略单测：`TODO/ime-research/repos/fcitx5-android/app/src/test/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitPermissionPolicyTest.kt`
+    - Android 宿主已拆掉 `postWebMessage + evaluateJavascript` 双发导致的 host 消息重复投递：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWebViewHost.kt`
+    - WebView console 不再继续回灌成 `host.state.update`，避免再次把 runtime duplicate 日志放大成消息风暴：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+    - 新增宿主事件/构建标识辅助逻辑：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitHostDiagnostics.kt`
+    - 新增 JVM 单测：`TODO/ime-research/repos/fcitx5-android/app/src/test/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitHostDiagnosticsTest.kt`
+    - Debug 包名/构建标识现在更容易观测：debug `app_name` 已带版本号与短 commit，Function Kit 面板 meta 也会显示 build 信息：
+      - `TODO/ime-research/repos/fcitx5-android/app/build.gradle.kts`
+      - `TODO/function-kits/chat-auto-reply/ui/app/main.js`
+      - `TODO/function-kits/quick-phrases/ui/app/main.js`
+  - 本轮验证：
+    - `node --test TODO/function-kit-runtime-sdk/tests/client-api.test.mjs`
+    - `node scripts/build-browser-bundle.mjs`
+    - `node --test TODO/function-kit-runtime-sdk/tests/client-api.test.mjs`
+    - `node --test TODO/function-kit-runtime-sdk/tests/browser-bundle.test.mjs`
+    - `node --check TODO/function-kits/chat-auto-reply/ui/app/main.js`
+    - `node --check TODO/function-kits/quick-phrases/ui/app/main.js`
+    - `powershell -ExecutionPolicy Bypass -File "<WORKSPACE_ROOT>\TODO\ime-research\scripts\run_fcitx5_android_debug_local.ps1" -GradleTasks "clean :app:testDebugUnitTest --tests org.fcitx.fcitx5.android.input.functionkit.FunctionKitAiChatBackendTest --tests org.fcitx.fcitx5.android.input.functionkit.FunctionKitPermissionPolicyTest --tests org.fcitx.fcitx5.android.ui.main.settings.behavior.FunctionKitSettingsStatusResolverTest :app:compileDebugKotlin"`
+    - `powershell -ExecutionPolicy Bypass -File "<WORKSPACE_ROOT>\TODO\ime-research\scripts\run_fcitx5_android_debug_docker.ps1" -Abi arm64-v8a -GradleTasks "clean :app:assembleDebug"`
+    - `adb -s <DEVICE_SERIAL> install --no-incremental -r -d "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-9fa072d-arm64-v8a-debug.apk"`
+    - `powershell -ExecutionPolicy Bypass -File "<WORKSPACE_ROOT>\TODO\ime-research\scripts\run_fcitx5_android_debug_local.ps1" -GradleTasks "clean :app:testDebugUnitTest --tests org.fcitx.fcitx5.android.input.functionkit.FunctionKitHostDiagnosticsTest --tests org.fcitx.fcitx5.android.input.functionkit.FunctionKitPermissionPolicyTest --tests org.fcitx.fcitx5.android.input.functionkit.FunctionKitAiChatBackendTest :app:compileDebugKotlin"`
+    - `powershell -ExecutionPolicy Bypass -File "<WORKSPACE_ROOT>\TODO\ime-research\scripts\run_fcitx5_android_debug_docker.ps1" -Abi arm64-v8a -GradleTasks "clean :app:assembleDebug"`
+    - `adb -s <DEVICE_SERIAL> install --no-incremental -r -d "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-9fa072d-arm64-v8a-debug.apk"`
+  - 当前状态：
+    - 代码层面已经把 Android 共享 AI bootstrap、`chat-auto-reply` 的 `ai.chat` 权限请求、runtime input bridge 自动桥接（internal `composer.*`）、以及 Android bridge 初始握手丢包兜底全部接上。
+    - 新确认的根因是 Android 宿主自己的 host 消息双发 + WebView console 回灌，已经在本轮修掉。
+    - 真机包已重新 clean build 并安装到设备 `<DEVICE_SERIAL>`，当前调试包实际包名是 `org.fcitx.fcitx5.android.debug`。
+    - 你要求的“debug 版本号必须易于观察”也已经接上：现在 debug 应用名和 Function Kit 面板 meta 都会带当前版本号/短 commit。
+    - 该条目暂时保留未勾选，等待你在手机上复测这两件事是否都已真正生效：
+      - `chat-auto-reply` 是否已从 `local-demo` 切到真实 `direct-model`
+      - 功能件内普通输入框点击后，是否已经通过 embedded input bridge 可输入（无可见 Detached Composer）
+    - 2026-03-24 补充（握手慢/偶发 timeout 兜底）：
+      - runtime `runtime.connect(...)` 现在支持传 `timeoutMs`（不会污染 payload），并补单测：
+        - `TODO/function-kit-runtime-sdk/src/index.js`
+        - `TODO/function-kit-runtime-sdk/tests/client-api.test.mjs`
+        - `TODO/function-kit-runtime-sdk/dist/function-kit-runtime.js`
+      - `chat-auto-reply` / `quick-phrases` 在 Android 上握手采用 `createKit(connect: { timeoutMs=20000, retries=3 })`，避免真机 WebView bridge 慢启动导致 `bridge.ready` 超时：
+        - `TODO/function-kits/chat-auto-reply/ui/app/main.js`
+        - `TODO/function-kits/quick-phrases/ui/app/main.js`
+    - 2026-03-24 验证（模拟器端已闭环，不再依赖手测猜测）：
+      - `powershell -ExecutionPolicy Bypass -File "<WORKSPACE_ROOT>\TODO\ime-research\scripts\run_fcitx5_android_emulator_e2e.ps1"`
+      - 最近一次结果（emulator-5554）：`TODO/ime-research/artifacts/emulator/instrument_20260324_035941.txt`
+  - 2026-03-24 启动闪退补充：
+    - 远程真机调试入口已确认：`adb connect <DEVICE_SERIAL>
+    - 真机启动崩溃诊断记录：`TODO/ime-research/notes/20260324_android_startup_crash_real_device.md`
+    - 本轮新增诊断/保护代码：
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/cpp/native-lib.cpp`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/cpp/androidaddonloader/androidaddonloader.cpp`
+      - `TODO/ime-research/repos/fcitx5-android/lib/fcitx5/src/main/cpp/fcitx5/src/lib/fcitx/addonmanager.cpp`
+      - `TODO/ime-research/repos/fcitx5-android/lib/fcitx5/src/main/cpp/fcitx5/src/lib/fcitx/inputmethodmanager.cpp`
+    - 本轮真机结果：
+      - 重新构建并通过远程 adb 推送/安装后，`<DEVICE_SERIAL>` 上已不再复现此前的 native startup crash
+      - 当前真机日志已确认：
+        - `Resolved addon config count in 'addon': 16`
+        - `androidfrontend` / `androidkeyboard` 已被发现并实例化
+        - `Finishing startup` 已出现
+
+
+- [x] Android 模拟器端 E2E 自动化跑通（宿主启动 + 连接 Function Kit + runtime 握手 + 功能件真实调用 runtime API + embedded input bridge 可输入 + AI 直连流程可回归）
+  - Instrumentation 测试（UIAutomator）已加入并在 `emulator-5554` 通过：
+    - `TODO/ime-research/repos/fcitx5-android/app/src/androidTest/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitImeEndToEndInstrumentationTest.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/debug/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitImeE2EPlaygroundActivity.kt`
+  - 测试覆盖：
+    - `quick-phrases`：`bridge.ready` -> `context.request/context.sync` -> focus `draftInput` 触发 `composer.open` -> 键盘输入路由到 Web 输入框 -> JS 点击 `insertDraftButton` -> `candidate.insert` 写回到外部输入框
+    - `chat-auto-reply`：MockWebServer 提供 `/v1/chat/completions` stub -> `context.request` -> `candidates.render` -> JS 点击候选 “插入” -> `candidate.insert` 写回外部输入框
+  - 运行脚本（包含 build + 安装 `--no-incremental` + 启用/切换 IME + 跑 instrumentation + 抓 logcat）：
+    - `TODO/ime-research/scripts/run_fcitx5_android_emulator_e2e.ps1`
+  - 为了让 E2E 稳定（不依赖 WebView accessibility 文本），新增测试钩子与固定 view id：
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitTestRegistry.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitEnvelopeProbe.kt`
+  - 关键修复补充：
+    - Function Kit 候选写回必须绕过 input bridge 目标，否则会把候选写进功能件输入框：
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/FcitxInputMethodService.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+
+- [x] (ARCHIVED) Android 真机端 E2E 自动化跑通（原计划：复用 instrumentation；现改为手动 Runbook，不再推进脚本化）
+  - 原目标：在 `adb -s <DEVICE_SERIAL> 下复用 `FunctionKitImeEndToEndInstrumentationTest` 通过（并抓 logcat 产物）
+  - 原脚本：`TODO/ime-research/scripts/run_fcitx5_android_device_e2e.ps1`
+  - 备注：该远程 adb 入口已可用；若连接失败，优先检查手机端 Tailscale 是否上线（先在手机上打开 Tailscale）
+  - 2026-03-25 旧阻塞记录：`adb connect <DEVICE_SERIAL> 连接超时，仅 `emulator-5554` 在线（需手机端 Tailscale 上线后再跑）
+
+- [x] 功能件图标格式（浏览器插件风格）补齐自动化回归
+  - 说明：Android 端已支持 `.png/.ico`；补一条 instrumentation 覆盖实际 decode（避免回归）
+  - 覆盖：`functionKitIcons_decodePngAndIco`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/androidTest/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitImeEndToEndInstrumentationTest.kt`
+
+- [x] Android 通过 Tailscale 访问主机上部署的项目（最简说明 + 可复用配置）
+  - 已知：PC tailscale IP `100.109.100.33`
+  - 目标：给出“服务绑定 + 防火墙 + URL 写法 + kit 如何调用 network.fetch”的最小闭环说明（不要 connector）
+  - 说明文档：`TODO/ime-research/notes/20260324_android_access_host_services_via_tailscale.md`
+
+- [x] 简化 Function Kit 的 network + AI 接入方案（Android-first）
+  - 输出：修订 `product-thinking/20260322_functionkit_network_surface_strategy.md` 与 `product-thinking/20260322_functionkit_ai_skills_capability_interfaces.md`
+
+- [x] 问题很多，1. 自动回复功能件出现问题 2. 功能件输入框点击之后有问题啊，我就说一个场景，如果用户需要向功能件输入怎  
+  么办？目前你的代码压根就实现不了，赶紧想办法啊！我之前已经说的很清楚了，需要输入的时候，就弹出功能件界面，下面是 
+  输入法，上面是一个弹窗类型或者你觉得是啥就是啥的东西，总之我已经在输入法里面了，不可能打开第二个输入法，所以我必 
+  须必须用到当前的输入法啊！！！用到当前输入法，指的是输入法界面需要跳转到输入啊！！！输入是啥啊！就是打字的东西   
+  啊！！！目前的情况就是，点击之后要么没有任何反应，要么就是一个功能件中打开的没有屁用的临时草稿箱，这有个蛋用！   
+  3. 还有个重大问题，那就是功能件只要一失去焦点，比如说返回打字去了，或者说点击了其他功能件，那么这个功能件的上下  
+  文、浏览器runtime全部清空！！！！这怎么可能啊，用户要是还想回去继续完成工作怎么办，你却把状态信息全部清空了。
+  - 2026-03-24 进展（Android 端为主，先把“真实可用”闭环打通）：
+    - 状态不再被切换窗口清空（缓存 FunctionKitWindow/WebView，避免重建）：
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/status/StatusAreaWindow.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/KawaiiBarComponent.kt`
+    - “点击功能件输入框没有反应”的输入路由改为 Runtime 自动桥接（embedded composer，不再要求每个 kit 手写按钮逻辑）：
+      - Runtime SDK：`TODO/function-kit-runtime-sdk/src/index.js`、`TODO/function-kit-runtime-sdk/dist/function-kit-runtime.js`
+      - 功能件前端去掉手搓 readOnly/blur hack，交给 SDK：
+        - `TODO/function-kits/chat-auto-reply/ui/app/main.js`
+        - `TODO/function-kits/quick-phrases/ui/app/main.js`
+    - 键盘显示策略：只有 composer open+focused 时才显示 embedded keyboard，并在关闭时收敛高度：
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+    - Auto Reply 的 Android 本地 AI 候选不再被 manifest executionMode 绑死（即使 kit 仍标记 local-demo，也能用 Android shared AI）：
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+  - 2026-03-24 手工模拟器验证记录（不是脚本 E2E，用截图+logcat 追踪）：
+    - 产物目录（含截图、logcat）：`TODO/ime-research/artifacts/manual/emulator/20260324_204015/`
+    - 关键证据：`candidates.render` 已由宿主下发、且状态栏已出现 `mode=direct-model`（Android AI 候选已更新）
+  - 2026-03-24 修复点：WebView 里 `hidden` 属性被 kit 的 CSS 覆盖导致“本地示例模式”提示不消失
+    - 修复：添加 `[hidden]{ display:none !important; }`
+    - `TODO/function-kits/chat-auto-reply/ui/app/styles.css`
+  - 2026-03-24 单测已跑通：
+    - `cd TODO/function-kit-runtime-sdk; npm test`
+    - `cd TODO/ime-research/repos/fcitx5-android; .\\gradlew.bat :app:testDebugUnitTest`
+
+
+- [x] 把模拟器的跑通！但是！千万不能写所谓的测试用例去跑端到端测试啊！！！你的测试用例简直就是一坨屎，而且如此复杂的环 
+  境光凭着脚本就能够跑通测试？你在开玩笑！你需要的是，自己亲力亲为！每一次都实时的截图或者其他方式拿到消息，然后决 
+  定下一步怎么去做！
+  - 手动验证 Runbook（不依赖脚本）：`TODO/ime-research/notes/20260325_functionkit_manual_e2e_runbook.md`
+  - 手动产物目录规范：`TODO/ime-research/artifacts/manual/emulator/README.md`
+
+
+
+- [x] 因为现在已经我看到了，点击输入框之后下面可以看到键盘，有键盘那就可以直接输入了啊！？不会没有点击功能件输入框功能 
+  件也在上方显示吧？不会吧不会吧？我靠什么情况啊！！！没有点击输入框的情况下，功能件怎么也在上面啊！！！！这怎么可 
+  能啊！！！！不点输入框或者输入框失去焦点的情况下，底下的键盘应该消失，让上面的功能件回归到正常位置
+  - 说明：键盘显示严格跟随 input bridge 的 `composerState.open && composerState.focused`，失焦会 `composer.close` 并隐藏 embedded keyboard
+  - 代码：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+
+
+- [x] 现在的效果有了，1. 点击功能件内部的输入框确实能够实现我说的效果，并不需要所谓的detached composer实现，也就是你在智能回复那边说的【草稿箱】。打开草稿箱后的那个东西完全不用了啊，要它干啥？只需要保持住，点击功能件输入框能够让功能件在上面，键盘在下面就行了！！2. 还有个问题，那就是点击功能件输入框能够让功能件在上面，键盘在下面目前确实实现了，但是下面目前光有键盘，候选词看不到了（尴尬），没有候选词，键盘按了之后都选不了文字了，你看看如何补充上来 3. 既然目前runtime以及功能件能够正常运行了，现在该考虑补充上真正的AI能力了，这要求，你必须给app启动ai功能，并且加上大模型 api配置，而这些内容我早就提供给你了，你直接搜索deepseek就行，该提供的我都提供了。下一次运行必须是真实的ai接入，而不是目前的模拟数据了。这些内容你同样需要先使用模拟器进行端到端测试，而且不是写脚本的那种，而是你亲力亲为。
+  - 2026-03-24 Android AI 接入现状核对：
+    - 现有 Android 共享 AI backend：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitAiChatBackend.kt`
+    - Auto Reply 真正走 Android 直连 HTTP 的落点：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+    - AI 设置入口已经存在：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/MainFragment.kt`、`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/behavior/AiSettingsFragment.kt`
+    - 调试包 AI bootstrap 已确认接到本机 `.openclaw`，不需要把 key 写进 git：
+      - 本机密钥文件：`<USER_HOME>\.openclaw\.env`
+      - 本机模型配置：`<USER_HOME>\.openclaw\openclaw.json`
+      - Debug 构建解析链：`TODO/ime-research/repos/fcitx5-android/app/build.gradle.kts`
+      - 当前 debug BuildConfig 已解析出：`baseUrl=https://api.deepseek.com/v1`、`model=deepseek-chat`、`providerType=openai-compatible`、`bootstrapEnabled=true`
+    - 当前最小落地原则：用户显式填写的 Android AI 设置优先；未填写时，debug 包自动回退到本机 `.openclaw` DeepSeek 配置；release 包继续保持空白，不内置任何密钥
+  - 2026-03-24 修复补充：
+    - embedded composer 编辑时，候选栏不显示（只能看到键盘，导致拼音无法选字）：
+      - 根因：扩展窗口附着后 `KawaiiBarStateMachine` 会停在 `Title`，不会因为候选更新回到 `Candidate`。
+      - 修复：当 `FunctionKitWindow` 的 embedded composer 激活时，`KawaiiBarComponent` 会在候选/预编辑非空时强制切回 `Candidate` UI，恢复候选可选字；composer 关闭后回到 `Title`。
+      - 代码：
+        - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/KawaiiBarComponent.kt`
+        - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+    - 移除 Auto Reply 里“草稿箱 / Detached Composer”相关 UI 控件（避免误触发 detached mode，输入框直接用 embedded 路由即可）：
+      - `TODO/function-kits/chat-auto-reply/ui/app/index.html`
+      - `TODO/function-kits/chat-auto-reply/ui/app/main.js`
+    - Debug 包 AI bootstrap 写入一次性偏好（只在用户未显式配置时）：打开功能件即 ready，避免 UI 表现为“未配置”。
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitAiChatBackend.kt`
+    - 2026-03-25 修复：Android AI 返回“JSON/围栏/松散 JSON”导致候选被拆成多行碎片（例如 ```json / { / "candidates": [）：
+      - 修复：normalizeCandidates 支持 fenced JSON、JSON 数组、以及松散 `"text":"..."` 提取，并过滤 JSON 噪音行
+      - 代码：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitAiChatBackend.kt`
+      - 单测：`TODO/ime-research/repos/fcitx5-android/app/src/test/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitAiChatBackendCandidatesTest.kt`
+    - 2026-03-25 构建修复：Windows 下 `msgfmt --xml` 缺 ITS rules（`C:\msys64\usr\share\gettext\its` 不存在）导致 `fcitx5-chinese-addons` 构建失败：
+      - 修复：`fcitx5_translate_desktop_file` 在 `Windows + XML` 时 fallback copy 模板（绕开 `msgfmt --xml`）
+      - 代码：`TODO/ime-research/repos/fcitx5-android/lib/fcitx5/src/main/cpp/fcitx5/src/lib/fcitx-utils/Fcitx5Macros.cmake`
+    - 2026-03-24 真机远程 adb 安装入口（优先）：
+      - `adb connect <DEVICE_SERIAL>
+      - `adb -s <DEVICE_SERIAL> install --no-incremental -r -d <apk>`
+
+- [x] 功能件中，输入框的替换功能有问题，替换功能目前完全就是插入的功能，和替换语义本身存在千差万别，你需要找出bug所在。
+  - 修复：replace 现在会走输入框 selection replace，而不是 insert
+  - 代码：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+
+- [x] 在主题设置中，你应该默认启用按键边框
+  - 修复：主题偏好 `showKeyBorder` 默认启用
+  - 代码：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/data/theme/ThemePrefs.kt`
+
+- [x] 我看目前的功能件中有个大问题，那就是一堆杂乱代码（非业务代码），这种强烈耦合令人感觉非常不适，你应该好好学习浏览器插件那边是如何设计API给插件使用的。也就是说你需要优化runtime注入的api设计，使得使用起来更加简洁简单。
+  - 设计文档：`TODO/function-kit-runtime-sdk/docs/BROWSER_EXTENSION_STYLE_API_V2.md`
+  - 落地（样板已迁移）：
+    - 新增高层封装：`FunctionKitRuntimeSDK.createKit(...)`
+    - `chat-auto-reply` / `quick-phrases` UI 已迁移到 `createKit`，不再手写 `requestedPermissions`/`replyTo`/协议级 `switch`
+  - 验证：
+    - `Set-Location <WORKSPACE_ROOT>\TODO\function-kit-runtime-sdk; npm test`
+
+- [x] 到目前为止也实现了不少功能了，现在需要你出面了，我脑力有限，可能还有非常非常多的地方没有考虑完整，我说两点，本地存储问题、文件上传问题。你需要尽最大努力把项目阅读完整，然后找出来什么地方有巨大功能缺陷，写成文档。
+  - 文档：`TODO/ime-research/notes/20260325_functionkit_storage_and_file_upload_gaps.md`
+  - 2026-03-25 过程记录（补全现状与真实阻塞）：
+    - 阅读/核对：`TODO/function-kit-runtime-sdk/src/index.js`、`TODO/function-kits/host-bridge/*`、`TODO/ime-research/repos/fcitx5-android/.../FunctionKitWindow.kt`、`TODO/ime-research/repos/fcitx5-android/.../FunctionKitWebViewHost.kt`、`TODO/ime-research/windows-functionkit-host/*`、`TODO/function-kit-host-service/src/server.js`
+    - 关键发现：Android WebView `domStorageEnabled=true` 且所有 kit 同源（`https://function-kit.local`），导致“本地持久化”可绕过 `storage.*` 并破坏 kit 隔离；文件上传在 UI/SDK/Host 三层同时不可用；Android Host->UI 主要走 `evaluateJavascript`，base64 大 payload 不稳；PC host-service 默认 JSON body limit=256KB（附件会被直接限死）
+    - 产出：已把上述缺口与演进建议（handle/file store + `bodyRef` 等）写回该文档
+
+- [x] 文件上传闭环（Android）：`files.pick` + `network.fetch bodyRef=file` + 上传验收功能件
+  - Android Host（fcitx5-android）：
+    - 文件选择 Activity：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitFilePickerActivity.kt`
+    - in-memory 回调注册表：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitFilePickerRegistry.kt`
+    - in-memory file store（URI handle）：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitFileStore.kt`
+    - Host 接入：
+      - `files.pick`：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+      - `network.fetch init.bodyRef={type:\"file\",fileId}`：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+      - bridge allowlist + result：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWebViewHost.kt`
+    - Manifest 注册 picker：`TODO/ime-research/repos/fcitx5-android/app/src/main/AndroidManifest.xml`
+  - Runtime SDK：新增 `kit.files.pick(...)` / `raw.files.pick(...)`
+    - `TODO/function-kit-runtime-sdk/src/index.js`
+    - `TODO/function-kit-runtime-sdk/src/index.d.ts`
+    - bundle：`TODO/function-kit-runtime-sdk/dist/function-kit-runtime.js`（`npm test` 会自动更新）
+  - Host Bridge 协议补齐：
+    - `TODO/function-kits/host-bridge/README.md`
+    - `TODO/function-kits/host-bridge/message-envelope.schema.json`
+  - 新增验收功能件：`File Upload Lab`
+    - `TODO/function-kits/file-upload-lab/manifest.json`
+    - `TODO/function-kits/file-upload-lab/ui/README.md`
+    - `TODO/function-kits/file-upload-lab/ui/app/index.html`
+    - `TODO/function-kits/file-upload-lab/ui/app/main.js`
+    - `TODO/function-kits/file-upload-lab/ui/app/styles.css`
+  - 构建验证：
+    - `Set-Location <WORKSPACE_ROOT>\\TODO\\function-kit-runtime-sdk; npm test`
+    - `Set-Location <WORKSPACE_ROOT>\\TODO\\ime-research\\repos\\fcitx5-android; .\\gradlew.bat :app:assembleDebug`
+
+- [x] Doubao thread 内容提取（写入产品思考目录）：提供脚本 + 提取方案文档（需你提供有效 Cookie）
+  - 方案文档：`product-thinking/doubao-thread-wce998b8e58c59ca0-extraction-plan.md`
+  - 归档入口（待脚本生成内容）：`product-thinking/doubao-thread-wce998b8e58c59ca0.md`
+  - 提取脚本：`TODO/ime-research/scripts/extract_doubao_thread.py`
+
+- [x] 现在先不实现新功能了，你需要去查漏补缺，仔细检查当前的项目存在那些问题，或者说还需要加上哪些功能。写成文档
+  - 审计文档：`TODO/ime-research/notes/20260325_functionkit_project_gap_audit.md`
+  - 关键点（先把风险写死）：manifest/权限目前不构成安全边界（union 导致可蹭权限）；同源 + DOM storage 导致 kit 隔离破功；`network.fetch` 无目标限制；host 状态更新可能过于频繁并携带重 payload
+
+- [x] 根据审计文档（P0/P1）收口现有实现（先修危险边界，再谈扩展）
+  - 总过程记录：`TODO/ime-research/notes/20260326_functionkit_gap_audit_fixlog.md`
+  - [x] P0-1/P0-2：权限模型改为“manifest 声明为上限 allowlist”（交集而非 union）；`requestedPermissions` 为空时回退 kit manifest 声明；`manifestSnapshot` 不再覆盖 `runtimePermissions`，宿主支持能力另开字段暴露
+  - [x] P0-3：隔离策略收口（二选一写死）：关闭 DOM storage 并强制持久化走 `storage.*`（或 per-kit origin）；同步更新 `SECURITY_MODEL.md`
+  - [x] P0-5：`host.state.update` 限流 + 轻量化，重 payload 只在 debug/显式请求时发送；并为可变大字段设上限与错误码（避免 evaluateJavascript 大 payload 不稳）
+  - [x] P0-6：`ai.chat.status.request` / `ai.agent.list` 等路径统一按权限门控；下发元数据遵循“最小必要”，避免泄露 baseUrl/model/routing/token 状态
+  - [x] P1-4：补齐 Bridge Debugger 的“可观测性闭环”（最近 N 条 envelope、ready/timeout 统计、权限变更、去重/乱序策略可见）
+  - [x] P1-5：宿主级统一 `FunctionKitWindow/WebView` 池，确保同 `kitId` 复用唯一实例（避免状态丢失/多实例不一致）
+  - [x] P1-7：Built-in kit UI 清理 `innerHTML` 拼接（改 `textContent` + DOM 组装）收口 XSS 面
+
+- [x] 一切向浏览器插件对齐啊！浏览器插件每一个插件都有自己的管理页面，而且还可能有自己的设置页面等等。管理页面设置runtime权限，设置页面则是由功能件自己决定的。
+  - 设计文档：`TODO/ime-research/notes/20260325_functionkit_management_page_and_settings_page.md`
+
+- [x] 后面的话，我想实现类似于浏览器鼠标右键的那种功能，也就是插件可以绑定contextmenu，其中配置好自己提供的工具。为什么呢？因为我想到了一种场景，不论是输入框内容还是剪切板内容（对了，你还需要提供剪切板权限给功能件），可能都需要进行处理来的，我想的是，不能光靠着用户主动点击各个功能件甚至还得自己去搜索查找下载好的功能件，这太麻烦了。功能件可以通过一个函数绑定上类似于contextmenu的东西。这有什么用，因为后续的话，在输入法的键盘主界面，还需要提供一个入口，能够看到这些绑定到类似于contextmenu的这些内容，点击就能够让对应的功能件提供的函数进行处理。因为有很多场景都依赖于此，外加用户压根不知道自己不知道，他想处理的内容，他压根就找不到哪个功能件去处理，你绝对不能指望用户一个一个去看！自然，一个功能件可以绑定多个功能上去。甚至以后一个最常见的功能就是，用户复制完成之后，输入法应用会启动一个小悬浮窗之类的东西，询问用户是否要处理复制的内容，用户若在一定时间内点击了就可以看到这些功能件提前绑定好的功能入口，用户可以选择其中一个处理。总之，这也是我的一个想法而已，你需要写文档不断完善，还需要调研可行性，比如说，用户复制了内容，输入法能不能搞出一个类似于悬浮窗的东西提醒用户，还有用户要是点击了，那如何在用户没有点击任何输入框的情况下，让输入法弹出来。这些都是可行性方面的问题，你需要仔细探究。除此之外，还有很多我自己完全没有考虑到的问题，你都需要帮我找出来，最后我需要先审核一下文档。
+  - 设计文档：`TODO/ime-research/notes/20260325_functionkit_contextmenu_bindings.md`
+  - 设计文档中的有关selection存在巨大误解，ime只能够处理输入框的selection，用户在app内网页内的selection压根拿不到！
+  - 悬浮窗可不可以做成有节制的那种，它只在用户复制之后出现，并不是任何时候都出现，而且只留5s钟，用户若没有点击则隐藏，这里需要处理好一件事情，那就是绑定的功能只在ime中，你需要搞定的是，如何在没有输入框激活的情况下，弹出ime，你看看该如何处理
+  - 2026-03-25 更新：补全/修正该设计文档
+    - 写死 `selection` 语义：仅限 `InputConnection` 可读的输入框 selection/光标附近文本；正文 selection 不可获得，主线只能走 `clipboard`（或高权限 Accessibility/OCR 方案）
+    - 写死“无焦点弹 IME”不可作为主线：无焦点 clipboard 场景走通知/宿主 Activity；处理结果写回剪贴板，并通过 `pendingPaste` 在下次 IME 出现时提示“一键粘贴”
+    - 将“复制后 5 秒悬浮提示”降级为实验项：需要 overlay 权限，只做提示入口，不直接弹 IME/不直接上屏
+    - 增补建议：引入 `clipboard.write`（宿主写剪贴板）能力，避免 kit 获得可随时读取剪贴板的原始 API
+  - 2026-03-26 更新：补足“复制后提示”的可行性快查与工程现实
+    - 默认主线更像 “5 秒 heads-up 通知”，而不是 overlay 悬浮窗
+    - 写明 `ClipboardManager` 监听器需要进程存活，因此不引入更重常驻机制时无法承诺“复制必提示”，必须 IME 内兜底
+    - 扩充风险清单：系统剪贴板浮层叠加打扰、非文本剪贴板类型与 URI 权限复杂度等
+  - 2026-03-26 落地（v0.5：复制后提示 overlay/notification）
+    - Android Host（fcitx5-android `5c39df4`）：新增 `ClipboardOverlayPromptManager` 通知降级 + `SYSTEM_ALERT_WINDOW` 权限声明；通知点击通过 `ClipboardActionsPromptReceiver` 打开「剪贴板动作」
+    - 行为：有 overlay 权限则显示 5s 悬浮 chip；否则显示 5s heads-up 通知；点击后若 IME 未激活则写入 pending，下次键盘出现时自动打开 `FunctionKitBindingsWindow(trigger=Clipboard)`
+    - 2026-03-26 修复：`ClipboardManager` 监听器集合是 `WeakHashSet`，之前 overlay manager 未持有强引用导致监听器被 GC，复制后完全无提示；已在 `ClipboardOverlayPromptManager` 内保留 listener 强引用（fcitx5-android `3c26a17`）
+    - 2026-03-26 体验增强：无输入框时点击提示不再要求用户“先点输入框”，而是用 overlay 内部的隐藏 `EditText` 把 IME 拉起来（focus bridge），并自动进入「剪贴板动作」窗口（fcitx5-android `0ba5df5`）
+    - 2026-03-26 修复：通知点击无反应（receiver 冷启动时拿不到 `ClipboardManager.lastEntry`）；改为在通知 `PendingIntent` 中携带 `clipboardText`，点击即可正确触发（fcitx5-android `d06cf6c`）
+    - 2026-03-26 体验增强（debug）：复制后不再需要“第二次点击入口”才能激活输入框，而是 best-effort 直接拉起 IME 并打开「剪贴板动作」（仅 debug 自动启用）；同时将 focus bridge 变为完全隐形（不再像广告贴屏），并用 `showSoftInput(SHOW_FORCED)` + 200ms retry 提升拉起成功率（fcitx5-android `5716b02`）
+    - 2026-03-27 体验修正：复制只做提示入口，不再自动拉起 IME（避免“未点通知就弹键盘”）；只有点击 chip/通知才通过 focus bridge 拉起并打开「剪贴板动作」（fcitx5-android `fd71840`）
+    - 2026-03-27 bugfix：点击 chip/通知后不会再在 5 秒后自动把键盘关掉（focus bridge 只在 IME 未成功拉起时才清理；IME 已显示时保持到用户关闭）（fcitx5-android `5499cba`）
+    - 2026-03-27 bugfix：点击入口拉起键盘后，点击键盘外部区域会正确关闭（focus bridge 监听 outside touch，触点不在 IME 区域则 dismiss）（fcitx5-android `fbefb16`）
+  - 2026-03-25 落地（v0：bindings + `binding.invoke` + IME 入口）
+    - Manifest schema：`TODO/function-kit-runtime-sdk/schemas/function-kit-manifest.schema.json`（新增 `bindings[]`）
+    - Host bridge schema：`TODO/function-kits/host-bridge/message-envelope.schema.json`（新增 `binding.invoke`）
+    - 示例功能件（证明“一个功能件绑定多个功能”）：`TODO/function-kits/chat-auto-reply/manifest.json`（2 个 bindings：clipboard/selection）
+      - fixture：`TODO/function-kits/chat-auto-reply/tests/fixtures/bridge.host-to-ui.binding-invoke.basic.json`
+      - UI demo：`TODO/function-kits/chat-auto-reply/ui/app/main.js`（监听 `binding.invoke`）
+    - 测试功能件（专门用于桥能力回归）：`TODO/function-kits/runtime-lab/README.md`
+    - Android Host（fcitx5-android）：
+      - manifest 解析：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitManifest.kt`
+      - binding registry：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingRegistry.kt`
+      - bridge allowlist + dispatch：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWebViewHost.kt`
+      - invocation queue + payload：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+      - UI 入口：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/status/StatusAreaWindow.kt`、`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindow.kt`
+      - 剪贴板入口（chip menu）：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/KawaiiBarComponent.kt`
+      - 文案：`TODO/ime-research/repos/fcitx5-android/app/src/main/res/values/strings.xml`、`TODO/ime-research/repos/fcitx5-android/app/src/main/res/values-zh-rCN/strings.xml`
+    - 验证：
+      - `Set-Location <WORKSPACE_ROOT>\\TODO\\function-kit-runtime-sdk; npm test`
+      - `Set-Location <WORKSPACE_ROOT>\\TODO\\ime-research\\repos\\fcitx5-android; .\\gradlew.bat :app:testDebugUnitTest`
+  - 2026-03-30 进展：Bindings 入口升级（更贴近“浏览器插件动作菜单”的主动触发体验）
+    - 工具栏一级入口：新增 `Bindings` 按钮，并与 `Task Center` 一起固定置顶（即便有 pinned kits）
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitQuickAccessSpec.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/ui/idle/ButtonsBarUi.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/KawaiiBarComponent.kt`
+    - Headless 执行：点击 binding 默认不打开 kit 面板（减少“切窗导致拿不到输入框上下文/selection”的概率），kit 在后台收到 `binding.invoke` 后自行决定是否上屏/替换/弹出 UI
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindow.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/status/StatusAreaWindow.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+    - 上下文快照：binding 触发时宿主先抓取一次 `InputConnection` 上下文（before/after/selected/selection range），随 `binding.invoke.payload.context` 下发
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingInvocationContext.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+    - 文档口径同步：`TODO/ime-research/notes/20260325_functionkit_contextmenu_bindings.md`
+    - 真机编译/安装（远程 adb：`<DEVICE_SERIAL>`）
+      - 构建：`.\gradlew.bat :app:assembleDebug -PbuildABI=arm64-v8a`
+      - 安装：`adb -s <DEVICE_SERIAL> install --no-incremental -r -d "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-28bf1de-arm64-v8a-debug.apk"`
+
+- [ ] 还有一些特殊场景可能需要用到一些特殊的接口，你帮我研究研究可行性，1. 实时监听输入 2. 发送之前拦截，返回true才可以发送成功，记录到文档中
+  - 设计 + 落地记录：`TODO/ime-research/notes/20260325_functionkit_realtime_input_and_send_intercept.md`
+  - 2026-03-25 落地（WIP）：`input.observe.best_effort` + `send.intercept.ime_action`
+    - Runtime permissions + schema：`TODO/function-kit-runtime-sdk/schemas/function-kit-manifest.schema.json`、`TODO/function-kits/host-bridge/message-envelope.schema.json`
+    - Runtime SDK：`TODO/function-kit-runtime-sdk/src/index.js`、`TODO/function-kit-runtime-sdk/src/index.d.ts`（新增 `kit.input.observeBestEffort`、`kit.send.registerImeActionInterceptor`、`kit.send.onImeActionIntent`）
+    - Android Host（fcitx5-android）：
+      - bridge allowlist + dispatch：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWebViewHost.kt`
+      - observe + intercept 实现：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+      - IME returnKey 入口：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/FcitxInputMethodService.kt`
+      - 权限开关：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/data/prefs/AppPrefs.kt`
+      - 文案：`TODO/ime-research/repos/fcitx5-android/app/src/main/res/values/strings.xml`、`TODO/ime-research/repos/fcitx5-android/app/src/main/res/values-zh-rCN/strings.xml`
+    - 单测（SDK）：`TODO/function-kit-runtime-sdk/tests/client-api.test.mjs`、`TODO/function-kit-runtime-sdk/tests/manifest-contract.test.mjs`
+    - 待验证：`Set-Location <WORKSPACE_ROOT>\\TODO\\ime-research\\repos\\fcitx5-android; .\\gradlew.bat :app:testDebugUnitTest` + 真机回车拦截路径
+  - 测试功能件（方便验收）：`TODO/function-kits/runtime-lab/README.md`
+    - 调试功能件（便于后续验证）：`TODO/function-kits/ime-hooks/`
+
+
+- [x] 支持查询当前使用输入法的软件的包名是啥，提供runtime api
+  - Android `context.sync` 结构化字段补齐：`sourcePackage / selectionStart / selectionEnd / selectedText / beforeCursor / afterCursor / preeditText / inputType / candidateCount`
+    - 代码：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+  - Runtime SDK 新增 `kit.app` 便捷访问器：
+    - `kit.app.getActivePackageName()`
+    - `kit.app.getSelection()`
+    - 代码：`TODO/function-kit-runtime-sdk/src/index.js`、`TODO/function-kit-runtime-sdk/src/index.d.ts`
+    - 单测：`TODO/function-kit-runtime-sdk/tests/client-api.test.mjs`
+
+- [x] 功能件中支持发送图片的功能，提供runtime api，比如以后要做一个AI表情包生成或者AI绘画的功能件，要是都不能发送那可太垃圾了
+  - Runtime permission + message：`input.commitImage`
+  - UI API（Browser-style）：`kit.input.commitImage({ dataUrl, mimeType?, fileName?, label? })`
+    - 实现：`TODO/function-kit-runtime-sdk/src/index.js`、`TODO/function-kit-runtime-sdk/src/index.d.ts`
+    - Schema：`TODO/function-kit-runtime-sdk/schemas/function-kit-manifest.schema.json`、`TODO/function-kits/host-bridge/message-envelope.schema.json`
+    - 单测：`TODO/function-kit-runtime-sdk/tests/client-api.test.mjs`、`TODO/function-kit-runtime-sdk/tests/manifest-contract.test.mjs`
+  - Android Host：使用 `InputConnectionCompat.commitContent` 写回 `content://` 图片
+    - 入口：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+    - bridge 白名单：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWebViewHost.kt`
+    - FileProvider：`TODO/ime-research/repos/fcitx5-android/app/src/main/AndroidManifest.xml`、`TODO/ime-research/repos/fcitx5-android/app/src/main/res/xml/function_kit_file_paths.xml`
+    - 权限开关：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/data/prefs/AppPrefs.kt`
+  - 验证：
+    - `Set-Location <WORKSPACE_ROOT>\\TODO\\function-kit-runtime-sdk; npm test`
+    - `Set-Location <WORKSPACE_ROOT>\\TODO\\ime-research\\repos\\fcitx5-android; .\\gradlew.bat :app:testDebugUnitTest`
+
+- [x] 功能件的任务追踪，功能件可能会有很多异步任务，如何追踪是个问题（设计 + MVP 落地）
+  - 设计文档：`TODO/ime-research/notes/20260325_functionkit_async_task_tracking.md`
+    可以开始实现
+  - 2026-03-26 进展：Task tracking 协议最小闭环（MVP）
+    - Bridge schema：新增 task 相关 message type（`task.update / tasks.sync.request / tasks.sync / task.cancel / task.cancel.ack`）
+      - `TODO/function-kits/host-bridge/message-envelope.schema.json`
+    - Runtime SDK：新增 `kit.tasks`（sync/cancel + 本地 tasks store + 幂等 seq 合并）
+      - `TODO/function-kit-runtime-sdk/src/index.js`
+      - `TODO/function-kit-runtime-sdk/src/index.d.ts`
+    - Runtime SDK tests：补齐 tasks 协议的单测覆盖（SDK merge + cancel ack）
+      - `TODO/function-kit-runtime-sdk/tests/client-api.test.mjs`
+      - `TODO/function-kit-runtime-sdk/tests/manifest-contract.test.mjs`
+    - Android Host：bridge allowlist + task dispatch helper
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWebViewHost.kt`
+    - Android Host：宿主侧 task tracker + 接入关键异步路径（`network.fetch / ai.request / candidates.regenerate`）
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitTaskTracker.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+    - 测试功能件（更轻量，替代 Bridge Debugger）：Runtime Lab 提供 Tasks 面板（Sync/Cancel + `network.fetch` 触发器）
+      - `TODO/function-kits/runtime-lab/ui/app/index.html`
+      - `TODO/function-kits/runtime-lab/ui/app/main.js`
+      - `TODO/function-kits/runtime-lab/ui/app/styles.css`
+      - `TODO/function-kits/runtime-lab/manifest.json`
+    - 待做（Phase 2，可选）：
+      - `task.log.append`（当前未落地：先用 `task.update.progress/message` + `host.state.update`）
+      - 覆盖更多宿主异步路径（例如 `input.commitImage` store/commit、未来 `ai.agent.run` 等）
+    - 待做（用户体验补齐）：IME Task Center（任务中心）
+      - 目标：IME 内有入口可查看所有“用户任务”的 running/history，并能查看结果摘要/错误/跳转到对应 kit
+      - 审计 + 方案文档：`TODO/ime-research/notes/20260326_functionkit_task_center_and_taskification_audit.md`
+
+- [x] 移除 Bridge Debugger（不随 Android 内置功能件分发），用更轻量的 Runtime Lab 替代用于“最近改动”手动验收
+  - Runtime Lab：`TODO/function-kits/runtime-lab/`
+  - Android 侧打包过滤（不再 sync `bridge-debugger` 到 assets）：`TODO/ime-research/repos/fcitx5-android/app/build.gradle.kts`
+  - 手动验收清单（只测最近变更：`ai.request/ai.response`、tasks、WindowPool、input 写回）：`TODO/ime-research/notes/20260326_functionkit_latest_changes_manual_checks.md`
+
+- [x] 记得用模拟器做自动化测试！！！而且是端到端测试，手动版本，亲力亲为的，不是写脚本的那种，参考 TODO\ime-research\artifacts\manual\emulator
+  - Runbook：`TODO/ime-research/notes/20260325_functionkit_manual_e2e_runbook.md`
+  - 产物规范：`TODO/ime-research/artifacts/manual/emulator/README.md`
+
+- [ ] 输入法留给功能件的位置非常非常小！！！还不到屏幕的一半，因此功能件的开发需要非常非常谨慎，需要做小来！而不是像传统的网页那般大小。接下来你需要完全重构各个功能件，适应这个大小。
+  - 2026-03-26 进展：Function Kits「IME 小面板」UI 重构（避免网页式大页面）
+    - 共享布局/间距（`kit-shell` / `kit-scroll`）：`TODO/function-kits/shared/ui/ime-panel.css`
+    - Chat Auto Reply：移除大 hero，把 `AI 生成/换一批` 挪到 topbar；内容区滚动；小高度隐藏冗余信息：
+      - `TODO/function-kits/chat-auto-reply/ui/app/index.html`
+      - `TODO/function-kits/chat-auto-reply/ui/app/styles.css`
+    - Quick Phrases：改为 3-tab（短语/草稿/状态），主流程优先显示短语列表；上下文/权限收纳到「状态」：
+      - `TODO/function-kits/quick-phrases/ui/app/index.html`
+      - `TODO/function-kits/quick-phrases/ui/app/main.js`
+      - `TODO/function-kits/quick-phrases/ui/app/styles.css`
+    - IME Hooks：改为小面板布局（固定 topbar+tabs，主区滚动），压缩字号/间距：
+      - `TODO/function-kits/ime-hooks/ui/app/index.html`
+      - `TODO/function-kits/ime-hooks/ui/app/styles.css`
+    - Runtime Lab：改为 IME 小面板布局（固定 topbar+tabs，主区滚动），压缩字号/间距：
+      - `TODO/function-kits/runtime-lab/ui/app/index.html`
+      - `TODO/function-kits/runtime-lab/ui/app/main.js`
+      - `TODO/function-kits/runtime-lab/ui/app/styles.css`
+
+- [x] 目前提前的runtime api设计中，有关ai的问题我需要澄清一下， 看看是否设计有误。那就是一个功能件可不仅仅一次只请求一次AI，AI请求并不是串行的，而且也不是只有同一个prompt，也不只有同一个schema，因此你需要提供足够的自由度。目前的runtime api以及schema设计是不是存在缺陷，你需要仔细全面的检查。还有所谓的candidate，我总感觉你在自以为是，你是不是认为只要是AI调用，就一定有所谓的candidate，似乎candidate在runtime中占据相当高的位置了已经！！！我总感觉你的设计出现了相当大的问题啊！！！！！！！！！！！！
+  - 2026-03-26 进展：完成现状审计 + 给出“AI 通用原语 / 候选解耦 / 并发 + 多 schema”方案文档（待你审核后再改代码）
+    - `TODO/ime-research/notes/20260326_functionkit_ai_runtime_api_review_and_proposal.md`
+  - 2026-03-26 进展：落地 Host Bridge `ai.request` / `ai.response`（不考虑兼容性，移除 `ai.chat`）
+    - Bridge schema：新增 `ai.request` / `ai.response`：`TODO/function-kits/host-bridge/message-envelope.schema.json`
+    - Manifest schema：新增 runtime permission `ai.request`：`TODO/function-kit-runtime-sdk/schemas/function-kit-manifest.schema.json`
+    - Runtime SDK：新增 `client.ai.request()` + `kit.ai.request()`，并更新 preview/mock-host 与单测：`TODO/function-kit-runtime-sdk/src/index.js`、`TODO/function-kit-runtime-sdk/src/index.d.ts`
+    - 样板功能件（用于验证）：`chat-auto-reply` 迁移为 `ai.request -> ai.response`：`TODO/function-kits/chat-auto-reply/ui/app/main.js`、`TODO/function-kits/chat-auto-reply/manifest.json`
+    - 已做：Android Host 接入 `ai.request`（当前仅支持 `route.kind=host-shared`）并回传 `ai.response`（fcitx5-android commits `0b23f0d`, `b3c4b96`）
+
+- [x] 有关ai部分确实还存在着大问题！目前我们做的是，不让功能件请求开发者自己的ai，而用的是用户配置好的api。但问题是，用户可能压根就不会配置api，更喜欢用功能件开发者提供的ai服务。这里面涉及到非常多的问题亟需处理，例如开发者如何管理用户以及如何提高ai服务，直接在功能件写，是否会因为源码泄露导致ai秘钥泄露？这其中的处理方案是怎么样的？如何处理好其中的灵活性问题？先提供方案文档。ai又包含了很多，比如你不能指望用户提供绘图api，视频生成api，这些很可能都是开发者提供的服务，别妄图让用户做配置，那简直就是把用户送入卸载通道。
+  - 2026-03-26 进展：开发者自带 AI 服务（无需用户配 key）的策略方案（待你审核后再落地实现）
+    - `TODO/ime-research/notes/20260326_functionkit_ai_developer_hosted_services_strategy.md`
+
+- [x] 我希望IME能够放大些，别紧张，你听我说，我希望在功能件的导航栏那边(目前有设置和刷新两个功能)加上一个界面放大功能，可以适当的放大ime，占更多的高度空间，点击功能件返回的时候，或者ime收起的时候，需要收起加高的宽度。你需要仔细研究研究怎么实现最高效。现在我需要的不是屎山代码，而且更加灵活的代码
+  - 2026-03-26 进展：Android Function Kit 工具栏新增「放大/收起面板」按钮（expand_more/expand_less），可临时放大 IME 面板高度；返回/IME 收起自动复位
+    - Host Window：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+    - IME 隐藏回调接口：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/wm/ImeWindowHiddenListener.kt`
+    - WindowManager 暴露当前窗口：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/wm/InputWindowManager.kt`
+    - IME 收起时触发复位：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/FcitxInputMethodService.kt`
+    - 文案：`TODO/ime-research/repos/fcitx5-android/app/src/main/res/values/strings.xml`
+    - 文案（简中）：`TODO/ime-research/repos/fcitx5-android/app/src/main/res/values-zh-rCN/strings.xml`
+    - 文案（繁中）：`TODO/ime-research/repos/fcitx5-android/app/src/main/res/values-zh-rTW/strings.xml`
+
+- [x] 复制之后的弹窗太靠近手机顶部了，能不能放到手机底部附近来
+
+
+- [x] 目前文件上传功能实用体验上还有很多问题，先看一个完整的逻辑链路，用户打开ime->选择自己想要打开的功能件->其中存在文件上传，点击->进入文件选择器，选择文件->返回到上一步ime所在的app，ime自动激活，但是在默认的键盘界面->找寻刚刚上传文件用到的功能件->功能件提示已有文件选择->执行文件上传。其中体验不好的就是，文件选择完成需要返回的时候，ime展示的不是刚刚打开的功能件，而且键盘界面。未来可能还有很多地方会让ime并不是默认进入到键盘界面的，对此，你需要提供一个更具灵活性和扩展性的方案。
+
+- [x] 在ime app中，功能件设置页面中有一个设置项叫作【远程推理】，这项内容以及相关的设置项应该删除掉！因为有一个单独的AI设置页面中已经包含了这些信息。
+  - 2026-03-29 进展：移除功能件设置页中的「远程推理」相关项（开关 / Base URL / Token / Timeout），并在 AI 设置页继续提供相同配置
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/behavior/FunctionKitSettingsFragment.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/data/prefs/AppPrefs.kt`
+  - 2026-03-30 修复：`hideDuplicatedPreferences` 改为递归移除嵌套 Preference，避免「远程推理」等重复项仍残留在 Function Kit 设置页
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/behavior/FunctionKitSettingsFragment.kt`
+  - 2026-03-30 真机编译/安装（远程 adb：`<DEVICE_SERIAL>`）
+    - 构建：`.\gradlew.bat :app:assembleDebug -PbuildABI=arm64-v8a`（fcitx5-android commit `28bf1de`）
+    - 安装：`adb -s <DEVICE_SERIAL> install --no-incremental -r -d "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-28bf1de-arm64-v8a-debug.apk"`
+
+- [x] 在ime app中，功能件设置页面中，目前还无法为每个功能件单独的页面进行非常细粒度的权限控制，目前仅仅能够大粒度的全部开启或者全部关闭，这肯定不够，需要细粒度的权限控制。而且，目前还无法设置功能件固定功能，还有目前没有根据LRU算法给功能件安排位置。任务中间过程记得写入到TODO啊！！！
+  - 2026-03-29 进展：补齐 per-kit 权限控制入口 + 固定/置顶 + LRU 排序
+    - per-kit 权限：功能件工具栏长按某个功能件，直接跳到该功能件的权限/开关页（不再只到总设置列表）
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/KawaiiBarComponent.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/utils/AppUtil.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitDetailFragment.kt`
+    - 固定功能件：功能件详情页新增「固定到工具栏」开关；工具栏/更多面板/设置列表均按「固定优先」排序
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitKitSettingsStore.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitDetailFragment.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitManagerFragment.kt`
+    - LRU 排序：记录每个功能件最近使用时间，并用「固定优先 + 最近使用优先」排序入口
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindowPool.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitQuickAccessOrderer.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/status/StatusAreaWindow.kt`
+    - 单测：`FunctionKitQuickAccessOrdererTest` + 更新 `FunctionKitQuickAccessSpecTest`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/test/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitQuickAccessOrdererTest.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/test/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitQuickAccessSpecTest.kt`
+
+- [x] 任务中心位于三级菜单中（滑动，点击更多，点击任务中心），要是用户不能够立马触及到，那么这任务中心不就是个摆设吗，用户永远不可能用如此复杂的步骤来打开任务中心的，你看看怎么放置更好？谈谈你的方案，写入文档，任务中间过程记得写入到TODO啊！！！还有任务中心的内容哪里是普通人看得懂的东西啊，太多开发者看的东西了啊！用户对于任务中心的观察和操作，你再仔细想想。
+  - 2026-03-29 进展：输出「任务中心」入口与内容改造方案文档
+    - `TODO/ime-research/notes/20260329_functionkit_task_center_ux_proposal.md`
+  - 2026-03-29 进展：落地 Phase 1/2（工具栏一键入口 + 运行中红点/badge + 用户可读列表/详情，开发者 JSON 折叠）
+    - 工具栏入口：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitQuickAccessSpec.kt`
+    - 运行中 badge：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/ui/ToolButton.kt`
+    - 运行中 badge 更新：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/KawaiiBarComponent.kt`
+    - 任务列表文案：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitTaskCenterWindow.kt`
+    - 任务详情（默认用户视图）：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitTaskDetailWindow.kt`
+    - 文案：`TODO/ime-research/repos/fcitx5-android/app/src/main/res/values/function_kit_task_center_strings.xml`
+    - 文案（简中）：`TODO/ime-research/repos/fcitx5-android/app/src/main/res/values-zh-rCN/function_kit_task_center_strings.xml`
+  - 2026-04-01 进展：Task 支持功能件自定义任务名称 `task.title`（避免显示接口名）
+    - Host（fcitx5-android commit `061b2da`）：`ai.request` / `network.fetch` 从 payload 读取 `task.title` 并写入 task；任务列表/详情优先展示 title
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitTaskTracker.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitTaskHub.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitTaskCenterWindow.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitTaskDetailWindow.kt`
+    - 协议/SDK 文档（主仓库 commit `434e0e4`）：约定 request payload 可带 `task:{title}`，并给出示例
+      - `TODO/function-kits/host-bridge/README.md`
+      - `TODO/function-kit-runtime-sdk/docs/CAPABILITIES_AND_PERMISSIONS.md`
+      - `TODO/function-kit-runtime-sdk/docs/BROWSER_EXTENSION_STYLE_API_V2.md`
+    - 示例 kits 已加：
+      - `TODO/function-kits/chat-auto-reply/ui/app/main.js`
+      - `TODO/function-kits/runtime-lab/ui/app/main.js`
+    - 真机安装：`versionName=061b2da`
+
+- [x] 在ime app中，功能件的启用和禁用之后，还有启动或者取消固定之后，我发现后面ime弹出的界面中，并没有看到效果有更新
+  - 2026-03-29 进展：修复 IME 工具栏功能件列表“不会即时更新”的问题（监听 per-kit 设置变更，动态重建工具栏按钮列表）
+    - 功能件工具栏动态渲染：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/ui/idle/ButtonsBarUi.kt`
+    - 监听设置变更 + 刷新：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/KawaiiBarComponent.kt`
+    - per-kit 设置变更监听入口：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitKitSettingsStore.kt`
+
+- [x] 一切向浏览器插件对齐：管理页面（宿主） vs 设置页面（功能件 Options）
+  - 2026-03-29 进展：对齐“浏览器插件图标右键菜单”，在 IME 工具栏功能件入口长按弹出菜单
+    - 菜单项：打开设置（Options）/ 固定或取消固定 / 管理权限
+    - 宿主 -> kit 触发 Options：复用 `host.state.update.details.intent`，约定 `intent.kind=open_options`
+    - Android Host：长按菜单 + intent 派发
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/KawaiiBarComponent.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values/strings.xml`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values-zh-rCN/strings.xml`
+    - Kit UI：收到 open_options intent 后切换到自己的 options UI（并避免触发不必要的 boot context refresh）
+      - `TODO/function-kits/chat-auto-reply/ui/app/main.js`
+      - `TODO/function-kits/quick-phrases/ui/app/main.js`
+    - 设计文档更新：`TODO/ime-research/notes/20260325_functionkit_management_page_and_settings_page.md`
+  - 2026-03-30 进展：修复 IME 内功能件 WebView 原生 `<select>` 点击无响应（不再依赖 Android 下拉弹窗，改为 segmented 控件）
+    - 共享样式：`TODO/function-kits/shared/ui/ime-panel.css`
+    - Chat Auto Reply：`TODO/function-kits/chat-auto-reply/ui/app/index.html`、`TODO/function-kits/chat-auto-reply/ui/app/main.js`
+    - File Upload Lab：`TODO/function-kits/file-upload-lab/ui/app/index.html`、`TODO/function-kits/file-upload-lab/ui/app/main.js`
+    - IME Hooks：`TODO/function-kits/ime-hooks/ui/app/index.html`、`TODO/function-kits/ime-hooks/ui/app/main.js`
+    - Bridge Debugger：`TODO/function-kits/bridge-debugger/ui/app/index.html`、`TODO/function-kits/bridge-debugger/ui/app/main.js`
+  - 2026-03-30 进展：修复功能件入口长按菜单闪退 & 菜单项点击无响应
+    - 闪退根因：`androidx.appcompat.widget.PopupMenu` 在 IME window 主题下 inflate `abc_popup_menu_item_layout` 失败
+    - 修复：改用 `android.widget.PopupMenu` + `setOnMenuItemClickListener`（避免 AppCompat 主题属性依赖）
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/KawaiiBarComponent.kt`
+  - 2026-03-30 进展：Android Host 支持 `runtime.message.*`（功能件间消息）路由
+    - `runtime.message.send`（UI->Host）路由到目标 kit，并回 `runtime.message.send.ack`
+    - 目标 kit 收到 `runtime.message`（Host->UI），握手前入队，握手后投递
+    - 权限：新增 `runtime.message.send/receive`（全局开关 + 每 kit override）
+    - fcitx5-android commit `1ef9cf4`
+    - 关键落点：
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWebViewHost.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitDefaults.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitPermissionPolicy.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/data/prefs/AppPrefs.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitDetailFragment.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/behavior/FunctionKitSettingsFragment.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/test/java/org/fcitx/fcitx5/android/ui/main/settings/behavior/FunctionKitSettingsStatusResolverTest.kt`
+  - 2026-03-30 真机编译/安装（远程 adb：`<DEVICE_SERIAL>`）
+    - 构建：`.\gradlew.bat :app:assembleDebug -PbuildABI=arm64-v8a`
+    - 安装：`adb -s <DEVICE_SERIAL> install --no-incremental -r -d "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-5d1431a-arm64-v8a-debug.apk"`
+    - 2026-03-30 新包：`org.fcitx.fcitx5.android-1ef9cf4-arm64-v8a-debug.apk`
+      - `adb install` / `pm install` 失败：`INSTALL_FAILED_ABORTED: User rejected permissions`（需要手机端确认安装/权限）
+      - 后续处理：关闭系统包校验后可无弹窗安装
+        - `adb -s <DEVICE_SERIAL> shell settings put global package_verifier_enable 0`
+        - 安装成功：`adb -s <DEVICE_SERIAL> install --no-streaming --no-incremental -r -d "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-1ef9cf4-arm64-v8a-debug.apk"`
+        - 验证：`dumpsys package org.fcitx.fcitx5.android.debug` 显示 `versionName=1ef9cf4`
+  - 2026-03-30 更新：Binding payload 契约收敛（`requestedPayloads` enum + 默认值 + 诊断字段 + 权限对齐）
+    - Runtime SDK commit `4335ce9`
+      - Schema：`TODO/function-kit-runtime-sdk/schemas/function-kit-manifest.schema.json`
+      - 文档：`TODO/function-kit-runtime-sdk/docs/BINDINGS.md`、`TODO/function-kit-runtime-sdk/docs/INDEX.md`、`TODO/function-kits/host-bridge/README.md`
+      - SDK：`TODO/function-kit-runtime-sdk/src/index.js`、`TODO/function-kit-runtime-sdk/src/index.d.ts`
+      - 单测：`TODO/function-kit-runtime-sdk/tests/client-api.test.mjs`（`npm test` 全绿）
+    - Android Host commit `caf61fe`
+      - 默认 payload：`requestedPayloads` 缺省时按 trigger 自动补齐；显式 `[]` 表示不下发任何额外文本 payload
+      - 诊断字段：`requestedPayloads/providedPayloads/missingPermissions/payloadLimits/payloadTruncated`
+      - 权限对齐：`selection.*` / `clipboard.text` 下发前对齐 `context.read`（未授予则跳过并回显 `missingPermissions`）
+      - 关键落点：
+        - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+        - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingInvocationContext.kt`
+        - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitManifest.kt`
+        - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingRegistry.kt`
+  - 2026-03-30 真机编译/安装（远程 adb：`<DEVICE_SERIAL>`）
+    - 构建：`.\gradlew.bat :app:assembleDebug -PbuildABI=arm64-v8a`（fcitx5-android commit `caf61fe`）
+    - 安装前：`adb -s <DEVICE_SERIAL> shell settings put global package_verifier_enable 0`
+    - 安装：`adb -s <DEVICE_SERIAL> install --no-streaming --no-incremental -r -d "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-caf61fe-arm64-v8a-debug.apk"`
+    - 验证：`dumpsys package org.fcitx.fcitx5.android.debug` 显示 `versionName=caf61fe`
+  - 2026-03-30 更新：打开功能件时默认处于「展开」模式（减少额外点击）
+    - Host：打开 `FunctionKitWindow` 时自动执行 `expandPanel(reason="auto-open")`
+    - fcitx5-android commit `ab72956`
+    - 关键落点：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+  - 2026-03-30 真机编译/安装（远程 adb：`<DEVICE_SERIAL>`）
+    - 构建：`.\gradlew.bat :app:assembleDebug -PbuildABI=arm64-v8a`（fcitx5-android commit `ab72956`）
+    - 安装前：`adb -s <DEVICE_SERIAL> shell settings put global package_verifier_enable 0`
+    - 安装：`adb -s <DEVICE_SERIAL> install --no-streaming --no-incremental -r -d "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-ab72956-arm64-v8a-debug.apk"`
+    - 验证：`dumpsys package org.fcitx.fcitx5.android.debug` 显示 `versionName=ab72956`
+
+- [ ] 如何开发一个实用的调试器？你仔细想想看微信开发者工具，它就提供了一种调试器，让微信小程序能够运行起来，微信小程序的runtime自然与网页浏览器完全不一样，所以不能够光靠浏览器运行。我们的输入法ime也提供了各种上下文，以及自己开发的runtime sdk，这些内容要是全部在真实的机器上运行，效率太差了，开发者自己都难受得要死。所以，接下来你其实需要干一个超大项目，那就是开发一个类似于微信开发者工具这么一个东西，名字由你来取。你需要新建一个git项目来管理这部分代码。
+  - 2026-03-30 进展：确定调试器项目命名为 **KitStudio**，并输出总体架构与路线文档
+    - `TODO/ime-research/notes/20260330_kitstudio_devtools_design.md`
+  - 2026-03-30 进展：初始化独立 git 仓库并落地 Phase 0 原型（Web Runner + Host Simulator + Bridge Inspector）
+    - 仓库：`TODO/ime-research/repos/kit-studio/`
+    - 架构：`TODO/ime-research/repos/kit-studio/docs/ARCHITECTURE.md`
+    - 启动：`powershell -ExecutionPolicy Bypass -File .\\TODO\\ime-research\\repos\\kit-studio\\scripts\\dev.ps1`
+  - 2026-03-31 进展：Runner IME 视角继续贴近真实比例（缩放/键盘 mock）+ Remote Attach history/dedup + 可视化 E2E 稳定性修正
+    - KitStudio commit `ddd78af`
+    - 证据（截图，已忽略）：`TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-99-annotated.png`
+    - E2E：`powershell -ExecutionPolicy Bypass -File .\\TODO\\ime-research\\repos\\kit-studio\\scripts\\e2e.ps1`（agent-browser 版本默认 pin `0.23.0`，可用 env `KITSTUDIO_AGENT_BROWSER_VERSION` 覆盖）
+  - 2026-03-31 进展：Electron Runner + Remote Attach 模式（observe/tap/bridge/remote-host）+ E2E Remote Attach 闭环与稳定性修正
+    - KitStudio commit `e252287`
+    - 启动 Electron：`cd TODO/ime-research/repos/kit-studio; npm run electron`
+    - 证据（截图，已忽略）：`TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-03b-remote-attach.png`
+    - E2E：`powershell -ExecutionPolicy Bypass -File .\\TODO\\ime-research\\repos\\kit-studio\\scripts\\e2e.ps1`（会探测 `GET /api/attach/history`，避免旧 server 常驻导致 endpoint 404）
+  - 2026-03-31 进展：Remote Attach 工具化（Channels 列表/清空/导出 + 复制 SSE/POST 示例）+ `/api/health` 版本标识 + allowlist（origin/clientId/kitId）+ 最近打开 kit 记忆
+    - KitStudio commit `6057686`
+    - 证据（截图，已忽略）：
+      - `TODO/ime-research/repos/kit-studio/e2e/screenshots/manual-02-home-after-remote-attach-layout.png`
+      - `TODO/ime-research/repos/kit-studio/e2e/screenshots/manual-05-remote-attach-advanced-export.png`
+    - E2E：`powershell -ExecutionPolicy Bypass -File .\\TODO\\ime-research\\repos\\kit-studio\\scripts\\e2e.ps1`
+  - 2026-03-31 进展：Remote Attach 可选 token 鉴权（server 校验 + UI token 输入；SSE query / fetch+POST Authorization）
+    - KitStudio commit `6149808`
+    - 证据（截图，已忽略）：`TODO/ime-research/repos/kit-studio/e2e/screenshots/manual-06-remote-attach-token.png`
+    - 配置：`TODO/ime-research/repos/kit-studio/kitstudio.config.json` 可选 `attach.token`（或 env `KITSTUDIO_ATTACH_TOKEN`）
+  - 2026-03-31 进展：导入 Remote Attach channel 导出文件（`kind=kitstudio.attach.channel`）→ 写入 Inspector log + 生成 fixture queue（为回放做准备）
+    - KitStudio commit `1902513`
+  - 2026-03-31 进展：Electron Runner 禁止下载（避免 kit 借 download 泄露/误操作），会话/Remote Attach 导出改为 Save Dialog 写文件
+    - KitStudio commit `0a753b9`
+
+  - 2026-03-31 进展：Android（fcitx5-android）→ KitStudio Remote Attach 接线（HTTP push）
+    - fcitx5-android commit `63bffc4`
+    - 配置入口：Android 设置 → Function Kit → `Enable KitStudio Remote Attach` / `KitStudio base URL` / `KitStudio attach token`
+    - channelId 约定：`android:<kitId>@<clientId8>`（origin=`fcitx5-android`，clientId 为安装级 UUID）
+    - 关键落点：
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitKitStudioRemoteAttach.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWebViewHost.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+    - 待做：真机验收（KitStudio Remote Attach 收到 `origin=fcitx5-android` 的实时事件）+ agent-browser 截图留证
+  - 2026-03-31 进展：去掉“看 logcat 抄 channelId”的摩擦（更贴近 Chrome/Flutter 的设备发现体验）
+    - fcitx5-android commit `c2f49ae`：功能件详情页直接展示并可点击复制 channelId（无需 logcat）
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitDetailFragment.kt`
+    - KitStudio commit `f764856`：Remote Attach「连接」在 channel 为空时自动选择最近 channel；Channels 列表展示元信息并支持一键点击连接
+      - `TODO/ime-research/repos/kit-studio/web/app.js`
+      - `TODO/ime-research/repos/kit-studio/src/server.mjs`
+  - 2026-03-31 进展：KitStudio Runner 尺度/布局修复 + Remote Attach Channels 进一步工具化（可视化 E2E 增强）
+    - KitStudio commit `c7a38c8`
+    - Runner：缩放不再导致布局“空白很大/滚动异常”（通过 `device-frame-wrap` 让缩放同时影响布局尺寸）；默认对齐 bottom、默认缩放 80%（更贴近“输入法功能件”验收视角）
+      - `TODO/ime-research/repos/kit-studio/web/index.html`
+      - `TODO/ime-research/repos/kit-studio/web/styles.src.css`
+      - `TODO/ime-research/repos/kit-studio/web/app.js`
+      - 证据（截图，已忽略）：`TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-01-home.png`
+    - Remote Attach：`POST /api/attach/envelope` 支持省略 channelId（由 `origin/clientId/envelope.kitId` 推导），Channels 列表新增 filter + 展示 kit manifest name，auto-pick 更偏向“当前 kitId 唯一匹配”
+      - `TODO/ime-research/repos/kit-studio/src/server.mjs`
+      - `TODO/ime-research/repos/kit-studio/web/index.html`
+      - `TODO/ime-research/repos/kit-studio/web/app.js`
+      - 证据（截图，已忽略）：`TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-03c-remote-attach-channels.png`
+    - E2E：新增 Remote Attach Channels 截图用例；失败时输出 agent-browser args 便于定位 selector
+      - `TODO/ime-research/repos/kit-studio/scripts/e2e.ps1`
+      - `TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-03c-remote-attach-channels.png`
+    - agent-browser（vercel-labs）源码已下载（便于对照 README/命令用法）：`.agent_browser/README.md`
+  - 2026-03-31 进展：KitStudio Kit Packages（Catalog/ZIP）分发 UI + 视觉 E2E
+    - KitStudio commit `61bd3aa`
+    - UI：Packages 面板（复制 Catalog URL + 单 kit 的 ZIP URL）：
+      - `TODO/ime-research/repos/kit-studio/web/index.html`
+      - `TODO/ime-research/repos/kit-studio/web/app.js`
+    - E2E：新增 Packages 截图 + 把 `/api/kit-packages` 纳入“旧 server 探测/自动重启”条件：
+      - `TODO/ime-research/repos/kit-studio/scripts/e2e.ps1`
+      - `TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-01b-packages.png`
+  - 2026-03-31 进展：KitStudio Workspace Profile（文件化）+ Kit Packages serve 端点落地（修复 `/api/kit-packages` 404）+ 视觉 E2E 补充
+    - KitStudio commit `ec6ba8e`
+    - Workspace：顶栏「导出工作区/导入工作区」（`kind=kitstudio.workspace@v1`，内含 `kitstudio.session@v1`），恢复主题/Runner/Remote Attach/会话快照
+      - `TODO/ime-research/repos/kit-studio/web/index.html`
+      - `TODO/ime-research/repos/kit-studio/web/app.js`
+      - 证据（截图，已忽略）：`TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-01c-workspace-import.png`
+    - Kit Packages：补齐 server 的 `/api/kit-packages*`，ZIP 用 `yazl` 按需构建并缓存到 `.kitstudio-data/kit-packages/`
+      - `TODO/ime-research/repos/kit-studio/src/server.mjs`
+      - `TODO/ime-research/repos/kit-studio/package.json`
+    - E2E：脚本新增「导入工作区」步骤 + 修复旧 server 识别（PowerShell 字符串 `src\\server.mjs`）
+      - `TODO/ime-research/repos/kit-studio/scripts/e2e.ps1`
+    - Doc：README/TODO/PROGRESS 补齐
+      - `TODO/ime-research/repos/kit-studio/README.md`
+      - `TODO/ime-research/repos/kit-studio/TODO.md`
+      - `TODO/ime-research/repos/kit-studio/PROGRESS.md`
+  - 2026-03-31 进展：KitStudio Capability allowlist（按能力粒度禁用 server API）
+    - KitStudio commit `3f8cd46`
+    - 配置：`TODO/ime-research/repos/kit-studio/kitstudio.config.json` 增加 `capabilities.allow/deny`
+    - 覆盖：`/api/network/fetch`、`/api/files*`、`/api/kit-packages*`（并在 `/api/health` 输出当前 allow/deny）
+    - 关键落点：
+      - `TODO/ime-research/repos/kit-studio/src/server.mjs`
+      - `TODO/ime-research/repos/kit-studio/README.md`
+      - `TODO/ime-research/repos/kit-studio/TODO.md`
+  - 2026-03-31 进展：同步 KitStudio TODO（标记 Android Host Adapter 已落地：HTTP transport；WebSocket 待做）
+    - KitStudio commit `070a537`
+  - 2026-04-01 进展：KitStudio Remote Attach 一次性配对码（Pair Code）+ Android 自动兑换 token + 视觉 E2E
+    - Server：新增 `/api/attach/pair/code` + `/api/attach/pair/claim`，并把 attach 鉴权分级（admin vs write）：`TODO/ime-research/repos/kit-studio/src/server.mjs`
+    - UI：Remote Attach 高级区新增「一次性配对码」卡片（生成/复制/到期提示）：`TODO/ime-research/repos/kit-studio/web/index.html`、`TODO/ime-research/repos/kit-studio/web/app.js`
+    - Android：`KitStudio attach token` 支持粘贴 `KS-XXXXXXXX` 自动兑换并写回 prefs：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitKitStudioRemoteAttach.kt`
+    - Android 设置页补齐：在「Function Kit」管理页与 kit 详情页显示 Remote Attach 开关/Base URL/token（避免“找不到开启远程调试”）：
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitManagerFragment.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitDetailFragment.kt`
+    - Android：修复「Function Kit」页闪退（Preference dependency 注册时机导致 `Dependency ... not found`），真机验证 Remote Attach 区块可用：`TODO/ime-research/repos/kit-studio/e2e/screenshots/android-remote-attach-settings.png`
+    - Android：修复「IME 弹出界面看不到功能件图标」的常见原因：新增一次性迁移把 `function_kit_toolbar_button` 默认开启（若之前为 false 会被改回 true，用户仍可再手动关闭）：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/data/prefs/AppPrefs.kt`
+    - KitStudio：修复本地 E2E（agent-browser）在 `host=0.0.0.0` 时用 `http://0.0.0.0:...` 探活失败的问题：`scripts/e2e.ps1` 区分 listen host 与 client host，并在需要时回退 `127.0.0.1`（支持 env `KITSTUDIO_CLIENT_HOST`）；最新截图：`TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-01-home.png`
+    - E2E：新增配对码截图：`TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-03d-remote-attach-pair-code.png`；脚本：`TODO/ime-research/repos/kit-studio/scripts/e2e.ps1`
+    - KitStudio：补齐本地“视觉 E2E”覆盖与 `task.cancel` 真正验收（慢 `network.fetch` → canceled）：
+      - server：新增 `/api/e2e/delay`：`TODO/ime-research/repos/kit-studio/src/server.mjs`
+      - Host Simulator：取消链路增强（抢跑取消 + canceled 识别）：`TODO/ime-research/repos/kit-studio/web/app.js`
+      - kit（file-upload-lab）：新增「取消任务」按钮（监听 `task.update` 获取 taskId 并发送 `task.cancel`）：`TODO/function-kits/file-upload-lab/ui/app/index.html`、`TODO/function-kits/file-upload-lab/ui/app/main.js`
+      - E2E：通过截图验收 DevTools/Topbar/Workspace/Session 等面板，新增自动确认 `confirm()` 避免阻塞：`TODO/ime-research/repos/kit-studio/scripts/e2e.ps1`
+      - 证据截图：`TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-02a-devtools-inspector.png`、`TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-02b-devtools-storage.png`、`TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-02e-devtools-tasks.png`、`TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-02i-topbar-actions.png`、`TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-99-annotated.png`
+    - 验收手册：`TODO/ime-research/repos/kit-studio/docs/ANDROID_REMOTE_ATTACH_ACCEPTANCE.md`
+
+  - 2026-04-02 进展：KitStudio 本地“视觉 E2E”（agent-browser）回归验收重新跑通（PASS）
+    - E2E：`powershell -ExecutionPolicy Bypass -File .\\TODO\\ime-research\\repos\\kit-studio\\scripts\\e2e.ps1`
+    - 证据截图（最新一轮生成）：
+      - `TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-01-home.png`
+      - `TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-03-bridge-debugger.png`
+      - `TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-05-ime-hooks-intercept.png`
+      - `TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-99-annotated.png`
+    - 修复点：E2E selectors 改为基于真实 UI 文本/DOM（避免依赖 kit 内不存在的 `#id`）；`ime-hooks` 决策 badge 放行态（`variant=""`）不再被错误回退为 muted
+
+- [x] 调研 runtime sdk，以及当前的功能件 js 文件写法，看看是不是还存在很多地方有冗余或者不必要的写法。调研好来，提供给我文档报告
+  - 2026-03-30 进展：输出「Runtime SDK & Function Kits：JS 写法冗余审计报告」（冗余清单 + 收敛方案 + 迁移路线）
+    - `TODO/ime-research/notes/20260330_runtime_sdk_and_functionkits_js_redundancy_audit.md`
+  - 2026-03-30 更新：根据反馈调整报告重点，以 Runtime SDK/协议层冗余与契约一致性为主（不建设 Function Kits 共享 UI JS）
+  - 2026-03-30 补充：输出「Runtime SDK 缺失能力菜单（unknown-unknowns）」供你勾选决定要加哪些能力
+    - `TODO/ime-research/notes/20260330_runtime_sdk_missing_capabilities_menu.md`
+  - 2026-03-30 落地：不考虑兼容性，直接收敛 Runtime SDK 冗余 API/握手载荷，并同步更新文档与测试
+    - `bridge.ready` 不再由 UI 发送 `requestedPermissions`（宿主按 manifest + 授权矩阵决定授予）
+    - 删除 `createClient` 的 legacy alias（`ready/requestContext/...`），避免 AI/人混用两套 API
+    - 移除 `createKit.manifest` 与 `resolveKitRuntimePermissions`（避免 UI 侧再去读 manifest 做权限推导）
+    - browser bundle 全局 SDK 只暴露 `createKit`（移除 `FunctionKitRuntimeSDK.createClient`），彻底杜绝入口混用
+    - 代码与文档：`TODO/function-kit-runtime-sdk/src/index.js`、`TODO/function-kit-runtime-sdk/src/index.d.ts`、`TODO/function-kit-runtime-sdk/README.md`、`TODO/function-kit-runtime-sdk/docs/CAPABILITIES_AND_PERMISSIONS.md`、`TODO/function-kit-runtime-sdk/docs/BROWSER_EXTENSION_STYLE_API_V2.md`
+    - bundle 更新：`TODO/function-kit-runtime-sdk/dist/function-kit-runtime.js`
+    - 测试通过：`TODO/function-kit-runtime-sdk/tests/*.mjs`（`npm test` 全绿）
+  - 2026-03-30 落地：新增 `runtime.message.*`（功能件间消息）与 `ai.response.delta`（流式增量）契约
+    - Runtime SDK：`kit.runtime.sendMessage(...)` / `kit.runtime.onMessage(...)`、`kit.on("ai.delta", ...)`
+      - `TODO/function-kit-runtime-sdk/src/index.js`
+      - `TODO/function-kit-runtime-sdk/src/index.d.ts`
+    - Schema：`TODO/function-kit-runtime-sdk/schemas/function-kit-manifest.schema.json`、`TODO/function-kits/host-bridge/message-envelope.schema.json`
+    - 文档：`TODO/function-kit-runtime-sdk/docs/CAPABILITIES_AND_PERMISSIONS.md`、`TODO/function-kit-runtime-sdk/docs/BROWSER_EXTENSION_STYLE_API_V2.md`
+    - 单测：`TODO/function-kit-runtime-sdk/tests/client-api.test.mjs`、`TODO/function-kit-runtime-sdk/tests/manifest-contract.test.mjs`
+    - bundle 更新：`TODO/function-kit-runtime-sdk/dist/function-kit-runtime.js`
+
+- [x] 支持下载、加载、卸载功能件 + 功能件下载中心；并补齐“zip 源码可读/IP”问题的工程口径与文档（对标浏览器扩展）
+  - Android Host（fcitx5-android）：Settings → Function Kit → Download Center（zip/URL 安装；Kit 详情页卸载；installed-first 资源加载）：commit `75e6435`
+  - 安装包规范：`TODO/function-kits/KIT_PACKAGE_SPEC.md`
+  - 分发/IP 说明：`TODO/function-kits/DISTRIBUTION_AND_IP.md`
+  - KitStudio 已补齐 pack + serve 安装包 ZIP + Install URL（Packages 面板）：KitStudio commit `61bd3aa`（证据：`TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-01b-packages.png`）
+
+- [x] 功能件下载中心作为“内置 Store Kit（Web UI）”：调研可行性 + 能力清单 + WebView 外部资源策略 + UI 还原
+  - 可行性与接口提案：`TODO/function-kits/store/DOWNLOAD_CENTER_AS_KIT.md`
+  - 能力清单（P0/P1/P2 + API 映射 + 验收）：`TODO/function-kits/store/DOWNLOAD_CENTER_CAPABILITIES.md`
+  - WebView 外部资源加载调研：`TODO/function-kits/store/WEBVIEW_EXTERNAL_RESOURCES_RESEARCH.md`
+  - Store Kit（下载中心）UI：`TODO/function-kits/kit-store/ui/app/index.html`、`TODO/function-kits/kit-store/ui/app/styles.css`、`TODO/function-kits/kit-store/ui/app/main.js`
+  - 2026-04-01 修正：发现/管理/搜索列表改为**纵向滚动**（移除横向分页/圆点指示器），避免“只显示两条 + 大空白/左右滑找条目”的怪异承载
+  - 2026-04-01 修正：补回底部页码指示器（两页）并支持左右滑切换，整体字号/间距再压缩一档以贴近截图与 IME 面板密度
+  - 2026-04-01 进展：Store Kit “打开/启用”按钮开始走真实闭环：新增 `kits.open`（从下载中心一键跳转目标 kit 面板）
+  - 2026-04-01 修复：Function Kit WebView 恢复长按（`webView.isLongClickable=true`），输入框可出现系统粘贴/复制菜单（解决“只能自动填充、无粘贴”）
+  - 2026-04-01 修复：Function Kit 面板内输入时，候选词靠近键盘（候选条 Dock 到嵌入键盘上方，避免出现在面板顶部导致点选距离过远）
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/KawaiiBarComponent.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+  - 2026-04-01 修复：Function Kit 面板内输入时，拼音/预编辑（preedit）靠近键盘（Preedit Dock 到嵌入键盘上方，避免出现在面板顶部）
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/preedit/PreeditComponent.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/InputView.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+  - 2026-04-02 修复：复制后“剪贴板动作提示框”不再静默失效（未授予悬浮窗 + 通知被禁/未授权时）
+    - 行为：若 IME 正在显示，直接打开剪贴板动作窗口；否则下次唤起键盘自动恢复到剪贴板动作窗口，并以 Toast 给出提示
+    - 代码：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/ClipboardOverlayPromptManager.kt`（fcitx5-android commit `04652ea`）
+  - 2026-04-03 新增：可用的 Binding 测试功能件「Tone Rewrite」（更礼貌/更坚定/更简短，一键替换到输入框；使用宿主 AI）
+    - Kit：`TODO/function-kits/tone-rewrite/manifest.json`
+    - UI：`TODO/function-kits/tone-rewrite/ui/app/index.html`
+    - ZIP（便于下载中心安装）：`TODO/function-kits/tmp/tone-rewrite-0.1.4.zip`（sha256=5E8A00C2081FC0278C560B7D3061CFFF196FB61A957087A460E518DD9A35B74A）
+  - 2026-04-03 修复：下载中心安装 ZIP 时偶发报错「Failed to read manifest.json from zip」（ZIP entryName 归一化后 `ZipFile.getEntry(...)` 找不到；如前导 `/`、路径分隔符为 `\\`）
+    - 代码：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitPackageManager.kt`（fcitx5-android commit `d77f3e5`）
+  - 2026-04-03 调整：`tone-rewrite` 不再随 APK 内置打包（避免“测试 kit”污染内置列表；改走下载中心 ZIP 安装流程）
+    - 代码：`TODO/ime-research/repos/fcitx5-android/app/build.gradle.kts`（fcitx5-android commit `e3e7a7d`）
+  - 2026-04-03 调整：Tone Rewrite UI 变得更“纯净”（语气 tab 顶部；隐藏空结果区；预览模式更轻）
+    - UI：`TODO/function-kits/tone-rewrite/ui/app/index.html`
+    - 逻辑：`TODO/function-kits/tone-rewrite/ui/app/main.js`
+  - 2026-04-03 修复：面板型 binding 偶发“点了 binding 但功能件语气/视图不一致、且不自动生成”（原因：窗口未 attach 时提前 flush，消息发到 paused WebView 丢失；改为仅 headless 或 windowAttached 时 flush，attach 后再 flush）
+    - 代码：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+  - 2026-04-03 修复：binding 直开面板时，功能件仍可能拿不到本次 invocation（面板打开后补发 `intent.kind=open_invocation`，携带 `invocationId/bindingId`，功能件可兜底对齐 UI 与自动生成）
+    - 代码：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindow.kt`
+  - 2026-04-03 修复：功能件动作窗口 category chip 使用 `AppCompatTextView` 导致 ThemeUtils 报错（改用 `TextView`，避免 AppCompat theme 依赖）
+    - 代码：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindow.kt`
+  - 2026-04-01 修正：整体字号再下调一档（更接近截图与真实输入法面板的密度）
+  - Android Host Bridge：补齐 `kits.*` / `catalog.*` 消息与权限（Store Kit 可接入真实数据）
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWebViewHost.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitDefaults.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitPermissionPolicy.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitCatalogStore.kt`
+  - 2026-04-04 真机“突然闪退”日志排查：当前没抓到新的 Java 崩溃；最近一次异常退出是 `2026-04-04 13:22:39` 的 `SIGKILL(status=9)`，并伴随 WebView sandbox `LOW_MEMORY`，判断更像系统低内存杀进程，不是 Java crash
+    - 排查记录：`TODO/ime-research/artifacts/manual/real-device/20260404_135654_crash_check/NOTES.md`
+    - 重点代码位：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindow.kt`、`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindowPool.kt`
+  - 2026-04-04 性能收敛：Function Kit 宿主/`tone-rewrite` 最近补的热路径调试日志默认关闭，避免在 binding/WebView 消息流、前端自动生成链路里持续刷 `Log.d/console.info`
+    - 宿主：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWebViewHost.kt`
+    - 宿主：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+    - Kit：`TODO/function-kits/tone-rewrite/ui/app/main.js`
+  - 2026-04-04 已验证 `release` 构建可出包（arm64-v8a）
+    - 命令：`$env:PATH = "C:\msys64\ucrt64\bin;$env:PATH"; .\gradlew.bat :app:assembleRelease -PbuildABI=arm64-v8a`
+    - APK：`TODO/ime-research/repos/fcitx5-android/app/build/outputs/apk/release/org.fcitx.fcitx5.android-cb929da-arm64-v8a-release-unsigned.apk`
+  - 2026-04-04 真机已安装 `release` 包（为便于当前测试，使用本机 `debug.keystore` 对 unsigned release 重新签名）
+    - 已签名 APK：`TODO/ime-research/repos/fcitx5-android/app/build/outputs/apk/release/org.fcitx.fcitx5.android-cb929da-arm64-v8a-release-signed-debugkey.apk`
+    - 真机安装：`adb -s <DEVICE_SERIAL> shell pm install -r -d -g /data/local/tmp/fcitx-release.apk`
+    - 包名：`org.fcitx.fcitx5.android`
+    - 版本：`versionName=cb929da`
+
+2026-04-04 wx-reply 功能件（WeChat 回复候选，petite-vue + shadcn-css，零构建）：
+- Kit：`TODO/function-kits/wx-reply/manifest.json`（生成候选并写回输入框，不自动发送）
+- UI：
+  - `TODO/function-kits/wx-reply/ui/app/index.html`
+  - `TODO/function-kits/wx-reply/ui/app/main.js`
+  - `TODO/function-kits/wx-reply/ui/app/styles.css`（主题色：微信绿；默认基址：`http://<HOST:PORT>`，可配置并持久化到 `kit.storage`）
+  - `TODO/function-kits/wx-reply/ui/README.md`
+- 上下文数据参考（WeChat Data Service）：`TODO/function-kits/wx-reply/API.md`、`TODO/function-kits/wx-reply/UPPER_LAYER_APPS.md`
+- 2026-04-04 修复：安装/卸载用户 kit 后，键盘工具栏的 kit 图标列表会自动刷新（不需要重启输入法）
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitPackageManager.kt`
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitKitSettingsStore.kt`
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/KawaiiBarComponent.kt`
+- 2026-04-04 修复：用户安装的 kit 图标可正常加载（`assets.open(...)` 失败时回退到内部存储 `filesDir/function-kits/<kitId>/...`）
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitIconLoader.kt`
+- 2026-04-04 新增：下载中心安装成功后提示“打开”（Snackbar，5s 超时）
+  - 设置页下载中心：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitDownloadCenterFragment.kt`
+  - IME 内 `kits.install`：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+  - Snackbar 封装：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitSnackbars.kt`
+- ZIP（便于下载中心安装）：`tmp/wx-reply-0.1.1.zip`（sha256=EE38D11A668089DEB102C59CF1C94F7538D1B4F502A294F0F35EC2041291E27A）
+
+2026-04-05 wx-reply 功能件重构（按参考图重做）：
+- 功能件改为“选联系人 → 服务配置 → 候选回复”三屏流，删除旧版 tabs / 选中 / 剪贴板 / 手动粘贴入口：
+  - `TODO/function-kits/wx-reply/ui/app/index.html`
+  - `TODO/function-kits/wx-reply/ui/app/styles.css`
+  - `TODO/function-kits/wx-reply/ui/app/main.js`
+- 数据链路改为真实服务优先：`/api/v1/state`、`/api/v1/recent_contacts`、`/api/v1/sessions`、`/api/v1/contacts`、`/api/v1/chats/{username}/history`、`/api/v1/people/{username}/profile`
+- 回复生成改为宿主 `ai.request`，任务名显式为“给某联系人生成微信回复”；点击候选直接写入输入框，不再堆插入/替换/复制按钮
+- 高级配置改为底部 sheet：`工作专业 / 高情商 / 日常闲聊` + `融合我的画像 / 不使用画像`，切换后会自动重新生成
+- Manifest 收敛：仅保留 `manual` binding；权限收敛为 `input.insert / storage.read / storage.write / network.fetch / ai.request / panel.state.write`：
+  - `TODO/function-kits/wx-reply/manifest.json`
+- UI 说明同步：`TODO/function-kits/wx-reply/ui/README.md`
+- 本地校验：
+  - `node --check TODO/function-kits/wx-reply/ui/app/main.js`
+  - `Get-Content -Encoding utf8 TODO/function-kits/wx-reply/manifest.json | ConvertFrom-Json | Out-Null`
+- 打包产物：`TODO/function-kits/tmp/wx-reply-0.2.0.zip`（sha256=`394D3264B9CAE7E030E4302D6A222971FC6669AF1B8269560C4E4CBBA94AF0AD`；zip 根目录已确认直接包含 `manifest.json`）
+- 2026-04-05 继续收敛：在不改风格的前提下提升空间利用率，减少小屏 IME 内频繁滚动
+  - 收紧头部 / 搜索框 / 列表 / 回复卡片 / 底部操作区间距与尺寸：`TODO/function-kits/wx-reply/ui/app/styles.css`
+  - 回复页顶部最近消息改为两行截断，减少长消息把候选区顶下去：`TODO/function-kits/wx-reply/ui/app/styles.css`
+  - 功能件版本升级：`TODO/function-kits/wx-reply/manifest.json`（`0.2.1`）
+  - 新 ZIP：`TODO/function-kits/tmp/wx-reply-0.2.1.zip`（sha256=`8F36AAEF6EF0A1F9FADB40AED0432A415A293F5E34AA895AAD5CF716500CC2F9`）
+- 2026-04-05 avatar 链路排查：服务端确实已返回 `avatar_url`，前端也已消费；真正拦住的是 Host 注入的 CSP 之前只放行 `https:` 图片，导致默认 `http://<HOST:PORT>/avatar/...` 被 WebView 拒掉
+  - 前端消费点：`TODO/function-kits/wx-reply/ui/app/main.js`
+  - Host 修复：放开 `style/img/media/font` 的 `http:` 资源，仍保持远程脚本禁止：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWebViewHost.kt`
+- 2026-04-05 回复页继续收敛：问题根因不是字号，而是回复页中段被 `flex: 1` 硬拉满，导致候选与底部操作之间出现大块无效空白
+  - 为三屏补充独立 screen class，并把回复页改成“内容按实际高度排布 + 底部区 sticky”而不是中段强行占满：`TODO/function-kits/wx-reply/ui/app/index.html`、`TODO/function-kits/wx-reply/ui/app/styles.css`
+  - 进一步收紧底部高级配置与操作按钮高度，减少展开后对候选区的侵占：`TODO/function-kits/wx-reply/ui/app/styles.css`
+  - 功能件版本升级：`TODO/function-kits/wx-reply/manifest.json`（`0.2.2`）
+  - 新 ZIP：`TODO/function-kits/tmp/wx-reply-0.2.2.zip`（sha256=`32882193E395F2854D7387CB4C9658B3302BF5A40AE4F75B74613B1C05D2FD8D`）
+- 2026-04-05 wx-reply 真机安装：已构建 Debug APK `TODO/ime-research/repos/fcitx5-android/app/build/outputs/apk/debug/org.fcitx.fcitx5.android-561eb7a-arm64-v8a-debug.apk`
+  - 远程设备：`<DEVICE_SERIAL>`
+  - `adb push` 到 `/data/local/tmp/fcitx-debug.apk` 后，`pm install` 仍被 vivo 安全策略拦截：`INSTALL_FAILED_ABORTED: User rejected permissions`
+  - 已改走系统安装器：推送到 `/sdcard/Download/fcitx-debug.apk` 并执行 `am start -a android.intent.action.VIEW -d file:///sdcard/Download/fcitx-debug.apk -t application/vnd.android.package-archive`
+  - 同时已把 `wx-reply` 目录直接写入当前 debug 包内部存储：`files/function-kits/wx-reply/manifest.json` 当前为 `0.2.2`
+- 2026-04-05 avatar 显示继续修复：
+  - 进一步确认：服务端 `/api/v1/sessions` 确实返回 `avatar_url`，直接请求 `http://<HOST:PORT>/avatar/...` 也可返回 `200 image/jpeg`；问题不在服务端
+  - 真正根因收敛为 **mixed content**：Kit 页面运行在 `https://function-kit.local/...`，而头像默认是 `http://<HOST:PORT>/avatar/...`，Chromium 会直接拦截，真机日志已出现 `Mixed Content ... requested an insecure image ... has been blocked`
+  - 这次不再依赖 WebView 的 mixed-content 宽松策略，改为把 `http` 头像统一改写为宿主本地代理 URL，再由 Host 代拉外部资源，彻底绕开 mixed content：
+    - Host 代理：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWebViewHost.kt`
+    - Kit 头像 URL 改写：`TODO/function-kits/wx-reply/ui/app/main.js`
+    - 功能件版本升级：`TODO/function-kits/wx-reply/manifest.json`（`0.2.3`）
+  - 构建阻塞顺手修复：`FunctionKitBindingsAdapter.kt` 中错误写成 `marginTop`，改回 `topMargin` 以恢复 Debug 编译
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsAdapter.kt`
+  - 已重新构建并安装真机：
+    - APK：`TODO/ime-research/repos/fcitx5-android/app/build/outputs/apk/debug/org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk`
+    - 安装命令：`adb -s <DEVICE_SERIAL> install -r -d --no-incremental "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk"`
+    - 当前真机：`org.fcitx.fcitx5.android.debug`，`versionName=034ae60`
+- 2026-04-05 wx-reply 最近使用头像继续修复：
+  - 根因不是服务端，而是功能件自己的数据兼容问题：`recentUsed` 持久化到 `storage` 时保存的是 camelCase（如 `avatarUrl` / `isGroup` / `lastTimestamp`），但恢复时 `normalizeContact(...)` 只识别 snake_case（如 `avatar_url` / `is_group` / `last_timestamp`），导致“最近使用”这一路在重开后把头像字段丢掉
+  - 同时补强联系人合并逻辑：同一 `username` 再次合并时，会补齐缺失字段，而不是简单“先来的覆盖后来的”
+  - 修改：
+    - `TODO/function-kits/wx-reply/ui/app/main.js`
+    - `TODO/function-kits/wx-reply/manifest.json`（`0.2.4`）
+  - 已重新构建并安装真机：
+    - APK：`TODO/ime-research/repos/fcitx5-android/app/build/outputs/apk/debug/org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk`
+    - 安装命令：`adb -s <DEVICE_SERIAL> install -r -d --no-incremental "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk"`
+- 2026-04-05 wx-reply 上下文量控制：
+  - 回复生成不再只依赖“最近一句”，而是显式把最近聊天记录带给 AI，且条数由用户控制，默认 `20`
+  - 新增高级配置「聊天上下文」步进器（`5` ~ `50`，步长 `5`），修改后会重新拉取会话并重新生成
+  - 会话拉取与 Prompt 统一跟随配置值：
+    - 会话读取会按配置动态放大抓取窗口，避免只拿到一小段历史
+    - Prompt 明确要求“综合最近 N 条聊天消息，不要只盯着最后一句”
+    - 任务名同步带上 `近N条`
+  - 修改：
+    - `TODO/function-kits/wx-reply/ui/app/main.js`
+    - `TODO/function-kits/wx-reply/ui/app/index.html`
+    - `TODO/function-kits/wx-reply/ui/app/styles.css`
+    - `TODO/function-kits/wx-reply/manifest.json`（`0.2.5`）
+  - 校验：
+    - `node --check TODO/function-kits/wx-reply/ui/app/main.js`
+    - `Get-Content -Encoding utf8 TODO/function-kits/wx-reply/manifest.json | ConvertFrom-Json | Out-Null`
+  - 真机更新：
+    - APK：`TODO/ime-research/repos/fcitx5-android/app/build/outputs/apk/debug/org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk`
+    - 直装被系统拦截后，改走系统安装器：推送到 `/sdcard/Download/fcitx-debug.apk` 并拉起安装页
+    - 当前真机包：`org.fcitx.fcitx5.android.debug`，`versionName=034ae60`，`lastUpdateTime=2026-04-05 09:26:36`
+- 2026-04-05 wx-reply 搜索 / 回复方向 / 候选更多箭头：
+  - 搜索接口本身可用，问题主要在前端交互：之前只靠输入防抖远程搜，失败时没有本地兜底，也没有显式搜索动作；现在改为：
+    - 输入时先本地匹配（最近使用 + 最近会话）
+    - 再异步远程搜 `/api/v1/contacts`
+    - 增加显式“搜索”按钮与回车触发
+  - 新增「本次回复方向」输入，允许用户明确这次回复想达到的目标；AI prompt 与任务名都会带上这段指令，避免泛泛而谈
+  - 修复功能件内输入框场景下“更多候选”箭头被隐藏：此前 `KawaiiBarComponent` 在 `functionKitCandidateDockActive` 时强行把展开按钮设为不可见，现在不再隐藏
+  - 修改：
+    - `TODO/function-kits/wx-reply/ui/app/main.js`
+    - `TODO/function-kits/wx-reply/ui/app/index.html`
+    - `TODO/function-kits/wx-reply/ui/app/styles.css`
+    - `TODO/function-kits/wx-reply/manifest.json`（`0.2.6`）
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/KawaiiBarComponent.kt`
+  - 校验：
+    - `node --check TODO/function-kits/wx-reply/ui/app/main.js`
+    - `Get-Content -Encoding utf8 TODO/function-kits/wx-reply/manifest.json | ConvertFrom-Json | Out-Null`
+    - `.\gradlew.bat :app:assembleDebug -PbuildABI=arm64-v8a`
+- 2026-04-05 wx-reply 搜索按钮继续修复：
+  - 真机复现现象：搜索框里已有可见文本，但“搜索”按钮仍处于不可点击状态；这不是 task center 的问题，而是前端把按钮可用性绑定到了 `picker.query.trim()`，而 Android WebView + IME 组合态下，可见输入不一定已经同步进这个模型值
+  - 收敛方案：
+    - 取消“输入后自动远程搜”，输入时只做本地过滤；远程 `/api/v1/contacts` 改为用户显式点按钮 / 回车触发，避免按钮刚亮就又被 `busy.searching` 锁死
+    - `triggerSearch()` 改为优先读取输入框实时 DOM 值，而不是只信 `picker.query`，从而兼容未完全提交的 IME 组合态
+    - 补充 `change` / `compositionend` 同步，按钮禁用态改走 `canTriggerSearch()`
+  - 修改：
+    - `TODO/function-kits/wx-reply/ui/app/main.js`
+    - `TODO/function-kits/wx-reply/ui/app/index.html`
+    - `TODO/function-kits/wx-reply/manifest.json`（`0.2.7`）
+- 2026-04-05 功能件候选“更多箭头”回归修复：
+  - 之前把“更多箭头”直接隐藏，虽然挡住了焦点乱跳，但这是错误修法；这次改为真正保留箭头，并在功能件动作 / 功能件内输入框的本地输入场景下，走**内嵌 expanded candidates**，不再 `attachWindow(...)` 替换当前功能件窗口
+  - 结构调整：
+    - `KawaiiBarComponent` 新增本地 expanded candidates 容器管理：箭头点击时，若当前活跃的是功能件本地输入 host，就把 expanded candidates RecyclerView 挂进 host 提供的容器里；收起时也在原位关闭
+    - `FunctionKitWindow` / `FunctionKitBindingsWindowController` 新增 `embeddedExpandedCandidateDockContainer`，并把 expanded dock 高度纳入整体 panel/dock 高度计算
+    - 新增 host 接口：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitEmbeddedCandidateHost.kt`
+  - 修改：
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/KawaiiBarComponent.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindow.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindowController.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitEmbeddedCandidateHost.kt`
+  - 校验：
+    - `.\gradlew.bat :app:compileDebugKotlin --no-daemon`
+    - `.\gradlew.bat :app:assembleDebug --no-daemon`
+  - 安装：
+    - 真机：`adb -s <DEVICE_SERIAL> install -r -d --no-incremental "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk"`
+    - 真机包信息：`org.fcitx.fcitx5.android.debug`，`versionName=034ae60`，`lastUpdateTime=2026-04-05 12:38:31`
+    - 模拟器基础烟测：`adb -s <DEVICE_SERIAL> install -r -d --no-incremental "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk"`；`adb -s <DEVICE_SERIAL> shell monkey -p org.fcitx.fcitx5.android.debug -c android.intent.category.LAUNCHER 1`
+- 2026-04-05 功能件动作窗口高度继续收敛：
+  - 用户反馈当前“功能件动作”界面整体偏高；这次只下调动作窗口，不动功能件内部面板
+  - 调整：
+    - 竖屏 `preferred`：`424dp -> 396dp`
+    - 横屏 `preferred`：`336dp -> 320dp`
+    - 最小高度与基准放大系数同步下调，避免在不同设备上仍被旧的 boost 顶得过高
+  - 修改：
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindowController.kt`
+  - 校验：
+    - `.\gradlew.bat clean :app:compileDebugKotlin --no-daemon`
+    - `.\gradlew.bat :app:assembleDebug --no-daemon`（需补 `C:\msys64\usr\bin` / `ucrt64\bin` / `clang64\bin` 到 PATH，避免 CMake 找不到 `msgfmt/msgmerge`）
+  - 安装：
+    - 真机：`adb -s <DEVICE_SERIAL> install -r -d --no-incremental "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk"`
+    - 真机包信息：`org.fcitx.fcitx5.android.debug`，`versionName=034ae60`，`lastUpdateTime=2026-04-05 13:03:08`
+- 2026-04-05 功能件动作窗口高度再降 `50dp`：
+  - 用户要求继续压低；这次不是只改默认值，而是把动作窗口的目标高度整体下移 `50dp`
+  - 调整：
+    - 竖屏 `preferred`：`396dp -> 346dp`
+    - 横屏 `preferred`：`320dp -> 270dp`
+    - `boostedBaseHeight` 也同步减去 `50dp`，避免某些机型仍被自动放大回去
+    - 最小高度同步下调为：竖屏 `206dp`、横屏 `182dp`
+  - 修改：
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindowController.kt`
+  - 校验：
+    - `.\gradlew.bat :app:compileDebugKotlin --no-daemon`
+    - `.\gradlew.bat :app:assembleDebug --no-daemon`（PATH 补 `C:\msys64\usr\bin;C:\msys64\ucrt64\bin;C:\msys64\clang64\bin`）
+  - 安装：
+    - 真机：`adb -s <DEVICE_SERIAL> install -r -d --no-incremental "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk"`
+    - 真机包信息：`org.fcitx.fcitx5.android.debug`，`versionName=034ae60`，`lastUpdateTime=2026-04-05 14:08:43`
+- 2026-04-05 wx-reply 搜索按钮兜底修复：
+  - 用户继续复现“输入框里看得到内容，但搜索按钮就是点不了”；这说明光靠 query 相关的禁用态修正还不够稳
+  - 进一步收敛：
+    - 搜索按钮不再依赖“当前 query 是否已同步到响应式状态”，只要当前不在搜索中就允许点击
+    - 点击时再实时读取输入框 DOM 值；若仍为空，则 toast 提示“请输入联系人或群聊关键词”
+    - 为绝对定位按钮补 `z-index` 与显式 `pointer-events`，避免输入框覆盖点击命中
+  - 修改：
+    - `TODO/function-kits/wx-reply/ui/app/main.js`
+    - `TODO/function-kits/wx-reply/ui/app/styles.css`
+    - `TODO/function-kits/wx-reply/manifest.json`（`0.2.8`）
+- 2026-04-05 wx-reply 搜索 UX 收敛：
+  - 用户补充了真实诉求：空输入本来就不需要搜索，更重要的是搜索结果不该把“最近使用 / 最近会话”完全覆盖，否则误搜后就失去快速返回入口
+  - 本次调整：
+    - “最近使用”与“最近会话”恢复为常驻区块，搜索结果仅作为额外区块显示，不再替代原有内容
+    - 增加显式“清空”按钮，一键恢复默认浏览态
+    - 空输入点击“搜索”只清空搜索态，不发请求、不弹错误 toast
+    - 搜索按钮继续保持非原生 `disabled` 命中方案，避免再次出现 Android WebView + IME 组合态下“明明有字却点不动”
+  - 修改：
+    - `TODO/function-kits/wx-reply/ui/app/main.js`
+    - `TODO/function-kits/wx-reply/ui/app/index.html`
+    - `TODO/function-kits/wx-reply/ui/app/styles.css`
+    - `TODO/function-kits/wx-reply/manifest.json`（`0.2.9`）
+  - 真机部署补充：
+    - 发现设备内部一直残留一份用户安装版 `wx-reply 0.2.2`，它会覆盖 APK 内置资源，导致前面多次“明明源码改了，手机却没变化”
+    - 已通过 `run-as` 删除旧目录并覆盖为 `files/function-kits/wx-reply` 的 `0.2.9`，随后 `am force-stop` 重启宿主
+- 2026-04-06 语气改写（tone-rewrite）改版：
+  - 功能从旧的 `更礼貌 / 更坚定 / 更简短` 调整为 5 个用户动作：
+    - `更短`
+    - `更长`
+    - `更礼貌`
+    - `更口语`
+    - `加个 emoji`
+  - Binding 同步重做，避免标题 / 语气 / 呈现方式再次漂移：
+    - `tone.shorter` → `更短` → `apply.headless`
+    - `tone.longer` → `更长` → `panel.preview`
+    - `tone.polite` → `更礼貌` → `panel.preview`
+    - `tone.casual` → `更口语` → `panel`
+    - `tone.emoji` → `加个 emoji` → `panel.preview`
+  - Kit UI 改成 5 个 shadcn 风格选项卡片（2×2 + 1 全宽），并为每个动作补充简短说明；状态文案统一改成“效果”而不是旧的“语气”
+  - Prompt 逻辑改为按动作分别生成，不再用旧的 `firm / concise` 分支；每个动作独立温度 / token 上限：
+    - `更短`：压缩赘述，保留重点
+    - `更长`：适度展开，补足表达
+    - `更礼貌`：更有分寸，更客气
+    - `更口语`：更像真人聊天
+    - `加个 emoji`：只补 1~2 个贴切 emoji
+  - 修改：
+    - `TODO/function-kits/tone-rewrite/manifest.json`（`0.2.0`）
+    - `TODO/function-kits/tone-rewrite/ui/app/index.html`
+    - `TODO/function-kits/tone-rewrite/ui/app/main.js`
+    - `TODO/function-kits/tone-rewrite/ui/app/styles.css`
+  - 校验：
+    - `node --check TODO/function-kits/tone-rewrite/ui/app/main.js`
+    - `Get-Content -Encoding utf8 TODO/function-kits/tone-rewrite/manifest.json | ConvertFrom-Json | Out-Null`
+  - 打包：
+    - `TODO/function-kits/tmp/tone-rewrite-0.2.0.zip`
+    - sha256=`B7E3686DC5629357460F94BAEB1FDE6E7953C5EA4C621312ED45DBC773491C4E`
+  - 真机覆盖：
+    - 发现真机当前仍加载用户安装版 `tone-rewrite 0.1.17`
+    - 已删除 `files/function-kits/tone-rewrite` 并覆盖为 `0.2.0`，随后执行 `adb -s <DEVICE_SERIAL> shell am force-stop org.fcitx.fcitx5.android.debug`
+- 2026-04-05 功能件动作 / 功能件内输入框焦点继续修复：
+  - 真正根因不在具体某个功能件，而在共用候选栏链路：点击候选区“更多箭头”会走 `InputWindowManager.attachWindow(...)` 挂上 expanded candidate window，直接替换当前 `FunctionKitWindow` / `FunctionKitBindingsWindow`，导致 `localInputTarget` 失活，焦点回落到 app 原始输入框
+  - 收敛方案：当当前活跃窗口是 `FunctionKitWindow` 或 `FunctionKitBindingsWindow`，且 `service.localInputTarget?.isActive() == true` 时，直接抑制 expanded candidate window 的接管；按钮状态同步到候选/预编辑/窗口 attach-detach 各时机，避免 stale click
+  - 修改：
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/KawaiiBarComponent.kt`
+  - 校验：
+    - `.\gradlew.bat :app:assembleDebug --no-daemon`
+  - 安装：
+    - 真机：`adb -s <DEVICE_SERIAL> install -r -d --no-incremental "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk"`
+    - 真机包信息：`org.fcitx.fcitx5.android.debug`，`versionName=034ae60`，`lastUpdateTime=2026-04-05 12:27:13`
+    - 模拟器：`adb -s <DEVICE_SERIAL> install -r -d --no-incremental "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk"`
+- 2026-04-05 功能件动作「打开下载中心」跳转修正：
+  - 问题：当前“打开下载中心”错误地拉起了 IME App 设置页里的下载中心，而不是打开内置的下载中心功能件
+  - 处理：已确认 Store Kit manifest `id` 为 `kit-store`（`TODO/function-kits/kit-store/manifest.json`），并把动作处理从 `AppUtil.launchMainToFunctionKitDownloadCenter(...)` 改为直接复用 `FunctionKitWindowPool` 打开 `kit-store` 对应的功能件窗口
+  - 修改：
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindowController.kt`
+  - 校验：
+    - `.\gradlew.bat :app:compileDebugKotlin --no-daemon`
+    - `.\gradlew.bat :app:assembleDebug --no-daemon`
+  - 安装：
+    - `adb install`：`INSTALL_FAILED_ABORTED: User rejected permissions`
+    - `adb shell pm install -r -d -g /data/local/tmp/fcitx-debug.apk`：同样被 vivo 安全策略拦截
+    - 已改走系统安装器：`adb -s <DEVICE_SERIAL> push "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk" /sdcard/Download/fcitx-debug.apk` + `adb -s <DEVICE_SERIAL> shell am start -a android.intent.action.VIEW -d file:///sdcard/Download/fcitx-debug.apk -t application/vnd.android.package-archive`
+    - 当前远程设备在锁屏图案页，安装器无法继续代点；现有包信息仍为：`org.fcitx.fcitx5.android.debug`，`versionName=034ae60`，`lastUpdateTime=2026-04-05 14:19:00`
+- 2026-04-05 任务中心导航栏缺失 + 键盘尺寸偶发回退：
+  - 任务中心根因：
+    - `FunctionKitTaskCenterWindow` 本身没有自定义 bar extension，只依赖默认标题栏
+    - 但 `TitleUi` 里标题/返回按钮的显隐此前只在 `addExtension(...)` 里切换；如果上一个窗口是 `showTitle=false`（如功能件动作窗口），按钮会被隐藏，切到“无 extension 的任务中心”时就不会再恢复，导致顶部导航整块消失
+  - 键盘尺寸根因：
+    - 多个扩展窗口会临时改写 `windowManager.view.height`
+    - 返回 `KeyboardWindow` 时此前不会强制重新套用用户设置的键盘高度/侧边距/底部 padding；一旦某条链路留下了较小高度，错误状态就会持续，看起来像“padding 失效、键盘突然变矮”
+    - 同时 `FunctionKitWindow` / `FunctionKitBindingsWindowController` 在进入时把“当前 window 高度”当作键盘基准，会继续放大这种污染；现改为优先使用键盘 prefs 里的真实基准高度
+  - 修改：
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/ui/TitleUi.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/KawaiiBarComponent.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/InputView.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/keyboard/KeyboardWindow.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindowController.kt`
+  - 校验：
+    - `.\gradlew.bat :app:compileDebugKotlin :app:assembleDebug --no-daemon`
+  - 产物：
+    - `TODO/ime-research/repos/fcitx5-android/app/build/outputs/apk/debug/org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk`
+  - 真机安装：
+    - `adb -s <DEVICE_SERIAL> install -r -d --no-incremental "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk"`
+    - 安装成功；当前包信息：`org.fcitx.fcitx5.android.debug`，`versionName=034ae60`，`lastUpdateTime=2026-04-05 22:21:08`
+  - 后续回归修复（“键盘点不开了”）：
+    - 根因：前面为了修复键盘高度回退，在 `KeyboardWindow.onAttached()` 里直接调用了 `inputView.reapplyKeyboardSize()`；但 `InputView` 初始化时会先 attach `KeyboardWindow`，这时 `windowManager.view.layoutParams` 还没挂上，过早触发尺寸回写会把输入法启动链路打断
+    - 修复：
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/InputView.kt`：`reapplyKeyboardSize()` 增加 `layoutParams == null` 早退保护
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/keyboard/KeyboardWindow.kt`：改成 `inputView.post { inputView.reapplyKeyboardSize() }`，等根 view 挂好后再回写尺寸
+    - 校验：
+      - `.\gradlew.bat :app:compileDebugKotlin :app:assembleDebug --no-daemon`
+    - 再次安装状态：
+      - `adb -s <DEVICE_SERIAL> install -r -d --no-incremental "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk"` → `INSTALL_FAILED_ABORTED: User rejected permissions`
+      - 已改走系统安装器：`adb -s <DEVICE_SERIAL> push "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk" /sdcard/Download/fcitx-debug.apk` + `adb -s <DEVICE_SERIAL> shell am start -a android.intent.action.VIEW -d file:///sdcard/Download/fcitx-debug.apk -t application/vnd.android.package-archive`
+      - 当前设备仍在锁屏页，安装器尚未完成确认；包信息仍是：`org.fcitx.fcitx5.android.debug`，`versionName=034ae60`，`lastUpdateTime=2026-04-05 22:21:08`
+  - 后续回归修复（功能件动作/功能件窗口抬高高度被冲掉）：
+    - 根因：上面这次 `KeyboardWindow.onAttached()` 的延后回写虽然修好了“键盘点不开”，但 `FunctionKitWindow` / `FunctionKitBindingsWindowController` 会把 `KeyboardWindow` 作为**内嵌键盘**复用，并手动调用 `embeddedKeyboardWindow?.onAttached()`；这会让 `inputView.reapplyKeyboardSize()` 在功能件窗口激活时也执行，把已经抬高后的 `windowManager.view.height` 强制改回普通键盘高度，表现就是“功能件动作界面 / 功能件界面高度像被删掉了一样”
+    - 修复：
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/keyboard/KeyboardWindow.kt`：把延后回写加上 `windowManager.isAttached(this@KeyboardWindow)` 保护，只允许“键盘窗口本身就是当前顶层窗口”时才重新套用键盘高度；内嵌到功能件里的场景不再覆盖功能件窗口自己的高度策略
+    - 校验：
+      - `.\gradlew.bat :app:compileDebugKotlin :app:assembleDebug --no-daemon`
+    - 真机安装：
+      - `adb -s <DEVICE_SERIAL> install -r -d --no-incremental "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk"` → `Success`
+      - 当前包信息：`org.fcitx.fcitx5.android.debug`，`versionName=034ae60`，`lastUpdateTime=2026-04-05 23:22:07`
+  - 后续回归修复（直接激活 IME 时键盘偏矮）：
+    - 根因：`功能件动作 -> 返回键盘` 这条路径会触发 `KeyboardWindow.onAttached()`，所以会重新套用键盘高度；但“直接激活 IME”时，当前窗口很多时候已经是 `KeyboardWindow`，`InputView.startInput(...)` 里的 `attachWindow(KeyboardWindow)` 会直接 early return，不会走 `onAttached()`，于是之前残留的偏矮高度就不会被纠正
+    - 修复：
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/InputView.kt`：在 `startInput(...)` 尾部新增一次 `post { if (windowManager.isAttached(keyboardWindow)) reapplyKeyboardSize() }`，保证每次直接显示 IME 时，只要当前顶层窗口就是键盘，都强制重新套用用户配置的键盘高度 / side padding / bottom padding
+    - 校验：
+      - `.\gradlew.bat :app:compileDebugKotlin :app:assembleDebug --no-daemon`
+    - 真机安装：
+      - `adb -s <DEVICE_SERIAL> install -r -d --no-incremental "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk"` → `Success`
+      - 当前包信息：`org.fcitx.fcitx5.android.debug`，`versionName=034ae60`，`lastUpdateTime=2026-04-06 00:44:43`
+- 2026-04-06 移除“复制后打开通知/悬浮框”：
+  - 用户要求彻底去掉复制后的通知提示与 overlay 悬浮入口，不再在复制事件后主动弹任何 UI
+  - 处理：
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/FcitxApplication.kt`：移除 `ClipboardOverlayPromptManager.init(ctx)`，复制事件不再注册这套提示链路
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/AndroidManifest.xml`：移除实验性 `SYSTEM_ALERT_WINDOW` 权限声明和 `ClipboardActionsPromptReceiver` 注册，避免继续暴露无用入口
+  - 影响：
+    - 复制后不再弹 heads-up 通知
+    - 复制后不再弹 overlay 悬浮 chip
+    - 复制后不再通过这套提示链路自动引导进入“剪贴板动作”
+  - 校验：
+    - `.\gradlew.bat :app:compileDebugKotlin :app:assembleDebug --no-daemon`
+  - 真机安装：
+    - `adb -s <DEVICE_SERIAL> install -r -d --no-incremental "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-034ae60-arm64-v8a-debug.apk"` → `Success`
+    - 当前包信息：`org.fcitx.fcitx5.android.debug`，`versionName=034ae60`，`lastUpdateTime=2026-04-06 15:16:26`
+- 2026-04-06 功能件动作窗口 UI 重构（动作列表 + 输入框）：
+  - 用户反馈当前“功能件动作”窗口整体丑陋，尤其顶部输入框像旧式伪搜索框，动作卡片也过于拥挤
+  - 本次重构：
+    - 顶部收敛为更像 shadcn/ui 的 sheet：圆角顶边 + drag handle；筛选区用卡片承载（Recent/Pinned/Library segmented control + Library 分类 chips），适配 IME 小高度
+    - 动作区统一为 shadcn 风格卡片：白底 + 边框 + icon slot + 标题/副标题 + pin 星标；用 2 列网格展示，最后一行单个卡片自动铺满避免半边空白
+    - `Paste` / `Open Download Center` 收敛为同一套卡片样式，通过 icon/文案强调主动作，不再是“特殊丑入口”
+    - 搜索框聚焦态：边框/背景/图标切换到 accent + 一键清空；Library 分类 chips 扩到 6 个，placeholder 与中英文文案同步收敛
+  - 修改：
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindowController.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsAdapter.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values/strings.xml`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values-zh-rCN/strings.xml`
+    - fcitx5-android commit：`cc6ad85`
+  - 校验：
+    - `.\gradlew.bat :app:compileDebugKotlin --no-daemon`
+  - 回归修复（打开“功能件动作”不再抬高高度）：
+    - 用户反馈“打开功能件动作会提升高度”的逻辑在回退 UI 时被误删
+    - 修复：恢复 panel peek height 的 boost 计算 + window height cap，确保打开动作窗口会抬高 IME 容器高度；聚焦搜索时叠加内嵌键盘高度但不会超过屏幕上限
+    - 修改：
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindowController.kt`
+      - fcitx5-android commit：`d2db0ec`
+    - 校验：
+      - `.\gradlew.bat :app:compileDebugKotlin --no-daemon`
+  - 继续收敛（搜索输入框更像真实输入框 + 节省 IME 高度）：
+    - 输入框从“伪搜索条”收敛为更像 shadcn input：14dp 圆角、聚焦态强调、光标闪烁（仍走本地 composer，不引入 EditText 递归输入）
+    - 顶栏 back/search 高度对齐 TitleBar 40dp，避免裁切；筛选卡片 padding/高度下调，减少可用高度浪费
+    - 文案：download center / paste 副标题缩短，避免两列卡片下大量省略号
+    - 修改：
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindowController.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values/strings.xml`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values-zh-rCN/strings.xml`
+    - fcitx5-android commit：`b3af0e7`
+    - 校验：
+      - `.\gradlew.bat :app:assembleDebug --no-daemon`
+  - 继续收敛（搜索输入框更像“正常输入框”）：
+    - 用户反馈“输入框不像正常输入框”，主要缺少光标位置/选区反馈
+    - 改进：聚焦态使用 selectionStart/End 渲染选区高亮；光标插入到 selectionEnd；空输入聚焦时显示“光标 + placeholder”
+    - 修改：
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindowController.kt`
+    - fcitx5-android commit：`5abf533`
+    - 校验：
+      - `.\gradlew.bat :app:assembleDebug --no-daemon`
+    - 真机安装：
+      - `adb -s <DEVICE_SERIAL> install -r -d --no-incremental "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-5abf533-arm64-v8a-debug.apk"` → `INSTALL_FAILED_ABORTED: User rejected permissions`
+      - 已改走系统安装器：`adb -s <DEVICE_SERIAL> push "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-5abf533-arm64-v8a-debug.apk" /sdcard/Download/fcitx-debug.apk` + `adb -s <DEVICE_SERIAL> shell am start -a android.intent.action.VIEW -d file:///sdcard/Download/fcitx-debug.apk -t application/vnd.android.package-archive`
+      - 待用户在手机安装器里点确认，安装完成后应看到：`org.fcitx.fcitx5.android.debug`，`versionName=5abf533`
+  - 继续收敛（IME 小高度：紧凑化 + 卡片可读性 + 移除复制提示）：
+    - 用户反馈：聚焦搜索框后“竖线鬼畜（时有时无）”，同时顶部/筛选区占高过多、卡片标题在两列里被挤到换行、内容区留白明显
+    - 改进：
+      - 搜索框：改为稳定 caret（不再闪烁），并用 span 绘制避免文本宽度变化导致抖动
+      - 顶部与筛选区：back/search/tabRow/chips/handle 全面降高降 padding，减少浪费高度
+      - 动作卡片：减少 icon/pin 占宽；标题统一 1 行；网格 padding/spacing 更紧凑；窄屏自动切 1 列避免“微信回复”这种短标题也被迫换行
+      - 当 Recent/Pinned 的结果很少时，显示“更多动作 → 动作库”引导，减少大块空白
+      - 删除复制后的通知/悬浮 chip：彻底移除 `SYSTEM_ALERT_WINDOW` 权限与这套 clipboard overlay prompt 链路
+    - 修改：
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/AndroidManifest.xml`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/FcitxApplication.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/FcitxInputMethodService.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindowController.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsAdapter.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values/strings.xml`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values-zh-rCN/strings.xml`
+    - fcitx5-android commit：`5316836`
+    - 校验：
+      - `.\gradlew.bat :app:assembleDebug --no-daemon`
+    - 真机安装（系统安装器）：
+      - `adb -s <DEVICE_SERIAL> push "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-5316836-arm64-v8a-debug.apk" /sdcard/Download/fcitx-debug.apk` + `adb -s <DEVICE_SERIAL> shell am start -a android.intent.action.VIEW -d file:///sdcard/Download/fcitx-debug.apk -t application/vnd.android.package-archive`
+      - 待用户在手机安装器里点确认，安装完成后应看到：`org.fcitx.fcitx5.android.debug`，`versionName=5316836`
+  - 继续收敛（去重下载中心入口 + 星标更克制）：
+    - 用户反馈截图里出现“打开下载中心”重复卡片，同时星标右侧气泡较抢眼、挤压标题宽度
+    - 改进：
+      - 去重：保留顶部的 `Open Download Center` 特殊卡片，过滤掉 `kit-store` 的重复绑定动作
+      - 星标：未置顶时去掉灰底气泡（透明背景），并用 `TouchDelegate` 扩大点击热区（不占布局宽度）
+      - 标题：根据 1/2 列自适应切换 `titleMaxLines`（1 列允许 2 行）
+    - 修改：
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindowController.kt`
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsAdapter.kt`
+    - fcitx5-android commit：`38526bf`
+    - 校验：
+      - `.\gradlew.bat :app:assembleDebug --no-daemon`
+    - 真机安装（系统安装器）：
+      - `adb -s <DEVICE_SERIAL> push "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-38526bf-arm64-v8a-debug.apk" /sdcard/Download/fcitx-debug.apk` + `adb -s <DEVICE_SERIAL> shell am start -a android.intent.action.VIEW -d file:///sdcard/Download/fcitx-debug.apk -t application/vnd.android.package-archive`
+      - 当前包信息：`org.fcitx.fcitx5.android.debug`，`versionName=38526bf`，`lastUpdateTime=2026-04-06 23:25:54`
+  - 继续收敛（动作卡片：图标与文字垂直居中对齐）：
+    - 用户反馈：单个动作卡片里，左侧 icon slot 与右侧标题/副标题整体没有严格垂直居中对齐
+    - 改进：
+      - icon slot：增加 `bottomToBottom` 约束，确保在卡片内垂直居中
+      - title/subtitle：改为 `CHAIN_PACKED` 垂直链并设置 `verticalBias=0.5`，让文字组整体居中
+      - subtitle：`endToStart=pinView`，避免与右上角 pin 发生轻微覆盖/挤压
+    - 修改：
+      - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsAdapter.kt`
+    - fcitx5-android commit：`5f152d5`
+    - 校验：
+      - `.\gradlew.bat :app:assembleDebug --no-daemon`
+    - 真机安装（系统安装器）：
+      - `adb -s <DEVICE_SERIAL> push "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-5f152d5-arm64-v8a-debug.apk" /sdcard/Download/fcitx-debug.apk` + `adb -s <DEVICE_SERIAL> shell am start -a android.intent.action.VIEW -d file:///sdcard/Download/fcitx-debug.apk -t application/vnd.android.package-archive`
+      - 待用户在手机安装器里点确认，安装完成后应看到：`org.fcitx.fcitx5.android.debug`，`versionName=5f152d5`
+- 2026-04-07 回归修复（任务中心标题栏缺失 + 微信回复头像缺失 + 键盘高度突然变矮）：
+  - 用户反馈：
+    - 点击“任务中心”后标题栏/返回键缺失
+    - `WX 回复` 功能件联系人列表看不到头像
+    - 键盘高度一开始正常，后面突然变矮（历史已修过但回退后复发）
+  - 根因与修复：
+    - 标题栏缺失：`ExtendedInputWindow` 若没有 bar extension，则不会触发 `TitleUi.addExtension(...)`，导致 `showTitle` 状态未刷新（从上一个 `showTitle=false` 的窗口继承）
+      - 修复：在 window attach 时无条件同步 `showTitle`（新增 `TitleUi.setShowTitle()`）
+    - 头像缺失：WebView 主页面是 `https://function-kit.local/...`，`mixedContentMode=NEVER_ALLOW` 会阻止 `http://...` 头像；wx-reply 已把 `http` 头像转成 `https://function-kit.local/assets/__external__/<base64url>`，但宿主未实现该 proxy 路由，导致 404
+      - 修复：`FunctionKitWebViewHost.shouldInterceptRequest` 拦截 `.../assets/__external__/`，解码 base64url → 宿主用 `HttpURLConnection` 拉取资源并返回 `WebResourceResponse`（4MB 上限 + 超时）
+    - 键盘变矮：`FunctionKitWindow` 以前用 `windowManager.view.layoutParams.height` 作为 baseHeight；从“动作窗口（未聚焦搜索）”打开 kit 面板时容器高度是 panelPeekHeight，导致错误保存并在 detach 时恢复成更小高度
+      - 修复：`FunctionKitWindow` baseHeight 改为优先用键盘 prefs 推导高度（`resolveKeyboardBaseHeightPx()`），detach 恢复始终回到键盘基准高度
+  - 修改：
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/KawaiiBarComponent.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/bar/ui/TitleUi.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWebViewHost.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+  - fcitx5-android commit：`08f829e`
+  - 校验：
+    - `.\gradlew.bat :app:assembleDebug --no-daemon`
+  - 真机安装（系统安装器）：
+    - `adb -s <DEVICE_SERIAL> push "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-08f829e-arm64-v8a-debug.apk" /sdcard/Download/fcitx-debug.apk` + `adb -s <DEVICE_SERIAL> shell am start -a android.intent.action.VIEW -d file:///sdcard/Download/fcitx-debug.apk -t application/vnd.android.package-archive`
+    - 当前包信息：`org.fcitx.fcitx5.android.debug`，`versionName=08f829e`
+- 2026-04-07 继续修复（键盘高度：再次激活后变矮）：
+  - 用户反馈：键盘第一次激活高度正常；第二次激活开始常复现“变矮”；点一次“功能件动作”再返回会恢复，直到下次激活又变矮
+  - 推断根因：部分设备在 IME hide/show 后会重置/扰动 `InputView` 子 View 的 `layoutParams.height`，导致 `windowManager.view` 高度未按 prefs 重新应用
+  - 修复：每次 `startInput(...)` 时，如果当前附着窗口是 `KeyboardWindow`，就强制 `updateKeyboardSize()` 重新应用 `keyboardHeightPercent/sidePadding/bottomPadding`
+  - 修改：
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/InputView.kt`
+  - fcitx5-android commit：`c209bb3`
+  - 校验：
+    - `.\gradlew.bat :app:assembleDebug --no-daemon`
+  - 真机安装（系统安装器）：
+    - `adb -s <DEVICE_SERIAL> push "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\debug\org.fcitx.fcitx5.android-c209bb3-arm64-v8a-debug.apk" /sdcard/Download/fcitx-debug.apk` + `adb -s <DEVICE_SERIAL> shell am start -a android.intent.action.VIEW -d file:///sdcard/Download/fcitx-debug.apk -t application/vnd.android.package-archive`
+    - 当前包信息：`org.fcitx.fcitx5.android.debug`，`versionName=c209bb3`
+- 2026-04-07 编译 Release 包并安装到手机：
+  - 产物：`.\gradlew.bat :app:assembleRelease --no-daemon`
+    - Release 默认输出为 `*-release-unsigned.apk`，需要手动签名后才能安装
+  - 签名（本机 debug.keystore，用于真机本地安装/更新）：
+    - `zipalign.exe -p -f 4 "...-release-unsigned.apk" "...-release-aligned.apk"`
+    - `apksigner.bat sign --ks "%USERPROFILE%\\.android\\debug.keystore" --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android --out "...-release.apk" "...-release-aligned.apk"`
+  - 真机安装（系统安装器）：
+    - `adb -s <DEVICE_SERIAL> push "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\release\org.fcitx.fcitx5.android-c209bb3-arm64-v8a-release.apk" /sdcard/Download/fcitx-release.apk`
+    - `adb -s <DEVICE_SERIAL> shell am start -a android.intent.action.VIEW -d file:///sdcard/Download/fcitx-release.apk -t application/vnd.android.package-archive`
+    - 待用户在手机安装器里点确认，安装完成后应看到：`org.fcitx.fcitx5.android`，`versionName=c209bb3`
+- 2026-04-07 Release 闪退修复（点击星标打开“功能件动作”）：
+  - 现象：Release 包里点击键盘工具栏星标（打开 `FunctionKitBindingsWindow`）直接闪退
+  - 日志（crash buffer）：`java.lang.IllegalStateException: Incomplete hierarchy for class FunctionKitBindingsWindow, unresolved classes [org.fcitx.fcitx5.android.input.FcitxInputMethodService.LocalInputTarget]`
+  - 根因：Release 开启 R8 后，`defaultType()`（kotlin-reflect 递归找泛型父类）在解析 `FunctionKitBindingsWindow` 的 supertypes 时触发 incomplete hierarchy，导致 `scope += window` 崩溃
+  - 修复：为 FunctionKit 窗口显式指定 `type`，绕开 `defaultType()` 反射推导
+  - 修改：
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitBindingsWindow.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+  - fcitx5-android commit：`90229d1`
+  - Release 构建与签名（build-tools 不在 PATH 时用全路径）：
+    - `.\gradlew.bat :app:assembleRelease --no-daemon`
+    - `%LOCALAPPDATA%\\Android\\Sdk\\build-tools\\36.1.0\\zipalign.exe -p -f 4 "...-release-unsigned.apk" "...-release-aligned.apk"`
+    - `%LOCALAPPDATA%\\Android\\Sdk\\build-tools\\36.1.0\\apksigner.bat sign --ks "%USERPROFILE%\\.android\\debug.keystore" --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android --out "...-release.apk" "...-release-aligned.apk"`
+  - 真机安装（系统安装器）：
+    - `adb -s <DEVICE_SERIAL> push "<WORKSPACE_ROOT>\TODO\ime-research\repos\fcitx5-android\app\build\outputs\apk\release\org.fcitx.fcitx5.android-90229d1-arm64-v8a-release.apk" /sdcard/Download/fcitx-release.apk`
+    - `adb -s <DEVICE_SERIAL> shell am start -a android.intent.action.VIEW -d file:///sdcard/Download/fcitx-release.apk -t application/vnd.android.package-archive`
+    - `adb install -r` 在此设备上会报：`INSTALL_FAILED_ABORTED: User rejected permissions`，所以必须在手机安装器里手动点确认
+  - 校验：
+    - `adb -s <DEVICE_SERIAL> shell dumpsys package org.fcitx.fcitx5.android | Select-String versionName` 应显示 `versionName=90229d1`
+- 2026-04-07 开源准备（发布到 GitHub 前的仓库“公共化”整理）：
+  - 目标：把项目涉及的若干 repo 以可公开维护的状态发布到 GitHub（社区健康文件、CI、脱敏与密钥扫描脚本）。
+  - code1（本仓库）：
+    - 新增：`README.md`、`LICENSE`（Apache-2.0）、`CONTRIBUTING.md`、`CODE_OF_CONDUCT.md`、`SECURITY.md`、`SUPPORT.md`
+    - 新增：`.github/`（Issue 模板 / PR 模板 / CI）
+      - CI：`.github/workflows/ci.yml`（运行 `TODO/function-kit-runtime-sdk` 的 `npm test`）
+    - 新增：`scripts/oss/scan-secrets.ps1`（扫描 tracked files 常见密钥模式）
+    - 新增：`scripts/oss/redact-private.ps1`（发布前可选脱敏工具，默认替换真机序列号占位）
+    - 新增：`TODO/open-source/PUBLISHING.md`（发布 checklist）
+    - 新增：`.editorconfig`（UTF-8 与换行约定）
+    - 自测：`TODO/function-kit-runtime-sdk` 执行 `npm test` 通过
+  - kit-studio（独立 repo）：
+    - 新增：`LICENSE`（Apache-2.0）、`CONTRIBUTING.md`、`CODE_OF_CONDUCT.md`、`SECURITY.md`、`SUPPORT.md`
+    - 新增：`.github/`（Issue 模板 / PR 模板 / CI）
+    - 新增：`scripts/scan-secrets.ps1`（扫描 tracked files 常见密钥模式）
+    - 新增：`.editorconfig`
+    - 调整：`kitstudio.config.json` 默认更安全/更通用：host 改为 `127.0.0.1`；mounts 改为 `../function-kits` 与 `../function-kit-runtime-sdk`
+
+
+
+

@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "messageId": "host-permission-denied-001",
+  "replyTo": "ui-storage-set-001",
+  "timestamp": "2026-03-21T21:35:03+08:00",
+  "kitId": "chat-auto-reply",
+  "surface": "panel",
+  "source": "host-adapter",
+  "target": "function-kit-ui",
+  "type": "permission.denied",
+  "payload": {},
+  "error": {
+    "code": "storage_write_not_granted",
+    "message": "当前功能件未获得 storage.write 权限。",
+    "retryable": false,
+    "details": {
+      "permission": "storage.write"
+    }
+  }
+}

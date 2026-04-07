@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "messageId": "host-binding-invoke-bridge-debugger-001",
+  "timestamp": "2026-03-25T21:10:00+08:00",
+  "kitId": "bridge-debugger",
+  "surface": "panel",
+  "source": "host-adapter",
+  "target": "function-kit-ui",
+  "type": "binding.invoke",
+  "payload": {
+    "invocationId": "invk-bridge-debugger-001",
+    "trigger": "clipboard",
+    "binding": {
+      "id": "clipboard.inspect",
+      "title": "Inspect Clipboard"
+    },
+    "clipboardText": "Copied text for debugging.",
+    "context": {
+      "sourcePackage": "com.example.chat",
+      "selectionStart": 0,
+      "selectionEnd": 0,
+      "selectedText": "",
+      "beforeCursor": "",
+      "afterCursor": "",
+      "inputType": 1,
+      "candidateCount": 0
+    },
+    "createdAtEpochMs": 1711372200000
+  }
+}
+

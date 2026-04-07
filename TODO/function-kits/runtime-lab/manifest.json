@@ -1,0 +1,138 @@
+{
+  "id": "runtime-lab",
+  "name": "Runtime Lab",
+  "version": "0.1.0",
+  "description": "Lightweight devtools kit for manually validating recent Function Kit runtime + host changes.",
+  "icons": {
+    "64": "icons/runtime-lab.png"
+  },
+  "platforms": [
+    "android"
+  ],
+  "entry": {
+    "type": "browser-app",
+    "bundle": {
+      "html": "ui/app/index.html",
+      "script": "ui/app/main.js",
+      "style": "ui/app/styles.css"
+    },
+    "sdk": {
+      "project": "../../function-kit-runtime-sdk/package.json",
+      "browserBundle": "../../function-kit-runtime-sdk/dist/function-kit-runtime.js"
+    },
+    "surfaces": {
+      "android": {
+        "preferred": "bottom-sheet",
+        "fallback": "full-screen",
+        "peekHeightDp": 320
+      }
+    },
+    "bridgeDoc": "ui/README.md"
+  },
+  "triggers": {
+    "manual": true,
+    "selectionRequired": false,
+    "contextTypes": [
+      "message-compose",
+      "generic-text"
+    ]
+  },
+  "discovery": {
+    "pinnable": false,
+    "recentEnabled": true,
+    "launchMode": "quick-action",
+    "slash": {
+      "enabled": true,
+      "commands": [
+        "lab"
+      ],
+      "aliases": [
+        "runtime-lab",
+        "devtools",
+        "debug"
+      ],
+      "tags": [
+        "debug",
+        "runtime",
+        "host-bridge"
+      ],
+      "minQueryLength": 1
+    }
+  },
+  "ai": {
+    "executionMode": "direct-model",
+    "backendHints": {
+      "preferredBackendClass": "direct-model",
+      "requiredCapabilities": [
+        "structured-output"
+      ],
+      "latencyTier": "interactive",
+      "latencyBudgetMs": 2000,
+      "allowFallbacks": true,
+      "allowBackgroundPreparation": false,
+      "requireStructuredJson": true,
+      "maxToolCalls": 0,
+      "maxReasoningSteps": 0,
+      "notes": [
+        "Devtools-only kit. Uses host-shared AI route to validate ai.request/ai.response."
+      ]
+    }
+  },
+  "network": {
+    "mode": "host-proxy",
+    "allowAbsoluteUrls": true
+  },
+  "permissions": {
+    "needsActiveInputContext": true,
+    "needsPersonaContext": false,
+    "needsNetwork": true,
+    "needsAiAccess": true
+  },
+  "runtimePermissions": [
+    "context.read",
+    "input.insert",
+    "input.replace",
+    "network.fetch",
+    "ai.request",
+    "settings.open",
+    "storage.read",
+    "storage.write",
+    "panel.state.write"
+  ],
+  "hostBridge": {
+    "protocolVersion": "1.0.0",
+    "envelopeSchema": "../host-bridge/message-envelope.schema.json",
+    "errorSchema": "../host-bridge/error.schema.json",
+    "uiToHost": [
+      "bridge.ready",
+      "context.request",
+      "candidate.insert",
+      "candidate.replace",
+      "network.fetch",
+      "ai.request",
+      "tasks.sync.request",
+      "task.cancel",
+      "settings.open",
+      "storage.get",
+      "storage.set",
+      "panel.state.update"
+    ],
+    "hostToUi": [
+      "bridge.ready.ack",
+      "binding.invoke",
+      "permissions.sync",
+      "context.sync",
+      "candidates.render",
+      "network.fetch.result",
+      "ai.response",
+      "task.update",
+      "tasks.sync",
+      "task.cancel.ack",
+      "storage.sync",
+      "panel.state.ack",
+      "host.state.update",
+      "permission.denied",
+      "bridge.error"
+    ]
+  }
+}

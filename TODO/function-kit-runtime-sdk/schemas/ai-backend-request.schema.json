@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "function-kit.ai-backend.request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "requestId",
+    "kitId",
+    "scene",
+    "inputContext",
+    "allowedTools",
+    "allowedPermissions",
+    "latencyBudgetMs",
+    "executionMode"
+  ],
+  "properties": {
+    "requestId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kitId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "surface": {
+      "$ref": "./ai-backend-common.schema.json#/$defs/functionKitSurface"
+    },
+    "scene": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "intent": {
+          "type": "string"
+        },
+        "trigger": {
+          "type": "string",
+          "enum": [
+            "manual",
+            "selection",
+            "shortcut",
+            "retry",
+            "background-preload"
+          ]
+        },
+        "locale": {
+          "type": "string"
+        },
+        "appId": {
+          "type": "string"
+        },
+        "userConfirmed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "inputContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "primaryText": {
+          "type": "string"
+        },
+        "selection": {
+          "$ref": "./ai-backend-common.schema.json#/$defs/selection"
+        },
+        "surroundingText": {
+          "$ref": "./ai-backend-common.schema.json#/$defs/surroundingText"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "sourceAppId": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "minLength": 1
+              },
+              "label": {
+                "type": "string"
+              },
+              "uri": {
+                "type": "string"
+              },
+              "mediaType": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "personaContext": {
+      "$ref": "./ai-backend-common.schema.json#/$defs/personaContext"
+    },
+    "allowedTools": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "allowedPermissions": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "latencyBudgetMs": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "executionMode": {
+      "$ref": "./ai-backend-common.schema.json#/$defs/executionMode"
+    },
+    "backendHints": {
+      "$ref": "./ai-backend-common.schema.json#/$defs/backendHints"
+    },
+    "debugContext": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

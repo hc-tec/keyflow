@@ -1,0 +1,174 @@
+{
+  "id": "bridge-debugger",
+  "name": "Bridge Debugger",
+  "version": "0.1.0",
+  "description": "Debug Function Kit host bridge features: bindings, input observe, and send intercept.",
+  "platforms": [
+    "windows",
+    "android"
+  ],
+  "entry": {
+    "type": "browser-app",
+    "bundle": {
+      "html": "ui/app/index.html",
+      "script": "ui/app/main.js",
+      "style": "ui/app/styles.css"
+    },
+    "sdk": {
+      "project": "../../function-kit-runtime-sdk/package.json",
+      "browserBundle": "../../function-kit-runtime-sdk/dist/function-kit-runtime.js"
+    },
+    "surfaces": {
+      "windows": {
+        "preferred": "side-panel",
+        "fallback": "popup",
+        "minWidth": 360
+      },
+      "android": {
+        "preferred": "bottom-sheet",
+        "fallback": "full-screen",
+        "peekHeightDp": 320
+      }
+    },
+    "bridgeDoc": "ui/README.md"
+  },
+  "triggers": {
+    "manual": true,
+    "selectionRequired": false,
+    "contextTypes": [
+      "generic-text",
+      "message-compose"
+    ]
+  },
+  "bindings": [
+    {
+      "id": "manual.open",
+      "title": "Open Bridge Debugger",
+      "triggers": [
+        "manual"
+      ]
+    },
+    {
+      "id": "clipboard.inspect",
+      "title": "Inspect Clipboard",
+      "triggers": [
+        "clipboard",
+        "manual"
+      ],
+      "requestedPayloads": [
+        "clipboard.text"
+      ],
+      "preferredPresentation": "clipboard-chip"
+    },
+    {
+      "id": "selection.inspect",
+      "title": "Inspect Selection",
+      "triggers": [
+        "selection",
+        "manual"
+      ],
+      "requestedPayloads": [
+        "selection.text",
+        "selection.beforeCursor",
+        "selection.afterCursor"
+      ],
+      "preferredPresentation": "candidate-strip"
+    }
+  ],
+  "discovery": {
+    "pinnable": false,
+    "recentEnabled": true,
+    "launchMode": "quick-action",
+    "slash": {
+      "enabled": true,
+      "commands": [
+        "debug"
+      ],
+      "aliases": [
+        "bridge"
+      ],
+      "tags": [
+        "debug",
+        "bridge",
+        "test"
+      ]
+    }
+  },
+  "ai": {
+    "executionMode": "none",
+    "backendHints": {
+      "preferredBackendClass": "none",
+      "requiredCapabilities": [],
+      "latencyTier": "instant",
+      "latencyBudgetMs": 150,
+      "allowFallbacks": false,
+      "allowBackgroundPreparation": false,
+      "requireStructuredJson": false,
+      "maxToolCalls": 0,
+      "maxReasoningSteps": 0,
+      "notes": [
+        "This kit is used to validate host-bridge features and should remain local-first."
+      ]
+    }
+  },
+  "network": {
+    "mode": "disabled",
+    "allowAbsoluteUrls": false
+  },
+  "permissions": {
+    "needsActiveInputContext": true,
+    "needsPersonaContext": false,
+    "needsNetwork": false,
+    "needsAiAccess": false
+  },
+  "runtimePermissions": [
+    "context.read",
+    "input.insert",
+    "input.replace",
+    "input.observe.best_effort",
+    "send.intercept.ime_action",
+    "settings.open",
+    "storage.read",
+    "storage.write"
+  ],
+  "hostBridge": {
+    "protocolVersion": "1.0.0",
+    "envelopeSchema": "../host-bridge/message-envelope.schema.json",
+    "errorSchema": "../host-bridge/error.schema.json",
+    "uiToHost": [
+      "bridge.ready",
+      "context.request",
+      "candidate.insert",
+      "candidate.replace",
+      "input.observe.best_effort.start",
+      "input.observe.best_effort.stop",
+      "send.intercept.ime_action.register",
+      "send.intercept.ime_action.unregister",
+      "send.intercept.ime_action.result",
+      "settings.open",
+      "storage.get",
+      "storage.set"
+    ],
+    "hostToUi": [
+      "bridge.ready.ack",
+      "binding.invoke",
+      "context.sync",
+      "input.observe.best_effort.ack",
+      "send.intercept.ime_action.ack",
+      "send.intercept.ime_action.intent",
+      "storage.sync",
+      "permissions.sync",
+      "host.state.update",
+      "permission.denied",
+      "bridge.error"
+    ],
+    "fixtures": [
+      "tests/fixtures/bridge.host-to-ui.binding-invoke.basic.json",
+      "tests/fixtures/bridge.host-to-ui.send-intercept.intent.basic.json"
+    ]
+  },
+  "tests": {
+    "readme": "tests/README.md"
+  }
+}
+

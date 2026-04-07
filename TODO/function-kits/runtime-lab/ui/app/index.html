@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Runtime Lab</title>
+    <link rel="stylesheet" href="../../../shared/ui/ime-panel.css" />
+    <link rel="stylesheet" href="../../../shared/ui/kit-shadcn.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app" class="shell kit-shell" v-cloak>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Function Kit Devtools</p>
+          <h1>Runtime Lab</h1>
+          <p class="subtitle">
+            手动验收最近改动：<code>ai.request/ai.response</code>、Tasks、WebView 复用（WindowPool）、输入写回。
+          </p>
+        </div>
+        <div class="topbar__actions">
+          <button id="refreshContextButton" class="ghost" type="button" @click="refreshContext('user-refresh')">刷新上下文</button>
+          <button id="openSettingsButton" class="ghost" type="button" @click="openSettings">宿主设置</button>
+        </div>
+      </header>
+
+      <section class="statusbar" id="statusBar" :data-state="status.state">
+        <span id="statusText" v-text="status.text"></span>
+        <span id="sessionMeta" v-text="statusMetaText"></span>
+      </section>
+
+      <section class="card">
+        <div class="card__header">
+          <h2>已授权能力</h2>
+          <span id="instanceBadge" class="badge" v-text="'instance=' + instanceId"></span>
+        </div>
+        <div id="permissionChips" class="chips">
+          <span class="chip" v-if="permissions.length === 0" v-text="permissionsEmptyText"></span>
+          <span class="chip chip--granted" v-for="permission in permissions" :key="permission" v-text="permission"></span>
+        </div>
+      </section>
+
+      <nav class="tabs">
+        <button class="tab" type="button" :class="{ 'tab--active': activeView === 'ai' }" @click="setActiveView('ai')">AI</button>
+        <button class="tab" type="button" :class="{ 'tab--active': activeView === 'tasks' }" @click="setActiveView('tasks')">
+          Tasks
+        </button>
+        <button class="tab" type="button" :class="{ 'tab--active': activeView === 'input' }" @click="setActiveView('input')">
+          Input
+        </button>
+        <button class="tab" type="button" :class="{ 'tab--active': activeView === 'logs' }" @click="setActiveView('logs')">Logs</button>
+      </nav>
+
+      <main class="views kit-scroll">
+        <section class="view" :class="{ 'view--active': activeView === 'ai' }">
+          <section class="card">
+            <div class="card__header">
+              <h2>AI Request（host-shared）</h2>
+              <button id="runAiButton" class="primary" type="button" @click="runAiRequest" :disabled="!canRunAi">AI 生成</button>
+            </div>
+
+            <label class="field">
+              <span class="field__label">Prompt</span>
+              <textarea
+                id="aiPromptInput"
+                class="field__control field__control--textarea"
+                rows="4"
+                v-model="settings.aiPrompt"
+                @change="saveSettings({ aiPrompt: settings.aiPrompt })"
+              ></textarea>
+            </label>
+
+            <div class="grid">
+              <label class="field">
+                <span class="field__label">temperature</span>
+                <input
+                  id="aiTemperatureInput"
+                  class="field__control"
+                  type="number"
+                  inputmode="decimal"
+                  min="0"
+                  max="2"
+                  step="0.1"
+                  v-model="settings.aiTemperature"
+                  @change="saveSettings({ aiTemperature: Number(settings.aiTemperature) })"
+                />
+              </label>
+              <label class="field">
+                <span class="field__label">maxTokens</span>
+                <input
+                  id="aiMaxTokensInput"
+                  class="field__control"
+                  type="number"
+                  inputmode="numeric"
+                  min="16"
+                  max="4096"
+                  step="16"
+                  v-model="settings.aiMaxTokens"
+                  @change="saveSettings({ aiMaxTokens: Number(settings.aiMaxTokens) })"
+                />
+              </label>
+            </div>
+
+            <p class="hint">
+              说明：默认强制 structured JSON，期望输出 <code>{"candidates":[{"text":"..."}]}</code>。
+            </p>
+          </section>
+
+          <section class="card">
+            <div class="card__header">
+              <h2>AI 输出（raw）</h2>
+              <span id="aiBadge" :class="aiBadgeClass" v-text="aiBadgeText"></span>
+            </div>
+            <pre id="aiResultJson" class="code code--scroll" v-text="aiResultText"></pre>
+            <div class="actions">
+              <button
+                id="insertFirstCandidateButton"
+                class="primary"
+                type="button"
+                @click="commitCandidateToInput('insert')"
+                :disabled="!canInsertCandidate"
+              >
+                插入第 1 条
+              </button>
+              <button
+                id="replaceFirstCandidateButton"
+                class="ghost"
+                type="button"
+                @click="commitCandidateToInput('replace')"
+                :disabled="!canReplaceCandidate"
+              >
+                替换第 1 条
+              </button>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" :class="{ 'view--active': activeView === 'tasks' }">
+          <section class="card">
+            <div class="card__header">
+              <h2>Tasks（host-tracked）</h2>
+              <button id="syncTasksButton" class="ghost" type="button" @click="syncTasks" :disabled="tasks.syncing">Sync</button>
+            </div>
+
+            <div class="actions">
+              <button
+                id="startSlowFetchButton"
+                class="primary"
+                type="button"
+                @click="startSlowFetch"
+                :disabled="!canStartSlowFetch"
+              >
+                Slow Fetch
+              </button>
+              <button
+                id="cancelFirstRunningTaskButton"
+                class="danger"
+                type="button"
+                @click="cancelFirstRunningTask"
+                :disabled="!canCancelRunningTask"
+              >
+                Cancel Running
+              </button>
+            </div>
+
+            <label class="field">
+              <span class="field__label">Slow Fetch URL</span>
+              <input
+                id="fetchUrlInput"
+                class="field__control"
+                type="url"
+                v-model="settings.fetchUrl"
+                @change="saveSettings({ fetchUrl: settings.fetchUrl })"
+              />
+            </label>
+
+            <details class="details" open>
+              <summary>运行中任务</summary>
+              <pre id="runningTasksJson" class="code code--scroll" v-text="runningTasksText"></pre>
+            </details>
+
+            <details class="details">
+              <summary>历史任务</summary>
+              <pre id="historyTasksJson" class="code code--scroll" v-text="historyTasksText"></pre>
+            </details>
+          </section>
+        </section>
+
+        <section class="view" :class="{ 'view--active': activeView === 'input' }">
+          <section class="card">
+            <div class="card__header">
+              <h2>当前上下文</h2>
+              <span id="contextBadge" :class="contextBadgeClass" v-text="contextBadgeText"></span>
+            </div>
+
+            <div class="kv">
+              <div class="kv__row">
+                <span class="kv__key">App</span>
+                <span id="contextPackage" class="kv__value" v-text="contextPackageText"></span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">Selection</span>
+                <span id="contextSelection" class="kv__value" v-text="contextSelectionText"></span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">BeforeCursor</span>
+                <span id="contextBeforeCursor" class="kv__value kv__value--mono" v-text="contextBeforeCursorText"></span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">SelectedText</span>
+                <span id="contextSelectedText" class="kv__value kv__value--mono" v-text="contextSelectedText"></span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">AfterCursor</span>
+                <span id="contextAfterCursor" class="kv__value kv__value--mono" v-text="contextAfterCursorText"></span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">Preedit</span>
+                <span id="contextPreedit" class="kv__value kv__value--mono" v-text="contextPreeditText"></span>
+              </div>
+            </div>
+
+            <details class="details">
+              <summary>查看 raw JSON</summary>
+              <pre id="contextJson" class="code code--scroll" v-text="contextJsonText"></pre>
+            </details>
+          </section>
+
+          <section class="card">
+            <div class="card__header">
+              <h2>写回到外部输入框</h2>
+            </div>
+
+            <label class="field">
+              <span class="field__label">text</span>
+              <input
+                id="commitTextInput"
+                class="field__control"
+                type="text"
+                v-model="settings.commitText"
+                @change="saveSettings({ commitText: settings.commitText })"
+              />
+            </label>
+
+            <div class="actions">
+              <button id="insertTextButton" class="primary" type="button" @click="commitTextToInput('insert')" :disabled="!caps.canInsert">
+                Insert
+              </button>
+              <button id="replaceTextButton" class="ghost" type="button" @click="commitTextToInput('replace')" :disabled="!caps.canReplace">
+                Replace
+              </button>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" :class="{ 'view--active': activeView === 'logs' }">
+          <section class="card">
+            <div class="card__header">
+              <h2>运行日志</h2>
+              <button id="clearLogsButton" class="ghost" type="button" @click="clearLogs">清空</button>
+            </div>
+            <pre id="logOutput" class="code code--scroll" v-text="logsText"></pre>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../../../function-kit-runtime-sdk/dist/function-kit-runtime.js"></script>
+    <script src="../../../shared/vendor/petite-vue/petite-vue.iife.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>

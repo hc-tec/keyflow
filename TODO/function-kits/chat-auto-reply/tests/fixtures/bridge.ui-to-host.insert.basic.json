@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "messageId": "ui-insert-001",
+  "replyTo": "host-render-001",
+  "timestamp": "2026-03-21T20:45:02+08:00",
+  "kitId": "chat-auto-reply",
+  "surface": "panel",
+  "source": "function-kit-ui",
+  "target": "host-adapter",
+  "type": "candidate.insert",
+  "payload": {
+    "candidateId": "candidate-1",
+    "text": "可以，我今晚 9 点前整理好发你。",
+    "commitMode": "insert"
+  }
+}

@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IME Hooks</title>
+    <link rel="stylesheet" href="../../../shared/ui/ime-panel.css" />
+    <link rel="stylesheet" href="../../../shared/ui/kit-shadcn.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app" class="shell kit-shell" v-cloak>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Function Kit Devtools</p>
+          <h1>IME Hooks</h1>
+          <p class="subtitle">用于测试 `input.observe.best_effort` 与 `send.intercept.ime_action`。</p>
+        </div>
+        <div class="topbar__actions">
+          <button
+            class="primary"
+            type="button"
+            :disabled="!connected || (!caps.canObserve && !caps.canIntercept)"
+            @click="enableAll"
+          >
+            启用全部
+          </button>
+          <button class="ghost" type="button" @click="openSettings">宿主设置</button>
+        </div>
+      </header>
+
+      <section class="statusbar" :data-state="status.state">
+        <span>{{ status.text }}</span>
+        <span>{{ sessionMetaText }}</span>
+      </section>
+
+      <section class="card">
+        <div class="card__header">
+          <h2>已授权能力</h2>
+        </div>
+        <div class="chips">
+          <span class="chip" v-if="permissions.length === 0">等待权限同步</span>
+          <span
+            class="chip"
+            :class="{ 'chip--granted': isPermissionGranted(permission) }"
+            v-for="permission in permissions"
+            :key="permission"
+            >{{ permission }}</span>
+        </div>
+      </section>
+
+      <nav class="tabs">
+        <button class="tab" type="button" :class="{ 'tab--active': activeView === 'observe' }" @click="setView('observe')">
+          监听
+        </button>
+        <button class="tab" type="button" :class="{ 'tab--active': activeView === 'intercept' }" @click="setView('intercept')">
+          拦截
+        </button>
+        <button class="tab" type="button" :class="{ 'tab--active': activeView === 'logs' }" @click="setView('logs')">日志</button>
+      </nav>
+
+      <main class="views kit-scroll">
+        <section class="view" :class="{ 'view--active': activeView === 'observe' }">
+          <section class="card">
+            <div class="card__header">
+              <h2>实时监听输入（best-effort）</h2>
+              <button class="ghost" type="button" :disabled="!canRefreshContext" @click="refreshContext('user-refresh')">
+                刷新上下文
+              </button>
+            </div>
+
+            <div class="grid">
+              <label class="field">
+                <span class="field__label">throttleMs</span>
+                <input
+                  class="field__control"
+                  type="number"
+                  min="16"
+                  max="2000"
+                  step="1"
+                  v-model="settings.observeThrottleMs"
+                  @change="onObserveOptionsChange"
+                />
+              </label>
+              <label class="field">
+                <span class="field__label">maxChars</span>
+                <input
+                  class="field__control"
+                  type="number"
+                  min="16"
+                  max="1024"
+                  step="1"
+                  v-model="settings.observeMaxChars"
+                  @change="onObserveOptionsChange"
+                />
+              </label>
+            </div>
+
+            <div class="actions">
+              <button class="primary" type="button" :disabled="!canStartObserve" @click="startObserve">开始监听</button>
+              <button class="ghost" type="button" :disabled="!canStopObserve" @click="stopObserve">停止监听</button>
+            </div>
+
+            <p class="hint">{{ observeHintText }}</p>
+          </section>
+
+          <section class="card">
+            <div class="card__header">
+              <h2>最近一次上下文快照</h2>
+              <span class="badge" :class="contextMetaBadgeClass">{{ contextMetaBadgeText }}</span>
+            </div>
+            <div class="kv">
+              <div class="kv__row">
+                <span class="kv__key">App</span>
+                <span class="kv__value">{{ contextPackageText }}</span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">Selection</span>
+                <span class="kv__value">{{ contextSelectionText }}</span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">BeforeCursor</span>
+                <span class="kv__value kv__value--mono">{{ contextBeforeCursorText }}</span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">SelectedText</span>
+                <span class="kv__value kv__value--mono">{{ contextSelectedText }}</span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">AfterCursor</span>
+                <span class="kv__value kv__value--mono">{{ contextAfterCursorText }}</span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">Preedit</span>
+                <span class="kv__value kv__value--mono">{{ contextPreeditText }}</span>
+              </div>
+            </div>
+
+            <details class="details">
+              <summary>查看 raw JSON</summary>
+              <pre class="code">{{ contextJsonText }}</pre>
+            </details>
+          </section>
+        </section>
+
+        <section class="view" :class="{ 'view--active': activeView === 'intercept' }">
+          <section class="card">
+            <div class="card__header">
+              <h2>动作键拦截（回车 / editorAction）</h2>
+              <span class="badge" :class="interceptBadgeClass">{{ interceptBadgeText }}</span>
+            </div>
+
+            <label class="field">
+              <span class="field__label">timeoutMs（建议手动模式设 3000+）</span>
+              <input
+                class="field__control"
+                type="number"
+                min="100"
+                max="5000"
+                step="50"
+                v-model="settings.interceptTimeoutMs"
+                @change="onInterceptTimeoutChange"
+              />
+            </label>
+
+            <div class="grid">
+              <label class="field">
+                <span class="field__label">决策模式</span>
+                <div
+                  class="field__control kit-segmented"
+                  role="radiogroup"
+                  aria-label="interceptMode"
+                >
+                  <button
+                    class="kit-segmented__button"
+                    type="button"
+                    role="radio"
+                    :aria-checked="settings.interceptMode === 'allow' ? 'true' : 'false'"
+                    data-value="allow"
+                    @click="setInterceptMode('allow')"
+                  >
+                    全部放行
+                  </button>
+                  <button
+                    class="kit-segmented__button"
+                    type="button"
+                    role="radio"
+                    :aria-checked="settings.interceptMode === 'block' ? 'true' : 'false'"
+                    data-value="block"
+                    @click="setInterceptMode('block')"
+                  >
+                    全部拦截
+                  </button>
+                  <button
+                    class="kit-segmented__button"
+                    type="button"
+                    role="radio"
+                    :aria-checked="settings.interceptMode === 'regex' ? 'true' : 'false'"
+                    data-value="regex"
+                    @click="setInterceptMode('regex')"
+                  >
+                    正则拦截
+                  </button>
+                  <button
+                    class="kit-segmented__button"
+                    type="button"
+                    role="radio"
+                    :aria-checked="settings.interceptMode === 'prompt' ? 'true' : 'false'"
+                    data-value="prompt"
+                    @click="setInterceptMode('prompt')"
+                  >
+                    手动确认
+                  </button>
+                </div>
+              </label>
+              <label class="field" v-if="settings.interceptMode === 'regex'">
+                <span class="field__label">拦截正则（JS RegExp）</span>
+                <input class="field__control" type="text" v-model="settings.interceptRegex" @change="onInterceptRegexChange" />
+              </label>
+            </div>
+
+            <div class="actions">
+              <button class="primary" type="button" :disabled="!canRegisterIntercept" @click="registerIntercept">注册拦截</button>
+              <button class="ghost" type="button" :disabled="!canUnregisterIntercept" @click="unregisterIntercept">取消拦截</button>
+            </div>
+
+            <p class="hint">
+              说明：只覆盖 IME 自己的回车 / editorAction 路径，不保证拦截 App 内“发送按钮”。
+            </p>
+          </section>
+
+          <section class="card" v-if="pending.visible">
+            <div class="card__header">
+              <h2>待确认的动作键意图</h2>
+              <span class="badge badge--warning">{{ pending.countdownText }}</span>
+            </div>
+            <div class="kv">
+              <div class="kv__row">
+                <span class="kv__key">kind</span>
+                <span class="kv__value kv__value--mono">{{ pending.intentKind }}</span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">actionId</span>
+                <span class="kv__value kv__value--mono">{{ pending.actionId }}</span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">label</span>
+                <span class="kv__value kv__value--mono">{{ pending.actionLabel }}</span>
+              </div>
+              <div class="kv__row">
+                <span class="kv__key">beforeCursor</span>
+                <span class="kv__value kv__value--mono">{{ pending.beforeCursor }}</span>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="primary" type="button" @click="decidePrompt(true)">放行</button>
+              <button class="danger" type="button" @click="decidePrompt(false)">拦截</button>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card__header">
+              <h2>最近一次拦截事件</h2>
+              <span class="badge" :class="lastDecisionBadgeClass">{{ lastDecisionText }}</span>
+            </div>
+            <pre class="code">{{ lastIntentJsonText }}</pre>
+          </section>
+        </section>
+
+        <section class="view" :class="{ 'view--active': activeView === 'logs' }">
+          <section class="card">
+            <div class="card__header">
+              <h2>运行日志</h2>
+              <button class="ghost" type="button" @click="clearLogs">清空</button>
+            </div>
+            <pre class="code code--scroll">{{ logsText }}</pre>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../../../function-kit-runtime-sdk/dist/function-kit-runtime.js"></script>
+    <script src="../../../shared/vendor/petite-vue/petite-vue.iife.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>

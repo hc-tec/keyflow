@@ -1,0 +1,31 @@
+{
+  "surface": "panel",
+  "status": {
+    "state": "ready",
+    "text": "已渲染 3 条候选"
+  },
+  "sourceMessage": "今晚方便把方案发我吗？",
+  "personaChips": [
+    "同事沟通",
+    "明确时间",
+    "简洁"
+  ],
+  "candidateCount": 3,
+  "firstCandidate": {
+    "id": "candidate-1",
+    "text": "可以，我今晚 9 点前整理好发你。",
+    "risk": "low",
+    "actions": [
+      {
+        "type": "insert",
+        "label": "插入"
+      }
+    ]
+  },
+  "availableCommands": [
+    "candidate.insert",
+    "candidates.regenerate",
+    "context.request",
+    "settings.open"
+  ]
+}

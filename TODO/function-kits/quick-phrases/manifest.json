@@ -1,0 +1,128 @@
+{
+  "id": "quick-phrases",
+  "name": "Quick Phrases",
+  "version": "0.1.0",
+  "description": "Insert reusable short phrases and local snippets into the active input field.",
+  "icons": {
+    "64": "icons/quick-phrases.png"
+  },
+  "platforms": [
+    "windows",
+    "android"
+  ],
+  "entry": {
+    "type": "browser-app",
+    "bundle": {
+      "html": "ui/app/index.html",
+      "script": "ui/app/main.js",
+      "style": "ui/app/styles.css"
+    },
+    "sdk": {
+      "project": "../../function-kit-runtime-sdk/package.json",
+      "browserBundle": "../../function-kit-runtime-sdk/dist/function-kit-runtime.js"
+    },
+    "surfaces": {
+      "windows": {
+        "preferred": "side-panel",
+        "fallback": "popup",
+        "minWidth": 320
+      },
+      "android": {
+        "preferred": "bottom-sheet",
+        "fallback": "full-screen",
+        "peekHeightDp": 280
+      }
+    },
+    "bridgeDoc": "ui/README.md"
+  },
+  "triggers": {
+    "manual": true,
+    "selectionRequired": false,
+    "contextTypes": [
+      "message-compose",
+      "generic-text"
+    ]
+  },
+  "discovery": {
+    "pinnable": true,
+    "recentEnabled": true,
+    "launchMode": "quick-action",
+    "slash": {
+      "enabled": true,
+      "commands": [
+        "phrase"
+      ],
+      "aliases": [
+        "quick-text",
+        "snippets",
+        "shortcuts"
+      ],
+      "tags": [
+        "template",
+        "snippet",
+        "local"
+      ]
+    }
+  },
+  "ai": {
+    "executionMode": "none",
+    "backendHints": {
+      "preferredBackendClass": "none",
+      "requiredCapabilities": [],
+      "latencyTier": "instant",
+      "latencyBudgetMs": 150,
+      "allowFallbacks": false,
+      "allowBackgroundPreparation": false,
+      "requireStructuredJson": false,
+      "maxToolCalls": 0,
+      "maxReasoningSteps": 0,
+      "notes": [
+        "This kit is local-first and should stay useful without remote AI."
+      ]
+    }
+  },
+  "network": {
+    "mode": "disabled",
+    "allowAbsoluteUrls": false
+  },
+  "permissions": {
+    "needsActiveInputContext": true,
+    "needsPersonaContext": false,
+    "needsNetwork": false,
+    "needsAiAccess": false
+  },
+  "runtimePermissions": [
+    "context.read",
+    "input.insert",
+    "input.replace",
+    "settings.open",
+    "storage.read",
+    "storage.write"
+  ],
+  "hostBridge": {
+    "protocolVersion": "1.0.0",
+    "envelopeSchema": "../host-bridge/message-envelope.schema.json",
+    "errorSchema": "../host-bridge/error.schema.json",
+    "uiToHost": [
+      "bridge.ready",
+      "context.request",
+      "candidate.insert",
+      "candidate.replace",
+      "settings.open",
+      "storage.get",
+      "storage.set"
+    ],
+    "hostToUi": [
+      "bridge.ready.ack",
+      "context.sync",
+      "storage.sync",
+      "permissions.sync",
+      "host.state.update",
+      "permission.denied",
+      "bridge.error"
+    ]
+  },
+  "tests": {
+    "readme": "tests/README.md"
+  }
+}

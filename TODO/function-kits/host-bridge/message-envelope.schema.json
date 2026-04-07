@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "function-kit.host-bridge.message-envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "messageId",
+    "timestamp",
+    "kitId",
+    "surface",
+    "source",
+    "target",
+    "type",
+    "payload"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "messageId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "replyTo": {
+      "type": "string",
+      "minLength": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "kitId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "surface": {
+      "type": "string",
+      "enum": [
+        "inline",
+        "panel",
+        "editor"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "host-adapter",
+        "function-kit-ui"
+      ]
+    },
+    "target": {
+      "type": "string",
+      "enum": [
+        "host-adapter",
+        "function-kit-ui"
+      ]
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "bridge.ready",
+        "bridge.ready.ack",
+        "binding.invoke",
+        "context.request",
+        "context.sync",
+        "candidates.render",
+        "candidate.insert",
+        "candidate.replace",
+        "input.commitImage",
+        "input.observe.best_effort.start",
+        "input.observe.best_effort.stop",
+        "input.observe.best_effort.ack",
+        "candidates.regenerate",
+        "settings.open",
+        "storage.get",
+        "storage.set",
+        "storage.sync",
+        "panel.state.update",
+        "panel.state.ack",
+        "permissions.sync",
+        "permission.denied",
+        "host.state.update",
+        "runtime.message.send",
+        "runtime.message.send.ack",
+        "runtime.message",
+        "bridge.error",
+        "network.fetch",
+        "network.fetch.result",
+        "files.pick",
+        "files.pick.result",
+        "files.download",
+        "files.download.result",
+        "files.getUrl",
+        "files.getUrl.result",
+        "ai.request",
+        "ai.response",
+        "ai.response.delta",
+        "ai.agent.list",
+        "ai.agent.list.result",
+        "ai.agent.run",
+        "ai.agent.run.result",
+        "kits.sync.request",
+        "kits.sync",
+        "kits.open",
+        "kits.open.result",
+        "kits.install",
+        "kits.install.result",
+        "kits.uninstall",
+        "kits.uninstall.result",
+        "kits.settings.update",
+        "kits.settings.update.result",
+        "catalog.sources.get",
+        "catalog.sources.set",
+        "catalog.sources.sync",
+        "catalog.refresh",
+        "catalog.sync",
+        "task.update",
+        "tasks.sync.request",
+        "tasks.sync",
+        "task.cancel",
+        "task.cancel.ack",
+        "send.intercept.ime_action.register",
+        "send.intercept.ime_action.unregister",
+        "send.intercept.ime_action.ack",
+        "send.intercept.ime_action.intent",
+        "send.intercept.ime_action.result",
+        "composer.open",
+        "composer.focus",
+        "composer.update",
+        "composer.close",
+        "composer.state.sync"
+      ]
+    },
+    "payload": {
+      "type": "object"
+    },
+    "error": {
+      "$ref": "./error.schema.json"
+    }
+  }
+}

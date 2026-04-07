@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "messageId": "host-storage-sync-001",
+  "replyTo": "ui-storage-get-001",
+  "timestamp": "2026-03-21T21:35:04+08:00",
+  "kitId": "chat-auto-reply",
+  "surface": "panel",
+  "source": "host-adapter",
+  "target": "function-kit-ui",
+  "type": "storage.sync",
+  "payload": {
+    "values": {
+      "draft": "可以，我今晚 9 点前整理好发你。"
+    }
+  }
+}

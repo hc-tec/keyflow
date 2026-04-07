@@ -1,0 +1,48 @@
+{
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "text": "可以，我今晚 9 点前整理好发你。",
+      "tone": "professional-friendly",
+      "risk": "low",
+      "rationale": "给出明确时间，适合同事协作场景。",
+      "actions": [
+        {
+          "type": "insert",
+          "label": "插入"
+        }
+      ]
+    },
+    {
+      "id": "candidate-2",
+      "text": "方便，我还在收尾，今晚整理完第一时间发你。",
+      "tone": "professional-friendly",
+      "risk": "medium",
+      "rationale": "语气更柔和，但时间不够具体。",
+      "actions": [
+        {
+          "type": "insert",
+          "label": "插入"
+        },
+        {
+          "type": "regenerate",
+          "label": "换一批"
+        }
+      ]
+    },
+    {
+      "id": "candidate-3",
+      "text": "可以，我再核一下细节，今晚确认后发你。",
+      "tone": "professional-friendly",
+      "risk": "low",
+      "rationale": "避免过度承诺，保留确认空间。",
+      "actions": [
+        {
+          "type": "insert",
+          "label": "插入"
+        }
+      ]
+    }
+  ],
+  "missing_context": []
+}

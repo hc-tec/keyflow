@@ -1,0 +1,228 @@
+{
+  "id": "chat-auto-reply",
+  "name": "Chat Auto Reply",
+  "version": "0.1.0",
+  "description": "Generate candidate chat replies for insertion into the active input field.",
+  "icons": {
+    "64": "icons/chat-auto-reply.ico"
+  },
+  "platforms": [
+    "windows",
+    "android"
+  ],
+  "entry": {
+    "type": "browser-app",
+    "bundle": {
+      "html": "ui/app/index.html",
+      "script": "ui/app/main.js",
+      "style": "ui/app/styles.css"
+    },
+    "sdk": {
+      "project": "../../function-kit-runtime-sdk/package.json",
+      "browserBundle": "../../function-kit-runtime-sdk/dist/function-kit-runtime.js"
+    },
+    "surfaces": {
+      "windows": {
+        "preferred": "side-panel",
+        "fallback": "popup",
+        "minWidth": 360
+      },
+      "android": {
+        "preferred": "bottom-sheet",
+        "fallback": "full-screen",
+        "peekHeightDp": 320
+      }
+    },
+    "bridgeDoc": "ui/README.md"
+  },
+  "triggers": {
+    "manual": true,
+    "selectionRequired": false,
+    "contextTypes": [
+      "chat",
+      "message-compose"
+    ]
+  },
+  "bindings": [
+    {
+      "id": "clipboard.summarize",
+      "title": "Summarize Clipboard",
+      "triggers": [
+        "clipboard",
+        "manual"
+      ],
+      "requestedPayloads": [
+        "clipboard.text"
+      ],
+      "categories": [
+        "paste",
+        "writing",
+        "summarize"
+      ],
+      "preferredPresentation": "clipboard-chip"
+    },
+    {
+      "id": "selection.rewrite",
+      "title": "Rewrite Selection",
+      "triggers": [
+        "selection",
+        "manual"
+      ],
+      "requestedPayloads": [
+        "selection.text",
+        "selection.beforeCursor",
+        "selection.afterCursor"
+      ],
+      "categories": [
+        "writing",
+        "rewrite"
+      ],
+      "preferredPresentation": "candidate-strip"
+    }
+  ],
+  "discovery": {
+    "pinnable": true,
+    "recentEnabled": true,
+    "launchMode": "quick-action",
+    "slash": {
+      "enabled": true,
+      "commands": [
+        "reply"
+      ],
+      "aliases": [
+        "auto-reply",
+        "chat-reply",
+        "wx-reply"
+      ],
+      "tags": [
+        "chat",
+        "message",
+        "wechat"
+      ],
+      "minQueryLength": 1,
+      "matchers": [
+        {
+          "type": "regex",
+          "pattern": "^wx([_-]?reply)?$",
+          "weight": 0.72
+        }
+      ]
+    },
+    "ranking": {
+      "baseWeight": 1,
+      "recentBoost": 0.4,
+      "pinnedBoost": 0.2,
+      "contextBoost": 0.35,
+      "blockedPenalty": 0.6
+    }
+  },
+  "ai": {
+    "executionMode": "direct-model",
+    "backendHints": {
+      "preferredBackendClass": "direct-model",
+      "requiredCapabilities": [
+        "structured-output",
+        "low-latency"
+      ],
+      "latencyTier": "interactive",
+      "latencyBudgetMs": 1200,
+      "allowFallbacks": true,
+      "allowBackgroundPreparation": false,
+      "requireStructuredJson": true,
+      "maxToolCalls": 0,
+      "maxReasoningSteps": 0,
+      "notes": [
+        "High-frequency reply suggestion should prefer a fast direct-model route.",
+        "If direct model routing is unavailable, the host may fall back to an external agent adapter."
+      ]
+    }
+  },
+  "network": {
+    "mode": "host-proxy",
+    "allowAbsoluteUrls": false
+  },
+  "permissions": {
+    "needsActiveInputContext": true,
+    "needsPersonaContext": true,
+    "needsNetwork": true,
+    "needsClipboard": false,
+    "needsAiAccess": true
+  },
+  "runtimePermissions": [
+    "context.read",
+    "input.insert",
+    "input.replace",
+    "candidates.regenerate",
+    "ai.request",
+    "settings.open",
+    "storage.read",
+    "storage.write",
+    "panel.state.write"
+  ],
+  "hostBridge": {
+    "protocolVersion": "1.0.0",
+    "envelopeSchema": "../host-bridge/message-envelope.schema.json",
+    "errorSchema": "../host-bridge/error.schema.json",
+    "uiToHost": [
+      "bridge.ready",
+      "context.request",
+      "candidate.insert",
+      "candidate.replace",
+      "candidates.regenerate",
+      "ai.request",
+      "settings.open",
+      "storage.get",
+      "storage.set",
+      "panel.state.update"
+    ],
+    "hostToUi": [
+      "bridge.ready.ack",
+      "binding.invoke",
+      "context.sync",
+      "candidates.render",
+      "ai.response",
+      "storage.sync",
+      "panel.state.ack",
+      "permissions.sync",
+      "permission.denied",
+      "host.state.update",
+      "bridge.error"
+    ],
+    "fixtures": [
+      "tests/fixtures/bridge.host-to-ui.ready-ack.basic.json",
+      "tests/fixtures/bridge.host-to-ui.binding-invoke.basic.json",
+      "tests/fixtures/bridge.host-to-ui.permissions.basic.json",
+      "tests/fixtures/bridge.host-to-ui.render.basic.json",
+      "tests/fixtures/bridge.ui-to-host.insert.basic.json",
+      "tests/fixtures/bridge.host-to-ui.storage-sync.basic.json",
+      "tests/fixtures/bridge.host-to-ui.permission-denied.basic.json",
+      "tests/fixtures/bridge.host-to-ui.error.basic.json"
+    ]
+  },
+  "agent": {
+    "mode": "openclaw-agent-only",
+    "skill": "skills/chat-auto-reply/SKILL.md"
+  },
+  "tools": [
+    {
+      "id": "reply-generator",
+      "inputSchema": "tools/reply-generator/input.schema.json",
+      "outputSchema": "tools/reply-generator/output.schema.json"
+    }
+  ],
+  "tests": {
+    "fixtures": [
+      "tests/fixtures/request.basic.json",
+      "tests/fixtures/response.basic.json",
+      "tests/fixtures/bridge.host-to-ui.ready-ack.basic.json",
+      "tests/fixtures/bridge.host-to-ui.permissions.basic.json",
+      "tests/fixtures/bridge.host-to-ui.render.basic.json",
+      "tests/fixtures/bridge.ui-to-host.insert.basic.json",
+      "tests/fixtures/bridge.host-to-ui.storage-sync.basic.json",
+      "tests/fixtures/bridge.host-to-ui.permission-denied.basic.json",
+      "tests/fixtures/bridge.host-to-ui.error.basic.json",
+      "tests/fixtures/runtime.snapshot.panel.basic.json"
+    ],
+    "readme": "tests/README.md"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "messageId": "host-send-intercept-intent-001",
+  "timestamp": "2026-03-25T21:10:05+08:00",
+  "kitId": "bridge-debugger",
+  "surface": "panel",
+  "source": "host-adapter",
+  "target": "function-kit-ui",
+  "type": "send.intercept.ime_action.intent",
+  "payload": {
+    "intent": {
+      "kind": "editorAction",
+      "actionId": 4,
+      "actionLabel": "send"
+    },
+    "context": {
+      "sourceMessage": "Hello, could you check this before sending?",
+      "sourcePackage": "com.example.chat",
+      "selectionStart": 0,
+      "selectionEnd": 0,
+      "selectedText": "",
+      "beforeCursor": "Hello, could you check this before sending?",
+      "afterCursor": "",
+      "preeditText": "",
+      "inputType": 1,
+      "candidateCount": 0
+    },
+    "bestEffort": true
+  }
+}
+

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Upload Lab</title>
+    <link rel="stylesheet" href="../../../shared/ui/ime-panel.css" />
+    <link rel="stylesheet" href="../../../shared/ui/kit-shadcn.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app" class="shell kit-shell" v-cloak>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Function Kit Devtools</p>
+          <h1>File Upload Lab</h1>
+          <p class="subtitle">验证 <code>files.pick</code> + <code>network.fetch bodyRef</code> 的最小闭环。</p>
+        </div>
+        <div class="topbar__actions">
+          <button class="ghost" type="button" @click="openSettings">宿主设置</button>
+        </div>
+      </header>
+
+      <section class="statusbar" :data-state="status.state">
+        <span>{{ status.text }}</span>
+        <span>{{ statusMetaText }}</span>
+      </section>
+
+      <section class="card">
+        <div class="card__header">
+          <h2>权限</h2>
+          <button class="ghost" type="button" @click="refreshPermissions">刷新</button>
+        </div>
+        <div class="chips">
+          <span class="chip" v-for="permission in wantedPermissions" :key="permission" :class="permissionChipClass(permission)">
+            {{ permission }}
+          </span>
+        </div>
+      </section>
+
+      <main class="views kit-scroll">
+        <section class="card">
+          <div class="card__header">
+            <h2>选择文件</h2>
+            <button class="primary" type="button" @click="pickFiles">选择文件</button>
+          </div>
+
+          <div class="grid">
+            <label class="field">
+              <span class="field__label">acceptMimeTypes（逗号分隔，可空）</span>
+              <input class="field__control" placeholder="image/*, text/plain" v-model="settings.acceptMimeTypes" />
+            </label>
+            <label class="field field--toggle">
+              <span class="field__label">multiple</span>
+              <input type="checkbox" v-model="settings.allowMultiple" />
+            </label>
+          </div>
+
+          <label class="field">
+            <span class="field__label">已选择文件</span>
+            <pre class="code">{{ pickedFilesText }}</pre>
+          </label>
+        </section>
+
+        <section class="card">
+          <div class="card__header">
+            <h2>上传</h2>
+            <div class="actions">
+              <button class="ghost" type="button" @click="cancelTask" :disabled="!canCancelTask">{{ cancelTaskLabel }}</button>
+              <button class="primary" type="button" @click="upload">上传</button>
+            </div>
+          </div>
+
+          <label class="field">
+            <span class="field__label">URL</span>
+            <input class="field__control" spellcheck="false" placeholder="https://httpbin.org/post" v-model="settings.uploadUrl" />
+          </label>
+
+          <div class="grid">
+            <label class="field">
+              <span class="field__label">method</span>
+              <div class="field__control kit-segmented" role="radiogroup" aria-label="method">
+                <button
+                  class="kit-segmented__button"
+                  type="button"
+                  role="radio"
+                  :aria-checked="settings.method === 'POST'"
+                  data-value="POST"
+                  @click="setMethod('POST')"
+                >
+                  POST
+                </button>
+                <button
+                  class="kit-segmented__button"
+                  type="button"
+                  role="radio"
+                  :aria-checked="settings.method === 'PUT'"
+                  data-value="PUT"
+                  @click="setMethod('PUT')"
+                >
+                  PUT
+                </button>
+              </div>
+            </label>
+            <label class="field">
+              <span class="field__label">Content-Type（可空，默认使用 picked mimeType）</span>
+              <input class="field__control" spellcheck="false" placeholder="image/png" v-model="settings.contentType" />
+            </label>
+          </div>
+
+          <label class="field">
+            <span class="field__label">headers（JSON，可空）</span>
+            <textarea
+              class="field__control field__control--textarea"
+              rows="3"
+              spellcheck="false"
+              placeholder='{\"authorization\":\"Bearer ...\"}'
+              v-model="settings.headersJson"
+            ></textarea>
+          </label>
+
+          <div class="actions">
+            <button class="ghost" type="button" @click="saveSettings">保存到 storage</button>
+            <button class="ghost" type="button" @click="loadSettings">从 storage 恢复</button>
+          </div>
+
+          <label class="field">
+            <span class="field__label">响应 / 调试输出</span>
+            <pre class="code">{{ uploadResultText }}</pre>
+          </label>
+        </section>
+
+        <section class="card">
+          <div class="card__header">
+            <h2>日志</h2>
+            <button class="ghost" type="button" @click="clearLogs">清空</button>
+          </div>
+          <pre class="code log">{{ logsText }}</pre>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../../../function-kit-runtime-sdk/dist/function-kit-runtime.js"></script>
+    <script src="../../../shared/vendor/petite-vue/petite-vue.iife.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>

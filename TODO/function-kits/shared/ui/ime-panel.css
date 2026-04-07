@@ -1,0 +1,89 @@
+:root {
+  --kit-space-1: 6px;
+  --kit-space-2: 10px;
+  --kit-space-3: 14px;
+  --kit-radius: 12px;
+  --kit-font: 13px;
+  --kit-line: 1.4;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-size: var(--kit-font);
+  line-height: var(--kit-line);
+}
+
+.kit-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kit-space-2);
+  padding: var(--kit-space-2);
+  min-height: 100vh;
+}
+
+.kit-scroll {
+  overflow: visible;
+}
+
+.kit-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--kit-space-2);
+}
+
+.kit-actions {
+  display: inline-flex;
+  gap: var(--kit-space-1);
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.field__control.kit-segmented {
+  width: 100%;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: var(--kit-space-1);
+  padding: var(--kit-space-1);
+  border-radius: var(--kit-radius);
+}
+
+.field__control.kit-segmented .kit-segmented__button {
+  appearance: none;
+  border: 0;
+  border-radius: calc(var(--kit-radius) - var(--kit-space-1));
+  padding: 8px 10px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  min-height: 34px;
+}
+
+.field__control.kit-segmented .kit-segmented__button[aria-checked="true"] {
+  background: var(--primary-soft, rgba(79, 124, 255, 0.18));
+  color: var(--text, inherit);
+}
+
+@media (max-height: 560px) {
+  :root {
+    --kit-space-1: 5px;
+    --kit-space-2: 8px;
+    --kit-space-3: 12px;
+    --kit-radius: 10px;
+    --kit-font: 12px;
+  }
+
+  .kit-shell {
+    padding: var(--kit-space-1);
+    gap: var(--kit-space-1);
+  }
+}
+

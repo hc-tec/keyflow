@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quick Phrases</title>
+    <link rel="stylesheet" href="../../../shared/ui/ime-panel.css" />
+    <link rel="stylesheet" href="../../../shared/ui/kit-shadcn.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app" class="shell kit-shell" v-cloak>
+      <header class="topbar">
+        <div class="kit-row">
+          <div>
+            <strong class="title">常用短语</strong>
+            <span class="subtitle">3 个短语槽位 · 适配 IME 小面板</span>
+          </div>
+          <div class="kit-actions">
+            <button class="ghost" type="button" @click="refreshContext">刷新</button>
+            <button class="ghost" type="button" @click="openSettings">设置</button>
+          </div>
+        </div>
+      </header>
+
+      <section class="statusbar" :data-state="status.state">
+        <span>{{ status.text }}</span>
+        <span>{{ statusMetaText }}</span>
+      </section>
+
+      <nav class="tabs" aria-label="views">
+        <button class="tab" type="button" :class="{ 'tab--active': activeView === 'phrases' }" @click="setView('phrases')">
+          短语
+        </button>
+        <button class="tab" type="button" :class="{ 'tab--active': activeView === 'draft' }" @click="setView('draft')">草稿</button>
+        <button class="tab" type="button" :class="{ 'tab--active': activeView === 'status' }" @click="setView('status')">
+          状态
+        </button>
+      </nav>
+
+      <main class="views kit-scroll">
+        <section class="view" :class="{ 'view--active': activeView === 'phrases' }">
+          <section class="card">
+            <div class="card__header">
+              <h2>短语槽位</h2>
+              <button class="ghost" type="button" @click="loadStoredPhrases" :disabled="!caps.canReadStorage">同步</button>
+            </div>
+            <div class="phrase-list">
+              <article class="phrase-card" v-for="slot in slots" :key="slot.key">
+                <div class="phrase-card__meta">
+                  <span class="phrase-card__slot">{{ slot.label }}</span>
+                  <span class="phrase-card__badge">本地</span>
+                </div>
+                <textarea class="phrase-card__input field__control" rows="2" v-model="slot.text"></textarea>
+                <div class="phrase-card__actions actions">
+                  <button class="primary" type="button" @click="submitSlot(slot, 'insert')" :disabled="!caps.canInsert">插入</button>
+                  <button class="ghost" type="button" @click="submitSlot(slot, 'replace')" :disabled="!caps.canReplace">替换</button>
+                  <button class="ghost" type="button" @click="saveSlot(slot)" :disabled="!caps.canWriteStorage">保存</button>
+                </div>
+              </article>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" :class="{ 'view--active': activeView === 'draft' }">
+          <section class="card">
+            <div class="card__header">
+              <h2>临时草稿</h2>
+            </div>
+            <label class="field">
+              <span class="field__label">草稿内容</span>
+              <textarea
+                class="field__control field__control--textarea"
+                placeholder="写一段临时要发出去的内容，然后直接插入或替换"
+                v-model="draftText"
+              ></textarea>
+            </label>
+            <div class="actions">
+              <button class="primary" type="button" @click="submitDraft('insert')" :disabled="!caps.canInsert">插入</button>
+              <button class="ghost" type="button" @click="submitDraft('replace')" :disabled="!caps.canReplace">替换</button>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" :class="{ 'view--active': activeView === 'status' }">
+          <section class="card">
+            <div class="card__header">
+              <h2>当前上下文</h2>
+            </div>
+            <div class="context-message">{{ contextMessage }}</div>
+            <div class="context-meta">{{ contextMeta }}</div>
+          </section>
+
+          <section class="card">
+            <div class="card__header">
+              <h2>已授权能力</h2>
+            </div>
+            <div class="chips">
+              <span class="chip" v-if="permissions.length === 0">等待权限同步</span>
+              <span class="chip" v-for="permission in permissions" :key="permission">{{ permission }}</span>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../../../function-kit-runtime-sdk/dist/function-kit-runtime.js"></script>
+    <script src="../../../shared/vendor/petite-vue/petite-vue.iife.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>

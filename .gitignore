@@ -1,0 +1,32 @@
+# Local research clones / build artifacts
+TODO/ime-research/repos/
+TODO/ime-research/.cache/
+TODO/ime-research/artifacts/**
+!TODO/ime-research/artifacts/**/
+!TODO/ime-research/artifacts/**/README.md
+TODO/ime-research/artifacts/apks/
+TODO/ime-research/logs/
+TODO/ime-research/windows-testhost/**/bin/
+TODO/ime-research/windows-testhost/**/obj/
+TODO/ime-research/windows-functionkit-host/**/bin/
+TODO/ime-research/windows-functionkit-host/**/obj/
+
+# Local OpenClaw workspace state
+.openclaw/
+.agent_browser/
+AGENTS.md
+HEARTBEAT.md
+IDENTITY.md
+SOUL.md
+TOOLS.md
+USER.md
+MEMORY.md
+memory/
+
+# Large source files (kept outside git; extract/notes are committed instead)
+*.pdf
+
+# Local scratch
+tmp/
+/artifacts/
+/tmp_*

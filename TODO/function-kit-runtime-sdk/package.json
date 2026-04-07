@@ -1,0 +1,28 @@
+{
+  "name": "@ime/function-kit-runtime-sdk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared browser runtime SDK for IME function kits.",
+  "main": "dist/function-kit-runtime.js",
+  "browser": "dist/function-kit-runtime.js",
+  "types": "src/index.d.ts",
+  "scripts": {
+    "build:browser": "node scripts/build-browser-bundle.mjs",
+    "test:client": "node --test tests/client-api.test.mjs",
+    "test:discovery": "node --test tests/discovery.test.mjs",
+    "test:bundle": "node --test tests/browser-bundle.test.mjs",
+    "test:manifest": "node --test tests/manifest-contract.test.mjs",
+    "test": "npm run build:browser && node --test tests/client-api.test.mjs tests/discovery.test.mjs tests/browser-bundle.test.mjs tests/manifest-contract.test.mjs"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./discovery": {
+      "types": "./src/discovery.d.ts",
+      "default": "./src/discovery.mjs"
+    },
+    "./browser": "./dist/function-kit-runtime.js"
+  }
+}

@@ -1,0 +1,383 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WX 回复</title>
+
+    <link rel="stylesheet" href="../../../shared/ui/ime-panel.css" />
+    <link rel="stylesheet" href="../../../shared/ui/kit-shadcn.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app" class="wx-shell" v-cloak>
+      <div class="wx-toast" v-if="toast.text" :data-kind="toast.kind">{{ toast.text }}</div>
+
+      <section class="screen screen--picker" v-show="screen === 'picker'">
+        <header class="screen__header">
+          <h1 class="screen__title">选择回复对象</h1>
+          <div class="header-actions">
+            <button class="icon-button" type="button" @click="openSettings('picker')" aria-label="服务配置">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3.5" y="4" width="17" height="6" rx="1.8" />
+                <rect x="3.5" y="14" width="17" height="6" rx="1.8" />
+                <path d="M8 7h.01M8 17h.01" />
+              </svg>
+            </button>
+            <button class="icon-button" type="button" @click="attemptClose()" aria-label="关闭">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+                <path d="M6 6 18 18M18 6 6 18" />
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <div class="search-box">
+          <svg class="search-box__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-3.5-3.5" />
+          </svg>
+          <input
+            class="search-box__input"
+            type="text"
+            placeholder="搜索联系人或群聊..."
+            v-model="picker.query"
+            @input="onSearchInput($event.target.value)"
+            @change="onSearchInput($event.target.value)"
+            @compositionend="onSearchInput($event.target.value)"
+            @keydown.enter.prevent="triggerSearch($event.target.value)"
+            enterkeyhint="search"
+            spellcheck="false"
+          />
+          <button
+            class="search-box__clear"
+            type="button"
+            v-if="picker.query.trim()"
+            @click="clearSearch()"
+            aria-label="清空搜索"
+          >
+            清空
+          </button>
+          <button
+            class="search-box__action"
+            type="button"
+            @click="triggerSearch()"
+            :data-disabled="canTriggerSearch() ? 'false' : 'true'"
+          >
+            搜索
+          </button>
+        </div>
+
+        <div class="service-inline" v-if="service.ok === false">
+          <div>
+            <strong>服务未连接</strong>
+            <span>{{ service.lastError || '无法加载联系人与最近会话。' }}</span>
+          </div>
+          <button class="service-inline__action" type="button" @click="openSettings('picker')">去配置</button>
+        </div>
+
+        <main class="screen__body">
+          <section class="section" v-if="showRecentUsedSection">
+            <div class="section__title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <path d="M12 8v5l3 2" />
+                <circle cx="12" cy="12" r="8" />
+              </svg>
+              <span>最近使用</span>
+            </div>
+            <div class="contact-strip">
+              <button class="avatar-tile" type="button" v-for="contact in picker.recentUsed" :key="'recent-' + contact.username" @click="selectContact(contact)">
+                <span class="avatar-frame" :class="{ 'avatar-frame--group': contact.isGroup }">
+                  <img
+                    v-if="resolveAvatarSrc(contact) && !isAvatarBroken(contact.username)"
+                    :src="resolveAvatarSrc(contact)"
+                    alt=""
+                    loading="lazy"
+                    @error="markAvatarBroken(contact.username)"
+                  />
+                  <span v-else>{{ avatarFallback(contact) }}</span>
+                </span>
+                <span class="avatar-tile__name">{{ contact.displayName }}</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="section" v-if="picker.query.trim()">
+            <div class="section__title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.5-3.5" />
+              </svg>
+              <span>{{ busy.searching ? '搜索中' : '搜索结果' }}</span>
+            </div>
+            <div class="session-grid" v-if="picker.searchResults.length">
+              <button class="session-tile" type="button" v-for="contact in picker.searchResults" :key="'search-' + contact.username" @click="selectContact(contact)">
+                <span class="avatar-frame" :class="{ 'avatar-frame--group': contact.isGroup }">
+                  <img
+                    v-if="resolveAvatarSrc(contact) && !isAvatarBroken(contact.username)"
+                    :src="resolveAvatarSrc(contact)"
+                    alt=""
+                    loading="lazy"
+                    @error="markAvatarBroken(contact.username)"
+                  />
+                  <span v-else>{{ avatarFallback(contact) }}</span>
+                </span>
+                <span class="session-tile__name">{{ contact.displayName }}</span>
+              </button>
+            </div>
+            <div class="empty-state empty-state--compact" v-else-if="!busy.searching">
+              <p>没有找到匹配联系人。</p>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section__title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 6h16M4 12h16M4 18h10" />
+              </svg>
+              <span>微信最近会话</span>
+            </div>
+            <div class="session-grid" v-if="picker.sessions.length">
+              <button class="session-tile" type="button" v-for="contact in picker.sessions" :key="'session-' + contact.username" @click="selectContact(contact)">
+                <span class="avatar-frame" :class="{ 'avatar-frame--group': contact.isGroup }">
+                  <img
+                    v-if="resolveAvatarSrc(contact) && !isAvatarBroken(contact.username)"
+                    :src="resolveAvatarSrc(contact)"
+                    alt=""
+                    loading="lazy"
+                    @error="markAvatarBroken(contact.username)"
+                  />
+                  <span v-else>{{ avatarFallback(contact) }}</span>
+                  <span class="unread-badge" v-if="contact.unread > 0">{{ contact.unreadDisplay }}</span>
+                </span>
+                <span class="session-tile__name">{{ contact.displayName }}</span>
+              </button>
+            </div>
+            <div class="empty-state empty-state--compact" v-else>
+              <p>{{ service.ok === false ? '服务不可用，无法拉取最近会话。' : '暂无最近会话。' }}</p>
+            </div>
+          </section>
+        </main>
+      </section>
+
+      <section class="screen screen--settings" v-show="screen === 'settings'">
+        <header class="subpage-header">
+          <button class="back-button" type="button" @click="goBackFromSettings()" aria-label="返回">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
+          <h2 class="subpage-title">服务配置</h2>
+        </header>
+
+        <main class="screen__body">
+          <article class="config-card">
+            <label class="config-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3.5" y="4" width="17" height="6" rx="1.8" />
+                <rect x="3.5" y="14" width="17" height="6" rx="1.8" />
+                <path d="M8 7h.01M8 17h.01" />
+              </svg>
+              <span>服务端基址 (Base URL)</span>
+            </label>
+
+            <input class="config-input" type="url" placeholder="http://<HOST:PORT>" v-model="settings.baseUrl" />
+
+            <p class="config-hint">功能件只走真实后端；探活成功后才会加载联系人、会话和画像数据。</p>
+            <p class="config-status" :data-kind="service.ok === false ? 'error' : 'ok'">
+              {{ serviceStatusText }}
+            </p>
+
+            <button class="save-button" type="button" @click="saveServiceSettings()" :disabled="busy.saving || busy.probing">
+              {{ busy.saving || busy.probing ? '保存中...' : '保存并生效' }}
+            </button>
+          </article>
+        </main>
+      </section>
+
+      <section class="screen screen--reply" v-show="screen === 'reply'">
+        <header class="subpage-header subpage-header--reply">
+          <button class="back-button" type="button" @click="goToPicker()" aria-label="返回">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
+
+          <div class="reply-header">
+            <h2 class="reply-header__title">发给: {{ compose.contact.displayName }}</h2>
+            <div class="reply-header__subtitle">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v6A2.5 2.5 0 0 1 17.5 16H8l-4 3V7.5Z" />
+              </svg>
+              <span>{{ compose.message || '正在读取最近消息...' }}</span>
+            </div>
+          </div>
+        </header>
+
+        <main class="screen__body screen__body--reply">
+          <div class="reply-list" v-if="compose.replies.length">
+            <button
+              class="reply-card"
+              type="button"
+              v-for="reply in compose.replies"
+              :key="reply.id"
+              :class="{ 'reply-card--selected': compose.lastInsertedReplyId === reply.id }"
+              @click="applyReply(reply)"
+            >
+              <span class="reply-card__lead" v-if="replyLeadText">{{ replyLeadText }}</span>
+              <span class="reply-card__text">{{ reply.text }}</span>
+            </button>
+          </div>
+
+          <div class="loading-list" v-else-if="busy.generating || busy.loadingConversation">
+            <div class="loading-card" v-for="index in 2" :key="'loading-' + index"></div>
+          </div>
+
+          <div class="empty-state" v-else>
+            <p>{{ compose.message ? '暂时没生成出候选，点“换一批”再试一次。' : '当前联系人没有读到可回复的最近一句消息。' }}</p>
+          </div>
+        </main>
+
+        <div class="reply-dock">
+          <div class="advanced-sheet" v-if="compose.advancedOpen">
+            <div class="advanced-section">
+              <div class="advanced-section__label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                  <path d="M4 7h16M7 12h10M10 17h4" />
+                </svg>
+                <span>回复基调</span>
+              </div>
+              <div class="segmented-grid">
+                <button
+                  class="segmented-button"
+                  type="button"
+                  v-for="tone in toneOptions"
+                  :key="tone.id"
+                  :aria-pressed="settings.tonePreset === tone.id"
+                  :class="{ 'segmented-button--active': settings.tonePreset === tone.id }"
+                  @click="selectTonePreset(tone.id)"
+                >
+                  {{ tone.label }}
+                </button>
+              </div>
+            </div>
+
+            <div class="advanced-section">
+              <div class="advanced-section__label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 7h14M5 12h10M5 17h8" />
+                </svg>
+                <span>本次回复方向</span>
+              </div>
+              <div class="intent-editor">
+                <input
+                  class="intent-editor__input"
+                  type="text"
+                  placeholder="例如：先安抚对方，再把时间约到明天下午"
+                  :value="compose.replyIntent"
+                  @input="onReplyIntentInput($event.target.value)"
+                  @keydown.enter.prevent="applyReplyIntent()"
+                />
+                <button
+                  class="intent-editor__button"
+                  type="button"
+                  @click="applyReplyIntent()"
+                  :disabled="busy.generating || busy.loadingConversation || !compose.message"
+                >
+                  应用
+                </button>
+              </div>
+              <p class="advanced-section__hint">不想让 AI 泛泛而谈时，在这里直接说明这次回复想达到什么目的。</p>
+            </div>
+
+            <div class="advanced-section">
+              <div class="advanced-section__label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6ZM6.5 20a3.5 3.5 0 0 1 3.5-3.5h4A3.5 3.5 0 0 1 17.5 20" />
+                  <path d="M5 9a2 2 0 1 1 0 4M19 9a2 2 0 1 0 0 4" />
+                </svg>
+                <span>个性化</span>
+              </div>
+              <div class="segmented-grid segmented-grid--wide">
+                <button
+                  class="segmented-button"
+                  type="button"
+                  :aria-pressed="settings.personaMode === 'merge-self'"
+                  :class="{ 'segmented-button--active': settings.personaMode === 'merge-self' }"
+                  @click="selectPersonaMode('merge-self')"
+                >
+                  融合我的画像
+                </button>
+                <button
+                  class="segmented-button"
+                  type="button"
+                  :aria-pressed="settings.personaMode === 'none'"
+                  :class="{ 'segmented-button--active': settings.personaMode === 'none' }"
+                  @click="selectPersonaMode('none')"
+                >
+                  不使用画像
+                </button>
+              </div>
+            </div>
+
+            <div class="advanced-section">
+              <div class="advanced-section__label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M8 7h8M6 12h12M4 17h16" />
+                </svg>
+                <span>聊天上下文</span>
+              </div>
+              <div class="count-stepper">
+                <button
+                  class="count-stepper__button"
+                  type="button"
+                  @click="decreaseContextMessageCount()"
+                  :disabled="busy.loadingConversation || busy.generating || settings.contextMessageCount <= 5"
+                  aria-label="减少聊天上下文条数"
+                >
+                  −
+                </button>
+                <div class="count-stepper__value">
+                  <strong>{{ settings.contextMessageCount }}</strong>
+                  <span>条聊天消息</span>
+                </div>
+                <button
+                  class="count-stepper__button"
+                  type="button"
+                  @click="increaseContextMessageCount()"
+                  :disabled="busy.loadingConversation || busy.generating || settings.contextMessageCount >= 50"
+                  aria-label="增加聊天上下文条数"
+                >
+                  +
+                </button>
+              </div>
+              <p class="advanced-section__hint">{{ contextMessageHint }}</p>
+            </div>
+          </div>
+
+          <div class="dock-actions">
+            <button class="dock-button dock-button--secondary" type="button" @click="toggleAdvanced()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <path d="M4 7h16M7 12h10M10 17h4" />
+              </svg>
+              <span>{{ compose.advancedOpen ? '收起配置' : '高级配置' }}</span>
+            </button>
+
+            <button class="dock-button dock-button--primary" type="button" @click="changeBatch()" :disabled="busy.generating || !compose.message">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 11a8 8 0 0 0-14.9-3M4 13a8 8 0 0 0 14.9 3" />
+                <path d="M4 4v4h4M20 20v-4h-4" />
+              </svg>
+              <span>{{ busy.generating ? '生成中' : '换一批' }}</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="../../../../function-kit-runtime-sdk/dist/function-kit-runtime.js"></script>
+    <script src="../../../shared/vendor/petite-vue/petite-vue.iife.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>
+

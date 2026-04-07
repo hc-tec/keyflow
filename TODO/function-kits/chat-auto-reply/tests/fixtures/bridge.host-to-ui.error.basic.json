@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "messageId": "host-error-001",
+  "replyTo": "ui-insert-001",
+  "timestamp": "2026-03-21T20:45:03+08:00",
+  "kitId": "chat-auto-reply",
+  "surface": "panel",
+  "source": "host-adapter",
+  "target": "function-kit-ui",
+  "type": "bridge.error",
+  "payload": {},
+  "error": {
+    "code": "target_input_lost",
+    "message": "目标输入框已失焦，请重新唤起功能件后再试。",
+    "retryable": true,
+    "details": {
+      "phase": "candidate.insert"
+    }
+  }
+}

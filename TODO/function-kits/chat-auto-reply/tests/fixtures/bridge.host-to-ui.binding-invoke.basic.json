@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "messageId": "host-binding-invoke-001",
+  "timestamp": "2026-03-25T21:10:00+08:00",
+  "kitId": "chat-auto-reply",
+  "surface": "panel",
+  "source": "host-adapter",
+  "target": "function-kit-ui",
+  "type": "binding.invoke",
+  "payload": {
+    "invocationId": "invk-chat-auto-reply-001",
+    "trigger": "clipboard",
+    "binding": {
+      "id": "clipboard.summarize",
+      "title": "Summarize Clipboard"
+    },
+    "clipboardText": "A long copied paragraph that should be summarized.",
+    "context": {
+      "sourcePackage": "com.example.chat",
+      "selectionStart": 0,
+      "selectionEnd": 0,
+      "selectedText": "",
+      "beforeCursor": "",
+      "afterCursor": "",
+      "inputType": 1,
+      "candidateCount": 0
+    },
+    "createdAtEpochMs": 1711372200000
+  }
+}
+

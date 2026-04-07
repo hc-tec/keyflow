@@ -1,0 +1,64 @@
+:root {
+  /* kit overrides */
+}
+
+.shell {
+  width: min(100vw, 820px);
+  margin: 0 auto;
+}
+
+.views {
+  display: grid;
+  gap: var(--kit-space-2);
+}
+
+.view {
+  display: none;
+  gap: var(--kit-space-2);
+}
+
+.view--active {
+  display: grid;
+}
+
+.card__actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--kit-space-1);
+  flex-wrap: wrap;
+}
+
+.actions--tight {
+  margin-top: 0;
+}
+
+.field--inline {
+  align-content: start;
+}
+
+.card--highlight {
+  border-color: hsl(var(--ring) / 0.55);
+  box-shadow: var(--shadow-sm), 0 0 0 4px hsl(var(--ring) / 0.12);
+}
+
+.context-meta {
+  margin-top: 10px;
+  color: hsl(var(--muted-foreground));
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  .card__header,
+  .statusbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-height: 560px) {
+  .subtitle {
+    display: none;
+  }
+}

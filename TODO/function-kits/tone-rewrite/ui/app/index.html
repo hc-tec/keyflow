@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>语气改写</title>
+    <link rel="stylesheet" href="styles.css?v=0.2.0" />
+    <script src="/assets/function-kit-runtime-sdk/dist/function-kit-runtime.js"></script>
+    <script src="../vendor/petite-vue.iife.js"></script>
+  </head>
+  <body>
+    <main id="app" class="container">
+      <header class="header">
+        <div class="title">语气改写</div>
+        <div class="subtitle" v-if="actionSubtitle">{{ actionSubtitle }}</div>
+      </header>
+
+      <section class="card card--compact">
+        <div class="card__body">
+          <div class="tone-grid">
+            <button
+              class="tone-option"
+              :class="{ 'tone-option--wide': option.tone === 'emoji' }"
+              v-for="option in toneOptions"
+              :key="option.tone"
+              :data-active="tone===option.tone"
+              @click="setTone(option.tone)"
+              :disabled="busy"
+            >
+              <span class="tone-option__label">{{ option.label }}</span>
+              <span class="tone-option__hint">{{ option.hint }}</span>
+            </button>
+          </div>
+          <div class="tone-note" v-if="currentToneHint">{{ currentToneHint }}</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card__body">
+          <div class="field__head">
+            <div class="label">原文</div>
+            <div class="field__tools">
+              <button class="link" @click="useCurrentInput" :disabled="busy">读取</button>
+              <button class="link" @click="clearAll" :disabled="busy">清空</button>
+            </div>
+          </div>
+          <textarea class="textarea" v-model="sourceText" :readonly="busy" placeholder="这里会自动读取当前输入内容"></textarea>
+
+          <div class="row row--gap row--wrap">
+            <button class="btn btn--primary" @click="generate" :disabled="!canGenerate">生成{{ toneLabel }}</button>
+          </div>
+
+          <div class="statusline" :data-kind="statusKind" v-if="statusText">{{ statusText }}</div>
+
+          <template v-if="resultText.trim()">
+            <div class="divider"></div>
+
+            <div class="field__head">
+              <div class="label">结果</div>
+              <div class="field__tools">
+                <button class="link" @click="rerun" :disabled="!canRerun">再生成</button>
+                <button class="link" @click="copyResult" :disabled="!canCopy">复制</button>
+              </div>
+            </div>
+            <textarea class="textarea textarea--result" v-model="resultText" readonly></textarea>
+
+            <div class="row row--gap row--wrap">
+              <button class="btn btn--primary" @click="applyReplace" :disabled="!canApply">替换到输入框</button>
+            </div>
+          </template>
+        </div>
+      </section>
+    </main>
+
+    <script src="main.js?v=0.2.0"></script>
+  </body>
+</html>

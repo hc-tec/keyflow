@@ -13,9 +13,8 @@ const otp = typeof args.get("otp") === "string" ? String(args.get("otp")) : null
 
 const token = process.env.NPM_TOKEN || process.env.NODE_AUTH_TOKEN;
 if (!dryRun && !token) {
-  console.error("[npm] Missing NPM_TOKEN (or NODE_AUTH_TOKEN).");
-  console.error("[npm] Create one via: npm token create (publish)  then set env var NPM_TOKEN.");
-  process.exit(2);
+  console.warn("[npm] NOTE: NPM_TOKEN not set; relying on existing npm login (~/.npmrc).");
+  console.warn("[npm] If publish fails with ENEEDAUTH, run: npm login  (or set NPM_TOKEN) and retry.");
 }
 
 const metaPath = path.join(outRoot, "kit-packages.json");

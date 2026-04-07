@@ -79,6 +79,7 @@
   - 规范：`TODO/function-kits/KIT_CATALOG_NPM_SPEC.md`
   - 工具：`scripts/npm/generate-catalog-from-registry.mjs`
   - 提交流程提示：`catalog/README.md`、`.github/ISSUE_TEMPLATE/kit_submission.yml`
+- Android Host（fcitx5-android）补充：用户安装不再强依赖 `kitId` 作为“唯一主键”，改为按 `installKey` 存储（避免不同来源/多个 catalog 的 `kitId` 撞车覆盖）；并保持虚拟资源路径仍为 `function-kits/<kitId>/...`：fcitx5-android commit `f6d7d778`
 
 2026-04-01 下载中心/商店 UI 作为“内置 Store Kit（Web UI）”调研：
 - 可行性与接口提案（`kits.manage` / `catalog.*` / 资源下载代理等）：`TODO/function-kits/store/DOWNLOAD_CENTER_AS_KIT.md`

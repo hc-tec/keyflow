@@ -54,6 +54,14 @@
 - 下载中心补充：Catalog（索引）安装模式：设置 Catalog URL（如 KitStudio `/api/kit-packages`）→ 刷新列表 → 一键安装（支持 sha256 校验 + 96MB 上限）：fcitx5-android commit `b89d7b7`
 - Catalog API 规范（供 KitStudio/服务端实现）：`TODO/function-kits/KIT_CATALOG_SPEC.md`
 
+2026-04-07 功能件 npm 分发实验（先验证可行性，不急着改 Host）：
+- 脚本说明：`scripts/npm/README.md`
+- 打包（本地生成 `.tgz`）：`scripts/npm/build-kits.mjs`（产物：`artifacts/npm/kit-packages.json`、`artifacts/npm/tarballs/<kitId>/*.tgz`）
+- 校验本地 `.tgz`：`scripts/npm/verify-kit-tgz.mjs`（校验包含 `package/manifest.json` + 可解包）
+- 生成 npm catalog JSON：`scripts/npm/generate-catalog.mjs`（产物：`artifacts/npm/catalog.npm.json`）
+- 发布/演练：`scripts/npm/publish-kits.mjs`（支持 `--dry-run`；真实发布需 `NPM_TOKEN`）
+- 发布后下载验证：`scripts/npm/verify-npm-kit.mjs`（下载 tarball 并校验 `dist.integrity`）
+
 2026-04-01 下载中心/商店 UI 作为“内置 Store Kit（Web UI）”调研：
 - 可行性与接口提案（`kits.manage` / `catalog.*` / 资源下载代理等）：`TODO/function-kits/store/DOWNLOAD_CENTER_AS_KIT.md`
 - 下载中心能力清单（P0/P1/P2 + API 映射 + 验收）：`TODO/function-kits/store/DOWNLOAD_CENTER_CAPABILITIES.md`

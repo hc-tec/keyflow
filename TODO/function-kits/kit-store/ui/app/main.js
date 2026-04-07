@@ -3,6 +3,7 @@
 
   const kitId = "kit-store";
   const surface = "panel";
+  const DEFAULT_CATALOG_SOURCE = "npm:@keyflow2/keyflow-kit-catalog";
 
   const featuredKitIds = new Set(["ai-smart-write", "clipboard-plus", "chat-auto-reply", "quick-phrases"]);
 
@@ -410,12 +411,15 @@
       const resolvedPkg = pkg && typeof pkg === "object" ? pkg : null;
       const id = normalizeKitId(resolvedPkg?.kitId ?? resolvedPkg?.id);
       const url = safeText(resolvedPkg?.resolvedZipUrl ?? resolvedPkg?.zipUrl ?? "");
+      const sha256 = safeText(resolvedPkg?.sha256 ?? "");
+      const integrity = safeText(resolvedPkg?.integrity ?? resolvedPkg?.dist?.integrity ?? "");
+      const installKey = safeText(resolvedPkg?.installKey ?? "");
       if (!id) {
         this.showToast("无法安装：缺少 kitId");
         return;
       }
       if (!url) {
-        this.showToast("无法安装：缺少 ZIP URL");
+        this.showToast("无法安装：缺少安装包 URL");
         return;
       }
       try {
@@ -424,7 +428,9 @@
           source: {
             kind: "url",
             url,
-            sha256: safeText(resolvedPkg?.sha256 ?? "") || undefined
+            sha256: sha256 || undefined,
+            integrity: integrity || undefined,
+            installKey: installKey || undefined
           }
         });
         this.showToast("已安装");
@@ -474,8 +480,8 @@
     async addCatalogSource() {
       const value = safeText(this.catalogAddUrl);
       if (!value) return;
-      if (!/^https?:\/\//i.test(value)) {
-        this.showToast("请输入 URL");
+      if (!/^https?:\/\//i.test(value) && !/^npm:/i.test(value)) {
+        this.showToast("请输入 URL 或 npm:xxx");
         return;
       }
 

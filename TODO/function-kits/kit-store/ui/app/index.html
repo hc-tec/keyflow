@@ -285,6 +285,14 @@
               </div>
               <div class="detail-meta">{{ detailMeta }}</div>
             </div>
+            <button
+              v-if="selectedItem.kind === 'package'"
+              class="kit-action kit-action--get"
+              type="button"
+              @click="installPackage(selectedItem.pkg)"
+            >
+              {{ selectedItem.action && selectedItem.action.kind === 'install' ? '获取' : '重新安装' }}
+            </button>
           </section>
 
           <nav class="segmented" aria-label="detail tabs">

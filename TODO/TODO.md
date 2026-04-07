@@ -81,6 +81,17 @@
   - 提交流程提示：`catalog/README.md`、`.github/ISSUE_TEMPLATE/kit_submission.yml`
 - Android Host（fcitx5-android）补充：用户安装不再强依赖 `kitId` 作为“唯一主键”，改为按 `installKey` 存储（避免不同来源/多个 catalog 的 `kitId` 撞车覆盖）；并保持虚拟资源路径仍为 `function-kits/<kitId>/...`：fcitx5-android commit `f6d7d778`
 
+2026-04-07 npm 分发落地（Android Host + Store Kit）：
+- Android Host：`catalog.refresh` 支持 `npm:` source（下载 npm 包内 `package/catalog.json`，校验 `dist.integrity`）；`kits.install` 支持 `.tgz` 安装（SRI `integrity` 校验 + tgz 解包到 `installKey` 目录）：
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitTgz.kt`
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitPackageManager.kt`
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitCatalogStore.kt`（默认源：`npm:@keyflow2/keyflow-kit-catalog`；用户显式保存空列表则尊重）
+- Store Kit（`kit-store`）：允许添加 `npm:` catalog 源；安装时下发 `integrity/installKey`；详情页提供“重新安装”（方便覆盖内置版本/更新）：
+  - `TODO/function-kits/kit-store/ui/app/main.js`
+  - `TODO/function-kits/kit-store/ui/app/index.html`
+- Emulator 冒烟验证（AVD `fcitx5-api36_1-google-play-x86_64`）：打开“下载中心”可看到默认源 `npm:@keyflow2/keyflow-kit-catalog`，点击“重新安装”成功从 npm tgz 安装 `tone-rewrite@0.2.0`（落盘 `_packages/<sha256(installKey)>/_install.json`，installKey=`npm:@keyflow2/keyflow-kit-tone-rewrite@0.2.0`）。
+
 2026-04-01 下载中心/商店 UI 作为“内置 Store Kit（Web UI）”调研：
 - 可行性与接口提案（`kits.manage` / `catalog.*` / 资源下载代理等）：`TODO/function-kits/store/DOWNLOAD_CENTER_AS_KIT.md`
 - 下载中心能力清单（P0/P1/P2 + API 映射 + 验收）：`TODO/function-kits/store/DOWNLOAD_CENTER_CAPABILITIES.md`

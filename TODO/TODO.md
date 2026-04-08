@@ -39,6 +39,10 @@
     - `TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-04-ime-hooks-observe.png`
     - `TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-05a-host-input-intercept.png`
     - `TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-05-ime-hooks-intercept.png`
+- 路线收缩：`Remote Attach` 降级为 `Experimental`，不再作为主流程推进；首屏概览改为 `Experimental`，README/TODO 同步改成 `local-first`
+  - UI 与文案：`TODO/ime-research/repos/kit-studio/web/index.html`、`TODO/ime-research/repos/kit-studio/web/app.js`
+  - 本地优先缺口清单：`TODO/ime-research/repos/kit-studio/LOCAL_FIRST_GAPS.md`
+  - 进度留痕：`TODO/ime-research/repos/kit-studio/TODO.md`、`TODO/ime-research/repos/kit-studio/PROGRESS.md`
 
 2026-03-30 文档整理（Function Kit 制作流程）：
 - 总手册（做什么/怎么做/怎么验收/怎么推广/怎么维护 SDK 文档）：`TODO/function-kits/PLAYBOOK.md`

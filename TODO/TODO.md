@@ -14,6 +14,20 @@
 我需要保持住任务进展的追踪，每完成一项任务，你记得记录下来各种文档路径
 别去看根目录下面的md啊！那是OpenClaw的md啊！！不是你要读取的
 
+2026-04-08 KitStudio 可用性/界面收敛（先修开发者第一屏体验）：
+- 输入链路补强：`targetInput` 现在会把 `focus/blur/input/select/Enter` 显式变成宿主状态更新；已注册 `send.intercept.ime_action` 时，Enter 直接触发 IME intent，便于验证“打字/发送”链路：
+  - `TODO/ime-research/repos/kit-studio/web/app.js`
+- UI 收敛：顶栏低频动作改为“工作区工具”下拉；左侧改为 `Workspace` + `Host Input Lab` + 折叠的高级区（Permissions / Context / Packages / Remote Attach），减少首屏杂乱：
+  - `TODO/ime-research/repos/kit-studio/web/index.html`
+  - `TODO/ime-research/repos/kit-studio/web/styles.src.css`
+  - `TODO/ime-research/repos/kit-studio/web/styles.css`
+- 进度留痕：
+  - `TODO/ime-research/repos/kit-studio/TODO.md`
+  - `TODO/ime-research/repos/kit-studio/PROGRESS.md`
+- 本地验证：
+  - `node --check TODO/ime-research/repos/kit-studio/web/app.js`
+  - `npm run css:build`（workdir=`TODO/ime-research/repos/kit-studio`）
+
 2026-03-30 文档整理（Function Kit 制作流程）：
 - 总手册（做什么/怎么做/怎么验收/怎么推广/怎么维护 SDK 文档）：`TODO/function-kits/PLAYBOOK.md`
 - 场景与选题库：`TODO/function-kits/IDEA_BANK.md`

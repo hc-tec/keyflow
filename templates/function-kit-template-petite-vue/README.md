@@ -13,9 +13,20 @@
 
 开发者要拿的东西分 3 个来源：
 
+- 最短入口：`npx @keyflow2/create-function-kit my-launchpad --kit-id yourscope.launchpad --name "Launchpad"`
 - starter 包：从 npm 拉 `@keyflow2/function-kit-template-petite-vue`
 - KitStudio：从 GitHub clone `https://github.com/hc-tec/kitstudio.git`
 - starter 源码：如果要看模板原始实现，去 `https://github.com/hc-tec/keyflow/tree/main/templates/function-kit-template-petite-vue`
+
+如果你只是想最快开始做 kit，优先用 create CLI：
+
+```powershell
+npx @keyflow2/create-function-kit my-launchpad --kit-id yourscope.launchpad --name "Launchpad"
+cd .\my-launchpad
+npm run open:kitstudio
+```
+
+下面这套 `npm pack` 路径更适合你想直接研究 starter 包结构本身时使用。
 
 推荐把 KitStudio clone 成 starter 包的同级目录，这样不用再配路径：
 

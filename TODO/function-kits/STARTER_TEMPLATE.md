@@ -25,17 +25,34 @@
 - 模板包源码：`templates/function-kit-template-petite-vue/`
 - create CLI 包源码：`templates/create-function-kit/`
 - npm 包名：`@keyflow2/function-kit-template-petite-vue`
+- create CLI npm 包名：`@keyflow2/create-function-kit`
 - 默认示例 kit：`templates/function-kit-template-petite-vue/workspace/function-kits/starter-showcase/`
 
 开发者实际拿项目时，入口要分开看：
 
-- 要直接开始做 kit：从 npm 拉 `@keyflow2/function-kit-template-petite-vue`
+- 要直接开始做 kit：优先运行 `npx @keyflow2/create-function-kit <dir> --kit-id yourscope.launchpad --name "Launchpad"`
+- 要手动拿 starter 包：从 npm 拉 `@keyflow2/function-kit-template-petite-vue`
 - 要本地预览 starter：再 clone `https://github.com/hc-tec/kitstudio.git`
 - 要看 starter 的原始源码/提 PR：clone `https://github.com/hc-tec/keyflow.git`，然后进入 `templates/function-kit-template-petite-vue/`
 
 ## 3. 开发者拿到包之后怎么用
 
-### 3.1 下载并直接打开 KitStudio
+### 3.1 最短路径：create CLI
+
+```powershell
+npx @keyflow2/create-function-kit my-launchpad --kit-id yourscope.launchpad --name "Launchpad"
+cd .\my-launchpad
+npm run open:kitstudio
+```
+
+这个 CLI 会：
+
+- 下载 starter 包
+- 解到本地目录
+- 自动运行 `rename-starter`
+- 让生成后的 workspace 直接指向新的 `defaultKitId`
+
+### 3.2 手动下载 starter 并直接打开 KitStudio
 
 推荐目录：
 
@@ -57,7 +74,7 @@ npm run open:kitstudio
 - 启动 KitStudio
 - 因为当前 mount 里只有一个 kit，KitStudio 会直接落到 starter 示例页
 
-### 3.2 先重命名，再写业务
+### 3.3 先重命名，再写业务
 
 ```powershell
 npm run rename:starter -- --kit-id yourscope.launchpad --name "Launchpad"

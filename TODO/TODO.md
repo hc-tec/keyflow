@@ -30,11 +30,14 @@
 - 视觉 E2E 回归：
   - 修复默认挂载路径：`TODO/ime-research/repos/kit-studio/kitstudio.config.json`（改为 `../../../function-kits` / `../../../function-kit-runtime-sdk`，解决 Runner `ENOENT` 与 Packages 空列表）
   - 脚本适配新 UI 折叠结构：`TODO/ime-research/repos/kit-studio/scripts/e2e.ps1`
+  - 第二轮补强：`scripts/e2e.ps1` 新增 `Host Input Lab` 可视断言，直接校验 `targetInput` / `observe` / `intercept` 摘要与 hint/pills，而不是只看 kit 内部状态
   - 文档同步：`TODO/ime-research/repos/kit-studio/README.md`
   - 视觉回归通过：`powershell -ExecutionPolicy Bypass -File .\scripts\e2e.ps1`（workdir=`TODO/ime-research/repos/kit-studio`）
   - 关键截图：
     - `TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-99-annotated.png`
+    - `TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-04a-host-input-observe.png`
     - `TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-04-ime-hooks-observe.png`
+    - `TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-05a-host-input-intercept.png`
     - `TODO/ime-research/repos/kit-studio/e2e/screenshots/kitstudio-e2e-05-ime-hooks-intercept.png`
 
 2026-03-30 文档整理（Function Kit 制作流程）：

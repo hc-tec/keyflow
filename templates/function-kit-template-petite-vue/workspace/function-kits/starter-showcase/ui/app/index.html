@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Starter Showcase</title>
+    <link rel="stylesheet" href="../vendor/kit-shadcn.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app" class="starter-shell" v-cloak>
+      <div class="starter-backdrop" aria-hidden="true"></div>
+
+      <main class="starter-layout">
+        <section class="hero reveal reveal--1">
+          <div class="hero__copy">
+            <p class="eyebrow">Function Kit Starter</p>
+            <h1>{{ starter.displayName }}</h1>
+            <p class="hero__lede">{{ starter.description }}</p>
+            <p class="hero__body">
+              Ship a first-class Function Kit without pausing on build tooling. This starter already vendors the runtime bundle,
+              petite-vue, and the shadcn-style CSS baseline, so the first thing you see in KitStudio is a working product surface.
+            </p>
+
+            <div class="hero__actions">
+              <button class="btn btn--primary" type="button" @click="insertStarterPitch">Insert pitch</button>
+              <button class="btn btn--ghost" type="button" @click="useCurrentSelection">Use selection</button>
+              <button class="btn btn--ghost" type="button" @click="openSettings">Open settings</button>
+            </div>
+
+            <div class="metric-row">
+              <article class="metric-card" v-for="metric in metrics" :key="metric.label">
+                <span class="metric-card__label">{{ metric.label }}</span>
+                <strong class="metric-card__value">{{ metric.value }}</strong>
+                <span class="metric-card__hint">{{ metric.hint }}</span>
+              </article>
+            </div>
+          </div>
+
+          <aside class="surface hero__panel">
+            <div class="surface__header">
+              <div>
+                <p class="eyebrow eyebrow--compact">Runtime Dock</p>
+                <h2>Starter actions that already work</h2>
+              </div>
+              <span class="status-pill" :data-state="status.state">{{ status.text }}</span>
+            </div>
+
+            <div class="meta-grid">
+              <div class="meta-item">
+                <span class="meta-item__label">Host</span>
+                <strong>{{ hostSummary }}</strong>
+              </div>
+              <div class="meta-item">
+                <span class="meta-item__label">Surface</span>
+                <strong>{{ starter.surface }}</strong>
+              </div>
+              <div class="meta-item">
+                <span class="meta-item__label">Permissions</span>
+                <strong>{{ permissionSummary }}</strong>
+              </div>
+              <div class="meta-item">
+                <span class="meta-item__label">Session</span>
+                <strong>{{ host.sessionId || "pending" }}</strong>
+              </div>
+            </div>
+
+            <label class="field">
+              <span class="field__label">Draft copy</span>
+              <textarea
+                class="field__control field__control--textarea"
+                rows="6"
+                v-model="draftText"
+                placeholder="Write the first interaction your kit should perform."
+              ></textarea>
+            </label>
+
+            <div class="action-row">
+              <button class="btn btn--primary" type="button" @click="replaceWithDraft" :disabled="!caps.canReplace">
+                Replace with draft
+              </button>
+              <button class="btn btn--ghost" type="button" @click="saveDraft" :disabled="!caps.canWriteStorage">Save draft</button>
+              <button class="btn btn--ghost" type="button" @click="refreshContext" :disabled="!caps.canReadContext">
+                Refresh context
+              </button>
+            </div>
+
+            <p class="runtime-note">
+              Stored in host-backed `kit.storage`, not `localStorage`, so the sample matches Android WebView constraints.
+            </p>
+          </aside>
+        </section>
+
+        <section class="section reveal reveal--2">
+          <div class="section__heading">
+            <p class="eyebrow">What ships in the box</p>
+            <h2>A starter that behaves like a product, not a placeholder</h2>
+          </div>
+
+          <div class="feature-grid">
+            <article class="surface feature-card" v-for="feature in features" :key="feature.title">
+              <span class="feature-card__index">{{ feature.index }}</span>
+              <h3>{{ feature.title }}</h3>
+              <p>{{ feature.body }}</p>
+              <span class="feature-card__tag">{{ feature.tag }}</span>
+            </article>
+          </div>
+        </section>
+
+        <section class="section section--split reveal reveal--3">
+          <article class="surface detail-card">
+            <div class="surface__header">
+              <div>
+                <p class="eyebrow eyebrow--compact">Live Context</p>
+                <h2>What the host is sending</h2>
+              </div>
+              <span class="status-inline">{{ statusMetaText }}</span>
+            </div>
+
+            <div class="context-snippet" :class="{ 'context-snippet--empty': !contextPreview }">
+              {{ contextPreview || "No context yet. Use Refresh context or open the starter through KitStudio." }}
+            </div>
+
+            <div class="context-meta">
+              <span v-if="context && context.selectedText">Selection: {{ context.selectedText }}</span>
+              <span v-if="context && context.sourcePackage">Source: {{ context.sourcePackage }}</span>
+            </div>
+
+            <div class="permission-chips">
+              <span class="permission-chip" v-if="permissions.length === 0">Waiting for permissions.sync</span>
+              <span class="permission-chip" v-for="permission in permissions" :key="permission">{{ permission }}</span>
+            </div>
+          </article>
+
+          <article class="surface detail-card">
+            <div class="surface__header">
+              <div>
+                <p class="eyebrow eyebrow--compact">File Map</p>
+                <h2>Edit these first</h2>
+              </div>
+              <code class="code-badge">ui/vendor/* direct imports</code>
+            </div>
+
+            <ul class="file-tree">
+              <li class="file-tree__item" v-for="entry in fileTree" :key="entry.path">
+                <code>{{ entry.path }}</code>
+                <span>{{ entry.note }}</span>
+              </li>
+            </ul>
+          </article>
+        </section>
+
+        <section class="section reveal reveal--4">
+          <div class="section__heading">
+            <p class="eyebrow">Suggested workflow</p>
+            <h2>From downloaded tarball to your first custom kit</h2>
+          </div>
+
+          <div class="step-grid">
+            <article class="surface step-card" v-for="step in steps" :key="step.title">
+              <span class="step-card__label">{{ step.label }}</span>
+              <h3>{{ step.title }}</h3>
+              <p>{{ step.body }}</p>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="../vendor/function-kit-runtime.js"></script>
+    <script src="../vendor/petite-vue.iife.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>

@@ -123,3 +123,41 @@ node scripts/npm/verify-npm-catalog.mjs --pkg @keyflow2/keyflow-kit-catalog@0.0.
 ```bash
 node scripts/npm/smoke-local.mjs --kit tone-rewrite --scope keyflow2
 ```
+
+## 7) 构建开发者 Starter 模板包（petite-vue + vendored runtime + KitStudio helper）
+
+```bash
+node scripts/npm/build-starter-template.mjs
+```
+
+输出：
+
+- `artifacts/npm/templates/function-kit-template-petite-vue/*.tgz`
+- `artifacts/npm/templates/function-kit-template-petite-vue/starter-template.json`
+
+校验 tarball：
+
+```bash
+node scripts/npm/verify-starter-template.mjs
+```
+
+## 8) 发布开发者 Starter 模板包到 npm
+
+```bash
+node scripts/npm/publish-starter-template.mjs --dry-run
+node scripts/npm/publish-starter-template.mjs --token-file tmp/npm-token.txt
+```
+
+Starter 包源码在：
+
+- `templates/function-kit-template-petite-vue/`
+
+它包含：
+
+- `workspace/function-kits/starter-showcase/`
+- `scripts/open-in-kitstudio.mjs`
+- `scripts/rename-starter.mjs`
+
+Starter 的详细说明见：
+
+- `TODO/function-kits/STARTER_TEMPLATE.md`

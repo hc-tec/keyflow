@@ -1,0 +1,41 @@
+{
+  "name": "@keyflow2/function-kit-template-petite-vue",
+  "version": "0.1.0",
+  "description": "Starter workspace for Keyflow Function Kits with vendored runtime.js, petite-vue, shadcn-style CSS, and KitStudio launch helpers.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "files": [
+    "workspace",
+    "scripts",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "keyflow",
+    "function-kit",
+    "starter",
+    "template",
+    "petite-vue",
+    "kitstudio",
+    "ime"
+  ],
+  "scripts": {
+    "open:kitstudio": "node ./scripts/open-in-kitstudio.mjs",
+    "rename:starter": "node ./scripts/rename-starter.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hc-tec/keyflow.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hc-tec/keyflow/issues"
+  },
+  "homepage": "https://github.com/hc-tec/keyflow#readme",
+  "keyflow": {
+    "kind": "function-kit-starter",
+    "defaultKitId": "starter-showcase",
+    "defaultMountRoot": "workspace/function-kits"
+  }
+}

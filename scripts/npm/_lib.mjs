@@ -59,9 +59,15 @@ export async function run(command, args, options = {}) {
     });
   }
 
-  const candidates = [command];
+  let candidates = [command];
   if (process.platform === "win32" && path.extname(command) === "") {
-    candidates.push(`${command}.cmd`, `${command}.exe`, `${command}.bat`);
+    const lower = command.toLowerCase();
+    const npmLike = new Set(["npm", "npx", "pnpm", "yarn"]);
+    if (npmLike.has(lower)) {
+      candidates = [`${command}.cmd`, `${command}.exe`, `${command}.bat`, command];
+    } else {
+      candidates = [`${command}.exe`, command, `${command}.cmd`, `${command}.bat`];
+    }
   }
 
   let lastErr = null;
@@ -71,7 +77,7 @@ export async function run(command, args, options = {}) {
       return await spawnOnce(cmd);
     } catch (e) {
       lastErr = e;
-      if (e?.code !== "ENOENT") throw e;
+      if (e?.code !== "ENOENT" && e?.code !== "EPERM") throw e;
     }
   }
 

@@ -13,11 +13,13 @@ npm test
 
 ### Developer Starter Template
 
-如果你改了 starter 模板、vendored runtime 资源，或 starter 的 npm 分发脚本，请至少跑：
+如果你改了 starter 模板、create CLI、vendored runtime 资源，或这些 npm 分发脚本，请至少跑：
 
 ```bash
 node scripts/npm/build-starter-template.mjs
 node scripts/npm/verify-starter-template.mjs
+node scripts/npm/build-create-function-kit.mjs
+node scripts/npm/verify-create-function-kit.mjs
 ```
 
 ## 开发环境（完整 workspace）
@@ -29,6 +31,12 @@ node scripts/npm/verify-starter-template.mjs
 ```bash
 cd templates/function-kit-template-petite-vue
 npm run open:kitstudio -- --dry-run
+```
+
+如果你在改 create CLI，建议再做一次本地脚手架冒烟：
+
+```bash
+node templates/create-function-kit/bin/create-function-kit.mjs artifacts/smoke/create-function-kit --template-dir templates/function-kit-template-petite-vue --kit-id keyflow2.smoke --name "Smoke" --dry-run
 ```
 
 ## PR 约定
@@ -43,3 +51,4 @@ npm run open:kitstudio -- --dry-run
 - 变更涉及新能力/新接口时，请同步更新对应文档（优先放在 `TODO/function-kits/` 或 `TODO/function-kit-runtime-sdk/docs/`）。
 - 如果你改了 `TODO/function-kit-runtime-sdk/dist/function-kit-runtime.js`、`TODO/function-kits/shared/vendor/petite-vue/` 或 `TODO/function-kits/shared/ui/kit-shadcn.css`，请同步更新 starter 包里的 vendored 副本：
   - `templates/function-kit-template-petite-vue/workspace/function-kits/starter-showcase/ui/vendor/`
+- 如果你改了 starter 的目录结构、rename/open helper 或包名，请同时检查 `templates/create-function-kit/` 是否仍然能正确解包并调用 starter helper。

@@ -1,0 +1,38 @@
+{
+  "name": "@keyflow2/create-function-kit",
+  "version": "0.1.0",
+  "description": "CLI to scaffold a local Keyflow Function Kit workspace from the petite-vue starter.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "create-function-kit": "./bin/create-function-kit.mjs"
+  },
+  "files": [
+    "bin",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "keyflow",
+    "function-kit",
+    "starter",
+    "scaffold",
+    "petite-vue",
+    "kitstudio",
+    "ime"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hc-tec/keyflow.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hc-tec/keyflow/issues"
+  },
+  "homepage": "https://github.com/hc-tec/keyflow#readme",
+  "keyflow": {
+    "kind": "function-kit-create-cli",
+    "templatePackage": "@keyflow2/function-kit-template-petite-vue"
+  }
+}

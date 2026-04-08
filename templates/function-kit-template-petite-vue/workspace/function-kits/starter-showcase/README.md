@@ -7,7 +7,8 @@
 1. 先运行 `npm run open:kitstudio`
 2. 看看页面里的 runtime 动作是否正常：`Refresh context` / `Insert pitch` / `Replace draft`
 3. 再运行 `npm run rename:starter -- --kit-id yourscope.launchpad --name "Launchpad"`
-4. 然后开始删示例文案、换成你的真实工作流
+4. rename 之后可以继续直接运行 `npm run open:kitstudio`
+5. 然后开始删示例文案、换成你的真实工作流
 
 最常改的文件：
 

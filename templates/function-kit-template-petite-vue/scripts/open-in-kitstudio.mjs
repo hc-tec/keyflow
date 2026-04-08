@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const packageRoot = path.resolve(__dirname, "..");
 const functionKitsRoot = path.join(packageRoot, "workspace", "function-kits");
+const defaultStarterKitId = "starter-showcase";
 
 function parseArgs(argv) {
   const args = new Map();
@@ -40,6 +41,22 @@ async function pathExists(targetPath, type = null) {
     return true;
   } catch {
     return false;
+  }
+}
+
+async function resolveDefaultKitId() {
+  const packageJsonPath = path.join(packageRoot, "package.json");
+  if (!(await pathExists(packageJsonPath, "file"))) {
+    return defaultStarterKitId;
+  }
+
+  try {
+    const packageJsonRaw = await fs.readFile(packageJsonPath, "utf8");
+    const packageJson = JSON.parse(packageJsonRaw);
+    const candidate = safeText(packageJson?.keyflow?.defaultKitId);
+    return candidate || defaultStarterKitId;
+  } catch {
+    return defaultStarterKitId;
   }
 }
 
@@ -144,6 +161,7 @@ if (!Number.isFinite(port) || port <= 0) {
 
 const shouldOpenBrowser = args.get("open") !== false;
 const dryRun = args.get("dry-run") === true;
+const defaultKitId = await resolveDefaultKitId();
 
 const kitStudioRoot = await resolveKitStudioRoot(args.get("kit-studio-root"));
 if (!kitStudioRoot) {
@@ -158,8 +176,10 @@ if (!kitStudioRoot) {
   process.exit(2);
 }
 
-if (!(await pathExists(path.join(functionKitsRoot, "starter-showcase", "manifest.json"), "file"))) {
-  console.error("[starter] The starter workspace is incomplete: missing workspace/function-kits/starter-showcase/manifest.json");
+if (!(await pathExists(path.join(functionKitsRoot, defaultKitId, "manifest.json"), "file"))) {
+  console.error(
+    `[starter] The starter workspace is incomplete: missing workspace/function-kits/${defaultKitId}/manifest.json`
+  );
   process.exit(2);
 }
 
@@ -188,6 +208,7 @@ const healthUrl = `${baseUrl}api/health`;
 
 console.log(`[starter] KitStudio root : ${kitStudioRoot}`);
 console.log(`[starter] Kits mount     : ${functionKitsRoot}`);
+console.log(`[starter] Default kit    : ${defaultKitId}`);
 console.log(`[starter] URL            : ${baseUrl}`);
 console.log("[starter] Because this workspace only mounts one starter kit, KitStudio will open it by default.");
 

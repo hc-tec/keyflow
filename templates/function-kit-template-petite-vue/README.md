@@ -66,7 +66,12 @@ npm run rename:starter -- --kit-id yourscope.launchpad --name "Launchpad"
 
 - `manifest.json` 的 `id/name/description`
 - `ui/app/main.js` 里的 starter 元信息
+- `ui/app/index.html` 的页面标题
+- `icons/` 里的默认 starter 图标文件名与 manifest 引用
+- 根 `package.json` 的本地 workspace 名称与 `keyflow.defaultKitId`
 - kit 目录名
+
+改完之后，`npm run open:kitstudio` 仍然可用，因为启动脚本会读取根 `package.json` 里的 `keyflow.defaultKitId`。
 
 然后重点改这些文件：
 

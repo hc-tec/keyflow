@@ -23,6 +23,7 @@
 ## 2. 源码与包名
 
 - 模板包源码：`templates/function-kit-template-petite-vue/`
+- create CLI 包源码：`templates/create-function-kit/`
 - npm 包名：`@keyflow2/function-kit-template-petite-vue`
 - 默认示例 kit：`templates/function-kit-template-petite-vue/workspace/function-kits/starter-showcase/`
 
@@ -66,7 +67,12 @@ npm run rename:starter -- --kit-id yourscope.launchpad --name "Launchpad"
 
 - `manifest.json`
 - `ui/app/main.js`
+- `ui/app/index.html`
+- `icons/*`
+- 根 `package.json` 的 `keyflow.defaultKitId`
 - kit 目录名
+
+这意味着 rename 完以后，`npm run open:kitstudio` 仍然能继续工作，不会再卡在旧的 `starter-showcase` 路径。
 
 ## 4. 本仓库里如何构建 / 校验 / 发布
 

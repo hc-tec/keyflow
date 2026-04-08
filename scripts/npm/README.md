@@ -161,3 +161,30 @@ Starter 包源码在：
 Starter 的详细说明见：
 
 - `TODO/function-kits/STARTER_TEMPLATE.md`
+
+## 9) 构建开发者 create CLI（把 starter 一键解到本地目录）
+
+包源码：
+
+- `templates/create-function-kit/`
+
+构建 tarball：
+
+```bash
+node scripts/npm/build-create-function-kit.mjs
+```
+
+校验 tarball：
+
+```bash
+node scripts/npm/verify-create-function-kit.mjs
+```
+
+发布到 npm：
+
+```bash
+node scripts/npm/publish-create-function-kit.mjs --dry-run
+node scripts/npm/publish-create-function-kit.mjs --token-file tmp/npm-token.txt
+```
+
+create CLI 会下载 starter 包并调用 starter 自带的 `rename-starter`，所以这两条链路必须一起维护。

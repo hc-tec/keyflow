@@ -11,6 +11,12 @@
 
 ## 快速开始
 
+开发者要拿的东西分 3 个来源：
+
+- starter 包：从 npm 拉 `@keyflow2/function-kit-template-petite-vue`
+- KitStudio：从 GitHub clone `https://github.com/hc-tec/kitstudio.git`
+- starter 源码：如果要看模板原始实现，去 `https://github.com/hc-tec/keyflow/tree/main/templates/function-kit-template-petite-vue`
+
 推荐把 KitStudio clone 成 starter 包的同级目录，这样不用再配路径：
 
 ```powershell

@@ -26,6 +26,12 @@
 - npm 包名：`@keyflow2/function-kit-template-petite-vue`
 - 默认示例 kit：`templates/function-kit-template-petite-vue/workspace/function-kits/starter-showcase/`
 
+开发者实际拿项目时，入口要分开看：
+
+- 要直接开始做 kit：从 npm 拉 `@keyflow2/function-kit-template-petite-vue`
+- 要本地预览 starter：再 clone `https://github.com/hc-tec/kitstudio.git`
+- 要看 starter 的原始源码/提 PR：clone `https://github.com/hc-tec/keyflow.git`，然后进入 `templates/function-kit-template-petite-vue/`
+
 ## 3. 开发者拿到包之后怎么用
 
 ### 3.1 下载并直接打开 KitStudio

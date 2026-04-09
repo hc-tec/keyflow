@@ -25,6 +25,18 @@
   - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values-zh-rCN/strings.xml`
   - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values-zh-rTW/strings.xml`
 
+2026-04-10 Keyflow Android logo 资产重建：
+- 基于用户提供的 `K` 标记重建一套干净的 launcher 资产，不再依赖带棋盘底的假透明图；脚本写在 `tmp/build_keyflow_logo_assets.py`，可重复导出 preview SVG/PNG 以及 Android `mipmap` 资源。
+- `fcitx5-android` 的 launcher 资源已切到新的 `keyflow` 黑底白字 `K`，包含 legacy PNG 与 adaptive foreground/monochrome：
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/mipmap-*/ic_launcher*.png`
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/mipmap-*/ic_launcher_foreground*.png`
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/mipmap-anydpi-v26/ic_launcher*.xml`
+- 本地预览输出：
+  - `tmp/keyflow-logo/keyflow-badge.png`
+  - `tmp/keyflow-logo/keyflow-round.png`
+  - `tmp/keyflow-logo/keyflow-adaptive-foreground.png`
+  - `tmp/keyflow-logo/keyflow-monochrome.svg`
+
 2026-04-09 Android 正式 release keystore 方案落地：
 - 根仓库新增正式签名 helper：
   - `scripts/release/new-android-release-keystore.ps1`

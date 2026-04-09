@@ -41,6 +41,10 @@
   - source repo / commit：`fcitx5-android@cb947f48`
   - assets：4 个 ABI APK + `SHA256SUMS.txt`
   - release APK 内置功能件已核对为 `kit-store` + `shared`
+- 软件内来源说明补齐：
+  - `About` 页面新增“项目来源”，明确当前构建来自 `hc-tec/fcitx5-android`，并注明基于上游 `Fcitx5 for Android`
+  - `About` 页源码链接改为当前 fork；上游仓库单独提供入口
+  - 相关文件：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/AboutFragment.kt`、`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/utils/Const.kt`、`app/src/main/res/values*/strings.xml`
 
 2026-04-08 KitStudio 可用性/界面收敛（先修开发者第一屏体验）：
 - 输入链路补强：`targetInput` 现在会把 `focus/blur/input/select/Enter` 显式变成宿主状态更新；已注册 `send.intercept.ime_action` 时，Enter 直接触发 IME intent，便于验证“打字/发送”链路：

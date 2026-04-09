@@ -40,4 +40,5 @@ npm test
 - Android APK 发布在 `keyflow` 上使用单独 tag，并显式写明 APK 版本与签名级别：
   - 正式签名：`fcitx5-android-<apkVersion>`
   - debug keystore 测试包：`fcitx5-android-<apkVersion>-debug`
+- 正式签名 keystore 的本地生成与保存流程见 `docs/RELEASING.md` 与 `scripts/release/`。
 - 具体流程见 `docs/RELEASING.md`。

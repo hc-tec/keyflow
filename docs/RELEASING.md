@@ -49,3 +49,67 @@ If the APK is signed with `debug.keystore`, mark the GitHub Release as `pre-rele
 4. Publish APK assets only to `keyflow` Release.
 5. Keep the release tag/name aligned with the APK version and signing level.
 6. Keep `fcitx5-android` GitHub repo source-only.
+
+## Formal Android Keystore
+
+Use one long-lived release keystore for all public Android APK releases. Do not switch keys after users have installed a public build, or Android will treat later APKs as a different signer and block in-place upgrades.
+
+### Local Secret Layout
+
+Keep signing material under the workspace root:
+
+- `.local-secrets/android-release/fcitx5-android-release.keystore`
+- `.local-secrets/android-release/signing.env`
+- `.local-secrets/android-release/keystore-metadata.json`
+- `.local-secrets/android-release/keystore-fingerprint.txt`
+
+This directory is gitignored on purpose.
+
+### One-Time Generation
+
+Generate the keystore once:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\release\new-android-release-keystore.ps1
+```
+
+The script will:
+
+- create a 4096-bit RSA keystore
+- generate a strong random password
+- save `SIGN_KEY_FILE`, `SIGN_KEY_ALIAS`, `SIGN_KEY_PWD` into `signing.env`
+- record SHA-256 fingerprint and metadata for later verification
+
+Current defaults are chosen to match the existing Gradle signing wiring:
+
+- alias: `keyflow-android-release`
+- same password for store and key
+- store type: `PKCS12`
+
+### Build With The Formal Keystore
+
+Use the helper so Gradle always receives the same signing env:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\release\build-fcitx5-android-release.ps1 -VersionName 0.1.3
+```
+
+The helper reads `.local-secrets/android-release/signing.env`, exports `SIGN_KEY_*` for the build process, adds `gettext` to `PATH` on Windows when available, and runs `:app:assembleRelease` in `fcitx5-android`.
+
+### Export For CI Or Another Machine
+
+If you later need GitHub Actions or another machine to use the same keystore, export the current env block:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\release\export-android-signing-env.ps1 -Format dotenv
+powershell -ExecutionPolicy Bypass -File .\scripts\release\export-android-signing-env.ps1 -Format powershell -IncludeBase64
+```
+
+`SIGN_KEY_BASE64` matches the env path already supported by the current Gradle build logic.
+
+### Backup Rules
+
+- Back up the keystore file and the password together before the first public release.
+- Keep at least two encrypted backups outside the git workspace.
+- Record the SHA-256 signer fingerprint wherever release operations are tracked.
+- Never delete or rotate this keystore unless you are intentionally abandoning upgrade compatibility for `org.fcitx.fcitx5.android`.

@@ -54,6 +54,7 @@ node templates/create-function-kit/bin/create-function-kit.mjs artifacts/smoke/c
   - 正式签名：`fcitx5-android-<apkVersion>`
   - debug keystore：`fcitx5-android-<apkVersion>-debug`
 - 如果 APK 由 `debug.keystore` 签名，GitHub Release 必须标为 `pre-release`，并在说明里明确写“仅供安装/测试”。
+- 正式 Android 签名材料统一放在根目录 `.local-secrets/android-release/`，通过 `scripts/release/` 下的脚本生成和读取；不要自行把 keystore 放进仓库或 `fcitx5-android` 子仓库。
 
 ## 风格与工程约定
 

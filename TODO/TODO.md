@@ -14,6 +14,20 @@
 我需要保持住任务进展的追踪，每完成一项任务，你记得记录下来各种文档路径
 别去看根目录下面的md啊！那是OpenClaw的md啊！！不是你要读取的
 
+2026-04-09 Android 正式 release keystore 方案落地：
+- 根仓库新增正式签名 helper：
+  - `scripts/release/new-android-release-keystore.ps1`
+  - `scripts/release/build-fcitx5-android-release.ps1`
+  - `scripts/release/export-android-signing-env.ps1`
+  - `scripts/release/README.md`
+- 正式签名材料统一落在 `.local-secrets/android-release/`，并通过 `.gitignore` 忽略：
+  - 根仓库：`.gitignore`
+  - `fcitx5-android`：`.gitignore`
+- 发布文档补齐正式 keystore 的生成、构建、导出、备份规则：
+  - `docs/RELEASING.md`
+  - `README.md`
+  - `CONTRIBUTING.md`
+
 2026-04-08 KitStudio 可用性/界面收敛（先修开发者第一屏体验）：
 - 输入链路补强：`targetInput` 现在会把 `focus/blur/input/select/Enter` 显式变成宿主状态更新；已注册 `send.intercept.ime_action` 时，Enter 直接触发 IME intent，便于验证“打字/发送”链路：
   - `TODO/ime-research/repos/kit-studio/web/app.js`

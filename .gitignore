@@ -26,6 +26,12 @@ memory/
 # Large source files (kept outside git; extract/notes are committed instead)
 *.pdf
 
+# Local signing materials
+.local-secrets/
+*.jks
+*.keystore
+*.p12
+
 # Local scratch
 tmp/
 /artifacts/

@@ -45,6 +45,16 @@ node templates/create-function-kit/bin/create-function-kit.mjs artifacts/smoke/c
 - 尽量把变更拆成可独立回滚的小 PR。
 - 不要提交任何密钥、token、个人隐私信息或内部地址（如需示例，请用占位符）。
 
+## 发布约定
+
+- `keyflow` 是对外分发入口；Android APK 只发布到 `keyflow` GitHub Releases。
+- `fcitx5-android` 仓库只保留源码与构建流程，不上传 APK assets。
+- `v*` tag 只用于 `keyflow` 自身工具链/模板发布，不混挂 Android APK。
+- Android APK 发布必须单独命名，并把 APK 版本与签名级别写进 tag / release name：
+  - 正式签名：`fcitx5-android-<apkVersion>`
+  - debug keystore：`fcitx5-android-<apkVersion>-debug`
+- 如果 APK 由 `debug.keystore` 签名，GitHub Release 必须标为 `pre-release`，并在说明里明确写“仅供安装/测试”。
+
 ## 风格与工程约定
 
 - 文档/脚本/代码一律使用 UTF-8 编码。

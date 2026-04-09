@@ -31,3 +31,13 @@ npm test
 - 贡献指南：`CONTRIBUTING.md`
 - 安全问题：`SECURITY.md`
 - 支持与反馈：`SUPPORT.md`
+
+## 发布约定
+
+- `keyflow` GitHub Releases 用于发布本项目对外分发物。
+- Android APK 只挂在 `keyflow` Releases；`fcitx5-android` 仓库只保留源码与构建说明，不再上传 APK assets。
+- `keyflow` 工具链/模板发布继续使用 `v*` tag（例如 `v0.1.0`），不要混挂 Android APK。
+- Android APK 发布在 `keyflow` 上使用单独 tag，并显式写明 APK 版本与签名级别：
+  - 正式签名：`fcitx5-android-<apkVersion>`
+  - debug keystore 测试包：`fcitx5-android-<apkVersion>-debug`
+- 具体流程见 `docs/RELEASING.md`。

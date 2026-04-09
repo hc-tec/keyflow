@@ -1,6 +1,6 @@
 {
   "kind": "keyflow.npm.catalog.v0",
-  "generatedAt": "2026-04-09T16:36:55.447Z",
+  "generatedAt": "2026-04-09T17:42:15.853Z",
   "registry": "https://registry.npmjs.org/",
   "packages": [
     {
@@ -34,9 +34,17 @@
       ],
       "categories": [
         "chat",
-        "rewrite",
+        "writing",
         "tone",
-        "writing"
+        "rewrite"
+      ],
+      "tag": "chat",
+      "tags": [
+        "chat",
+        "writing",
+        "tone",
+        "rewrite",
+        "ai"
       ],
       "bindingCount": 5,
       "links": {

@@ -50,6 +50,8 @@
   "platforms": ["android"],
   "runtimePermissions": ["context.read", "input.replace", "ai.request"],
   "categories": ["chat", "rewrite", "tone", "writing"],
+  "tag": "chat",
+  "tags": ["chat", "rewrite", "tone", "writing", "ai"],
   "bindingCount": 6,
   "links": {
     "homepage": "https://github.com/hc-tec/keyflow#readme",
@@ -77,6 +79,8 @@
 - `platforms`（string[]，可选）：支持平台（通常来自 `manifest.platforms`）
 - `runtimePermissions`（string[]，可选）：运行时权限（来自 `manifest.runtimePermissions`，强烈建议在 UI 中展示）
 - `categories`（string[]，可选）：分类/标签（推荐从 `manifest.bindings[].categories` 聚合去重；也可由 catalog 维护者补充/覆盖）
+- `tag`（string，可选）：单个主标签，给只能展示一个 chip 的消费者用；通常取 `tags[0]`
+- `tags`（string[]，可选）：展示/搜索用标签；推荐由 `discovery.slash.tags`、`categories`、以及必要的能力标签（如 `ai`）聚合而来
 - `bindingCount`（number/int，可选）：该 kit 暴露的 binding 数量（便于在目录中快速评估“有多少动作”）
 - `links`（object，可选）：相关链接（通常来自 npm 元数据 `homepage/repository/bugs`）
 - `dist`（object，可选但强烈建议）

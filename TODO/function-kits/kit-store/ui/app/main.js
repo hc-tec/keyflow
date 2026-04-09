@@ -4,6 +4,36 @@
   const kitId = "kit-store";
   const surface = "panel";
   const DEFAULT_CATALOG_SOURCE = "npm:@keyflow2/keyflow-kit-catalog";
+  const CATEGORY_LABELS = Object.freeze({
+    ai: "AI",
+    chat: "聊天",
+    clipboard: "剪贴板",
+    download: "下载",
+    file: "文件",
+    files: "文件",
+    image: "图片",
+    install: "安装",
+    local: "本地",
+    network: "联网",
+    ocr: "识图",
+    paste: "粘贴",
+    productivity: "效率",
+    reply: "回复",
+    rewrite: "改写",
+    snippet: "短语",
+    store: "商店",
+    summarize: "总结",
+    system: "系统",
+    template: "模板",
+    tone: "语气",
+    tool: "工具",
+    tools: "工具",
+    translate: "翻译",
+    translation: "翻译",
+    upload: "上传",
+    wechat: "微信",
+    writing: "写作"
+  });
 
   const featuredKitIds = new Set(["ai-smart-write", "clipboard-plus", "chat-auto-reply", "quick-phrases"]);
 
@@ -23,6 +53,38 @@
   function normalizeKitId(value) {
     const text = safeText(value);
     return text || null;
+  }
+
+  function normalizeTextList(values) {
+    if (!Array.isArray(values)) return [];
+    const seen = new Set();
+    const list = [];
+    for (const value of values) {
+      const text = safeText(value);
+      if (!text) continue;
+      const key = text.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      list.push(text);
+    }
+    return list;
+  }
+
+  function humanizeToken(value) {
+    const raw = safeText(value);
+    if (!raw) return "";
+    if (/[^\x00-\x7F]/.test(raw)) return raw;
+    return raw
+      .split(/[._-]+/)
+      .filter(Boolean)
+      .map((part) => (part.length <= 3 ? part.toUpperCase() : `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`))
+      .join(" ");
+  }
+
+  function displayTagLabel(value) {
+    const raw = safeText(value);
+    if (!raw) return "";
+    return CATEGORY_LABELS[raw.toLowerCase()] ?? humanizeToken(raw);
   }
 
   function formatBytes(bytes) {
@@ -66,6 +128,14 @@
     if (list.includes("storage.read") || list.includes("storage.write")) tags.push("系统");
     if (list.includes("files.pick")) tags.push("工具");
     return tags.slice(0, 2);
+  }
+
+  function deriveCatalogTags(pkg) {
+    const directTags = normalizeTextList(pkg?.tags).map(displayTagLabel);
+    const categoryTags = normalizeTextList(pkg?.categories).map(displayTagLabel);
+    const primaryTag = displayTagLabel(pkg?.tag);
+    const permissionTags = deriveTagsFromRuntimePermissions(pkg?.runtimePermissions);
+    return normalizeTextList([...directTags, ...categoryTags, primaryTag, ...permissionTags]).slice(0, 3);
   }
 
   function safeCreateKit() {
@@ -153,6 +223,7 @@
           const installedRecord = installedById.get(id) ?? null;
           const isInstalled = Boolean(installedRecord);
           const isEnabled = installedRecord?.enabled !== false;
+          const tags = deriveCatalogTags(pkg);
           return {
             kind: "package",
             kitId: id,
@@ -161,7 +232,8 @@
             iconUrl: null,
             iconClass: "kit-icon--meme",
             sub: {
-              tag: (pkg?.tag ?? "娱乐").toString(),
+              tags,
+              tag: tags[0] ?? "",
               desc: (pkg?.description ?? "从 catalog 下载并安装到输入法。").toString()
             },
             action: isInstalled
@@ -206,7 +278,17 @@
       const query = safeText(this.searchQuery).toLowerCase();
       const base = this.tab === "discover" ? this.discoverItems : this.manageItems;
       if (!query) return base;
-      return base.filter((item) => `${item.title} ${(item.sub && item.sub.desc) || ""}`.toLowerCase().includes(query));
+      return base.filter((item) =>
+        [
+          item.title,
+          (item.sub && item.sub.desc) || "",
+          ...(((item.sub && item.sub.tags) || []).filter(Boolean)),
+          (item.sub && item.sub.tag) || ""
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(query)
+      );
     },
 
     get selectedItem() {

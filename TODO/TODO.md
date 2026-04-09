@@ -24,6 +24,20 @@
   - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values/strings.xml`
   - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values-zh-rCN/strings.xml`
   - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values-zh-rTW/strings.xml`
+- 官方 Catalog / 下载中心类别信息补齐：
+  - `official.catalog.json` 生成链现在会产出 `tag` / `tags`，并继续保留 `categories`，避免下载中心再因为 catalog 缺单标签而回退到默认“娱乐”：
+    - `scripts/npm/generate-catalog-from-registry.mjs`
+    - `catalog/official.catalog.json`
+    - `TODO/function-kits/KIT_CATALOG_NPM_SPEC.md`
+  - Android Host 的 catalog 规范化补齐 `tag/tags/categories/runtimePermissions` 透传，Store Kit 可以直接消费这些字段：
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+  - 下载中心展示改为优先显示 catalog 提供的类别/tag，并把常见英文类别映射成中文标签；设置页旧下载中心也同步展示描述 + 标签：
+    - `TODO/function-kits/kit-store/ui/app/main.js`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitDownloadCenterFragment.kt`
+  - 验证：
+    - `node scripts/npm/generate-catalog-from-registry.mjs --packages-file catalog/official.packages.json --out-file catalog/official.catalog.json`
+    - `node --check TODO/function-kits/kit-store/ui/app/main.js`
+    - `.\gradlew.bat :app:compileDebugKotlin --no-daemon`（workdir=`TODO/ime-research/repos/fcitx5-android`）
 
 2026-04-10 Keyflow Android logo 资产重建：
 - 基于用户提供的 `K` 标记重建一套干净的 launcher 资产，不再依赖带棋盘底的假透明图；脚本写在 `tmp/build_keyflow_logo_assets.py`，可重复导出 preview SVG/PNG 以及 Android `mipmap` 资源。

@@ -118,7 +118,35 @@ function collectBindingCategories(manifest) {
       if (typeof c === "string" && c.trim()) set.add(c.trim());
     }
   }
-  return [...set].sort((a, b) => a.localeCompare(b));
+  return [...set];
+}
+
+function collectSlashTags(manifest) {
+  const tags = manifest?.discovery?.slash?.tags;
+  if (!Array.isArray(tags)) return [];
+  const set = new Set();
+  for (const tag of tags) {
+    if (typeof tag === "string" && tag.trim()) set.add(tag.trim());
+  }
+  return [...set];
+}
+
+function deriveTagsFromRuntimePermissions(runtimePermissions) {
+  const list = Array.isArray(runtimePermissions) ? runtimePermissions : [];
+  const tags = [];
+  if (list.includes("ai.request")) tags.push("ai");
+  if (list.includes("network.fetch")) tags.push("network");
+  if (list.includes("storage.read") || list.includes("storage.write")) tags.push("system");
+  if (list.includes("files.pick")) tags.push("files");
+  return tags;
+}
+
+function collectCatalogTags(manifest, categories, runtimePermissions) {
+  const set = new Set();
+  for (const tag of [...collectSlashTags(manifest), ...categories, ...deriveTagsFromRuntimePermissions(runtimePermissions)]) {
+    if (typeof tag === "string" && tag.trim()) set.add(tag.trim());
+  }
+  return [...set];
 }
 
 function validateKitIdOrThrow(kitId, pkg) {
@@ -194,6 +222,8 @@ async function main() {
     const runtimePermissions = Array.isArray(manifest?.runtimePermissions)
       ? manifest.runtimePermissions.map((p) => String(p))
       : null;
+    const tags = collectCatalogTags(manifest, categories, runtimePermissions);
+    const primaryTag = tags[0] ?? null;
 
     const publisher = parsePublisher(meta);
     const maintainers = listMaintainers(meta);
@@ -218,6 +248,8 @@ async function main() {
       platforms,
       runtimePermissions,
       categories,
+      tag: primaryTag,
+      tags,
       bindingCount: Array.isArray(manifest?.bindings) ? manifest.bindings.length : null,
       links: {
         homepage: meta?.homepage ? String(meta.homepage) : null,

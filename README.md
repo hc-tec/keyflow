@@ -43,6 +43,12 @@ npm test
 - 安全问题：`SECURITY.md`
 - 支持与反馈：`SUPPORT.md`
 
+## License Scope
+
+- 除非另有说明，`keyflow` 根仓库的代码与文档使用 `Apache-2.0`，见 [LICENSE](LICENSE)。
+- Android APK release 仍然回指 `hc-tec/fcitx5-android` 源码仓库，并按 `LGPL-2.1-or-later` 处理；不要把根仓库的 `Apache-2.0` 误认为 APK 许可证。
+- 第三方 vendored 资产与单独许可边界见 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)。
+
 ## 发布约定
 
 - `keyflow` GitHub Releases 用于发布本项目对外分发物。

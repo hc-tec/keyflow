@@ -69,6 +69,10 @@
   - 宿主包名联动的插件 convention / manifest 查询 / release 脚本默认 APK 前缀同步到新包名
   - Android fork README 与发布文档补充当前 fork 的 package name 说明
   - 相关文件：`TODO/ime-research/repos/fcitx5-android/app/build.gradle.kts`、`TODO/ime-research/repos/fcitx5-android/build-logic/convention/src/main/kotlin/AndroidPluginAppConventionPlugin.kt`、`TODO/ime-research/repos/fcitx5-android/lib/plugin-base/src/main/AndroidManifest.xml`、`TODO/ime-research/repos/fcitx5-android/lib/plugin-base/src/debug/AndroidManifest.xml`、`TODO/ime-research/repos/fcitx5-android/app/src/main/AndroidManifest.xml`、`TODO/ime-research/repos/fcitx5-android/README.md`、`scripts/release/publish-keyflow-android-release.ps1`、`docs/RELEASING.md`
+- 根仓库许可证边界补充：
+  - 根 README 新增 `License Scope`，明确 `Apache-2.0` 只作为 `keyflow` 根仓库默认许可，不覆盖 Android APK release
+  - 新增 `THIRD_PARTY_LICENSES.md`，列出 Android APK 的 `LGPL-2.1-or-later` 边界，以及 vendored `petite-vue` / `shadcn/ui` token provenance
+  - 相关文件：`README.md`、`THIRD_PARTY_LICENSES.md`
 
 2026-04-08 KitStudio 可用性/界面收敛（先修开发者第一屏体验）：
 - 输入链路补强：`targetInput` 现在会把 `focus/blur/input/select/Enter` 显式变成宿主状态更新；已注册 `send.intercept.ime_action` 时，Enter 直接触发 IME intent，便于验证“打字/发送”链路：

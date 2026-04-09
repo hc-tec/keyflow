@@ -27,6 +27,15 @@
   - `docs/RELEASING.md`
   - `README.md`
   - `CONTRIBUTING.md`
+- 已生成正式 release keystore，并完成 `fcitx5-android` `0.1.3` 正式签名构建：
+  - 本地 keystore 元数据：`.local-secrets/android-release/keystore-metadata.json`
+  - 正式 APK 输出：`TODO/ime-research/repos/fcitx5-android/app/build/outputs/apk/release/`
+  - signer SHA-256：`D7:F1:F9:74:5A:42:2C:DC:2E:1A:5E:69:FB:DE:6E:93:2A:ED:48:09:8A:4C:D6:25:1A:71:32:DC:D6:A5:C7:DB`
+- 已发布正式 Android Release（仅 `keyflow` 仓库挂 APK）：
+  - GitHub Release：`https://github.com/hc-tec/keyflow/releases/tag/fcitx5-android-0.1.3`
+  - source repo / commit：`fcitx5-android@cb947f48`
+  - assets：4 个 ABI APK + `SHA256SUMS.txt`
+  - release APK 内置功能件已核对为 `kit-store` + `shared`
 
 2026-04-08 KitStudio 可用性/界面收敛（先修开发者第一屏体验）：
 - 输入链路补强：`targetInput` 现在会把 `focus/blur/input/select/Enter` 显式变成宿主状态更新；已注册 `send.intercept.ime_action` 时，Enter 直接触发 IME intent，便于验证“打字/发送”链路：

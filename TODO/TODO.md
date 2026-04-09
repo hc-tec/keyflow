@@ -49,6 +49,13 @@
   - Android GitHub Release 发布脚本现在会自动写入 source repo URL / source commit URL / source archive URL / `LGPL-2.1-or-later`
   - 已给本轮改过的 Android fork 源文件补显式修改声明（`Modified by hc-tec on 2026-04-09`）
   - 相关文件：`scripts/release/publish-keyflow-android-release.ps1`、`docs/RELEASING.md`、`scripts/release/README.md`、`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/AboutFragment.kt`、`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/utils/Const.kt`、`app/src/main/res/values*/strings.xml`
+- 开发者入口补链：
+  - 根 README 与开发环境文档现在都显式写出 Android 宿主仓库地址 `https://github.com/hc-tec/fcitx5-android`
+  - 相关文件：`README.md`、`docs/DEVELOPMENT.md`
+- 项目命名口径收敛：
+  - 根 README 现在以 `keyflow` 作为项目主名
+  - Android fork README 开头明确这是 `keyflow` 的 Android 宿主仓库，并补上 `keyflow` / 当前 fork / upstream 三个仓库链接
+  - 相关文件：`README.md`、`TODO/ime-research/repos/fcitx5-android/README.md`
 
 2026-04-08 KitStudio 可用性/界面收敛（先修开发者第一屏体验）：
 - 输入链路补强：`targetInput` 现在会把 `focus/blur/input/select/Enter` 显式变成宿主状态更新；已注册 `send.intercept.ime_action` 时，Enter 直接触发 IME intent，便于验证“打字/发送”链路：

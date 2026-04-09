@@ -9,7 +9,7 @@
   - Runtime SDK：`TODO/function-kit-runtime-sdk/`
 - KitStudio（单独仓库）：本地调试器/开发者工具
 - Android IME 宿主（单独仓库）：`fcitx5-android`（含 Function Kit 集成）
-  - GitHub：`https://github.com/hc-tec/fcitx5-android`
+  - GitHub：[hc-tec/fcitx5-android](https://github.com/hc-tec/fcitx5-android)
 
 ## 0. 依赖准备
 
@@ -17,7 +17,7 @@
 - Node.js（建议 LTS，例如 20+）+ npm
 - Android 宿主（可选）：Android Studio + SDK/NDK/CMake + `extra-cmake-modules` + `gettext`  
   具体依赖与版本以 `fcitx5-android` 的 `README.md` 为准：
-  `https://github.com/hc-tec/fcitx5-android`
+  [hc-tec/fcitx5-android](https://github.com/hc-tec/fcitx5-android)
 
 ## 1. 推荐目录结构
 
@@ -108,4 +108,4 @@ cd .\\fcitx5-android
 - Runtime SDK：本仓 `TODO/function-kit-runtime-sdk/`
 - KitStudio：KitStudio 仓库
 - Android IME 宿主（Function Kit 集成）：`fcitx5-android` 仓库
-  - `https://github.com/hc-tec/fcitx5-android`
+  - [hc-tec/fcitx5-android](https://github.com/hc-tec/fcitx5-android)

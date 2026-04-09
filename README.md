@@ -10,7 +10,7 @@
 
 Android 宿主仓库在：
 
-- `https://github.com/hc-tec/fcitx5-android`
+- [hc-tec/fcitx5-android](https://github.com/hc-tec/fcitx5-android)
 
 ## 仓库内容
 
@@ -34,8 +34,8 @@ npm test
 
 如果你希望从零搭起「KitStudio 调试 + Android IME 宿主运行 + Kits/SDK 开发」的一整套环境，见：
 
-- `docs/DEVELOPMENT.md`
-- Android IME 宿主仓库：`https://github.com/hc-tec/fcitx5-android`
+- [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)
+- Android IME 宿主仓库：[hc-tec/fcitx5-android](https://github.com/hc-tec/fcitx5-android)
 
 ## 开发与贡献
 
@@ -46,10 +46,10 @@ npm test
 ## 发布约定
 
 - `keyflow` GitHub Releases 用于发布本项目对外分发物。
-- Android APK 只挂在 `keyflow` Releases；`fcitx5-android` 仓库（`https://github.com/hc-tec/fcitx5-android`）只保留源码与构建说明，不再上传 APK assets。
+- Android APK 只挂在 `keyflow` Releases；`fcitx5-android` 仓库（[hc-tec/fcitx5-android](https://github.com/hc-tec/fcitx5-android)）只保留源码与构建说明，不再上传 APK assets。
 - `keyflow` 工具链/模板发布继续使用 `v*` tag（例如 `v0.1.0`），不要混挂 Android APK。
 - Android APK 发布在 `keyflow` 上使用单独 tag，并显式写明 APK 版本与签名级别：
   - 正式签名：`fcitx5-android-<apkVersion>`
   - debug keystore 测试包：`fcitx5-android-<apkVersion>-debug`
-- 正式签名 keystore 的本地生成与保存流程见 `docs/RELEASING.md` 与 `scripts/release/`。
-- 具体流程见 `docs/RELEASING.md`。
+- 正式签名 keystore 的本地生成与保存流程见 [docs/RELEASING.md](docs/RELEASING.md) 与 `scripts/release/`。
+- 具体流程见 [docs/RELEASING.md](docs/RELEASING.md)。

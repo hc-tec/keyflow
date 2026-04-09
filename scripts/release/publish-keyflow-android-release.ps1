@@ -13,6 +13,8 @@ param(
     [string]$RootCommit,
     [string]$SourceCommit,
     [string]$ApkDirectory,
+    [string]$ReleaseAssetPrefix = 'keyflow',
+    [string]$SourceApkPrefix = 'org.fcitx.fcitx5.android',
     [string[]]$ExpectedBundledKitIds = @('kit-store', 'shared'),
     [switch]$SkipBundledKitVerification,
     [switch]$MakeLatest = $true
@@ -177,6 +179,33 @@ function Compare-StringSets {
         }
     }
     return $true
+}
+
+function Get-ReleaseAssetName {
+    param(
+        [Parameter(Mandatory = $true)][string]$OriginalFileName,
+        [Parameter(Mandatory = $true)][string]$ReleaseAssetPrefix,
+        [Parameter(Mandatory = $true)][string]$SourceApkPrefix,
+        [Parameter(Mandatory = $true)][string]$SigningMode
+    )
+
+    $renamedFile = $OriginalFileName
+    $sourcePrefixPattern = '^{0}-' -f [regex]::Escape($SourceApkPrefix)
+    if ($renamedFile -like "$ReleaseAssetPrefix-*") {
+        $renamedFile = $renamedFile
+    } elseif ($renamedFile -match $sourcePrefixPattern) {
+        $renamedFile = [regex]::Replace($renamedFile, $sourcePrefixPattern, "$ReleaseAssetPrefix-")
+    } else {
+        $renamedFile = '{0}-{1}' -f $ReleaseAssetPrefix, $renamedFile
+    }
+
+    if ($SigningMode -eq 'debug' -and $renamedFile -like '*.apk' -and $renamedFile -notlike '*-debug.apk') {
+        $baseName = [System.IO.Path]::GetFileNameWithoutExtension($renamedFile)
+        $extension = [System.IO.Path]::GetExtension($renamedFile)
+        $renamedFile = '{0}-debug{1}' -f $baseName, $extension
+    }
+
+    return $renamedFile
 }
 
 function Get-GitHubCredential {
@@ -353,16 +382,29 @@ if ($SigningMode -eq 'formal') {
 
 $artifactRoot = Join-Path $resolvedWorkspaceRoot ("tmp\release\{0}" -f $Tag)
 New-Item -ItemType Directory -Force -Path $artifactRoot | Out-Null
+$stagedApkPaths =
+    foreach ($apkFile in $apkFiles) {
+        $releaseAssetName =
+            Get-ReleaseAssetName `
+                -OriginalFileName $apkFile.Name `
+                -ReleaseAssetPrefix $ReleaseAssetPrefix `
+                -SourceApkPrefix $SourceApkPrefix `
+                -SigningMode $SigningMode
+        $stagedPath = Join-Path $artifactRoot $releaseAssetName
+        Copy-Item -Force $apkFile.FullName $stagedPath
+        $stagedPath
+    }
 $sha256Path = Join-Path $artifactRoot 'SHA256SUMS.txt'
-$sha256Lines = foreach ($apkFile in $apkFiles) {
-    $hash = (Get-FileHash -Algorithm SHA256 $apkFile.FullName).Hash.ToLowerInvariant()
-    "{0}  {1}" -f $hash, $apkFile.Name
+$sha256Lines = foreach ($stagedApkPath in $stagedApkPaths) {
+    $hash = (Get-FileHash -Algorithm SHA256 $stagedApkPath).Hash.ToLowerInvariant()
+    "{0}  {1}" -f $hash, ([System.IO.Path]::GetFileName($stagedApkPath))
 }
 Write-Utf8File -Path $sha256Path -Content (($sha256Lines -join [Environment]::NewLine) + [Environment]::NewLine)
 
 $signingDescription = if ($SigningMode -eq 'formal') { 'formal release keystore' } else { 'local debug.keystore' }
-$assetPaths = @($apkFiles.FullName) + $sha256Path
+$assetPaths = @($stagedApkPaths) + $sha256Path
 $assetNames = $assetPaths | ForEach-Object { [System.IO.Path]::GetFileName($_) }
+$assetNamesToReplace = (@($apkFiles.Name) + @($assetNames)) | Sort-Object -Unique
 $releaseBody =
     New-ReleaseBody `
         -SourceRepoName $SourceRepo `
@@ -412,7 +454,7 @@ try {
 }
 
 foreach ($asset in @($release.assets)) {
-    if ($assetNames -contains $asset.name) {
+    if ($assetNamesToReplace -contains $asset.name) {
         Invoke-RestMethod -Headers $headers -Uri "$repoApi/releases/assets/$($asset.id)" -Method Delete | Out-Null
     }
 }

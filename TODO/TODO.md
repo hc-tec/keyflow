@@ -60,6 +60,10 @@
   - 根 README、开发环境文档、Android fork README 里的仓库地址都改为可点击 Markdown 链接，避免开发者在 GitHub 页面里看见地址但点不进去
   - Android fork README 额外明确：源码仓库是 `hc-tec/fcitx5-android`，APK 发布入口在 `hc-tec/keyflow/releases`
   - 相关文件：`README.md`、`docs/DEVELOPMENT.md`、`TODO/ime-research/repos/fcitx5-android/README.md`
+- Android release 资产命名收敛：
+  - `publish-keyflow-android-release.ps1` 现在会把上传到 GitHub Release 的 APK 资产统一改成 `keyflow-` 前缀，同时清理旧的 `org.fcitx.fcitx5.android-*` 资产名
+  - 发布/贡献文档同步明确正式包与 debug 测试包的命名格式
+  - 相关文件：`scripts/release/publish-keyflow-android-release.ps1`、`scripts/release/README.md`、`docs/RELEASING.md`、`README.md`、`CONTRIBUTING.md`
 
 2026-04-08 KitStudio 可用性/界面收敛（先修开发者第一屏体验）：
 - 输入链路补强：`targetInput` 现在会把 `focus/blur/input/select/Enter` 显式变成宿主状态更新；已注册 `send.intercept.ime_action` 时，Enter 直接触发 IME intent，便于验证“打字/发送”链路：

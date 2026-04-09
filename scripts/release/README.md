@@ -11,7 +11,7 @@ These scripts standardize how the workspace creates and uses the formal Android 
 - `export-android-signing-env.ps1`
   - prints the current signing env block, optionally including `SIGN_KEY_BASE64`
 - `publish-keyflow-android-release.ps1`
-  - creates or updates the `keyflow` Android GitHub Release, verifies signer + bundled kits, writes source/license metadata, uploads APKs and `SHA256SUMS.txt`
+  - creates or updates the `keyflow` Android GitHub Release, verifies signer + bundled kits, rewrites uploaded APK asset names to the `keyflow-` prefix, writes source/license metadata, uploads APKs and `SHA256SUMS.txt`
 
 ## Recommended Flow
 
@@ -32,6 +32,10 @@ These scripts standardize how the workspace creates and uses the formal Android 
    ```powershell
    powershell -ExecutionPolicy Bypass -File .\scripts\release\publish-keyflow-android-release.ps1 -ApkVersion 0.1.3
    ```
+
+   Uploaded APK assets will be renamed like:
+   - `keyflow-0.1.3-arm64-v8a-release.apk`
+   - `keyflow-0.1.3-arm64-v8a-release-debug.apk`
 
    The release note will include:
    - source repo URL

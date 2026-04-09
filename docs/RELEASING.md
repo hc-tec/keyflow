@@ -26,6 +26,9 @@ Use this when publishing installable `fcitx5-android` builds through `keyflow`.
 - Tag formats:
   - Formal signing: `fcitx5-android-<apkVersion>`
   - Debug keystore / test build: `fcitx5-android-<apkVersion>-debug`
+- Uploaded APK asset names:
+  - Formal signing: `keyflow-<apkVersion>-<abi>-release.apk`
+  - Debug keystore / test build: `keyflow-<apkVersion>-<abi>-release-debug.apk`
 
 ## Required Metadata
 
@@ -110,6 +113,7 @@ The publisher script will:
 - create or update the target GitHub Release by tag
 - verify that all APKs have the same signer SHA-256 digest
 - verify bundled Function Kits against the expected release set (`kit-store` + `shared` by default)
+- stage renamed APK assets with the `keyflow-` prefix before upload
 - write Android source metadata into the release note:
   - source repo URL
   - source commit URL

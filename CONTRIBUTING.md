@@ -53,6 +53,9 @@ node templates/create-function-kit/bin/create-function-kit.mjs artifacts/smoke/c
 - Android APK 发布必须单独命名，并把 APK 版本与签名级别写进 tag / release name：
   - 正式签名：`fcitx5-android-<apkVersion>`
   - debug keystore：`fcitx5-android-<apkVersion>-debug`
+- Android APK assets 上传到 `keyflow` Release 时，文件名前缀统一改为 `keyflow-`：
+  - 正式签名：`keyflow-<apkVersion>-<abi>-release.apk`
+  - debug keystore：`keyflow-<apkVersion>-<abi>-release-debug.apk`
 - 如果 APK 由 `debug.keystore` 签名，GitHub Release 必须标为 `pre-release`，并在说明里明确写“仅供安装/测试”。
 - 正式 Android 签名材料统一放在根目录 `.local-secrets/android-release/`，通过 `scripts/release/` 下的脚本生成和读取；不要自行把 keystore 放进仓库或 `fcitx5-android` 子仓库。
 

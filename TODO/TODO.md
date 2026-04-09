@@ -64,6 +64,11 @@
   - `publish-keyflow-android-release.ps1` 现在会把上传到 GitHub Release 的 APK 资产统一改成 `keyflow-` 前缀，同时清理旧的 `org.fcitx.fcitx5.android-*` 资产名
   - 发布/贡献文档同步明确正式包与 debug 测试包的命名格式
   - 相关文件：`scripts/release/publish-keyflow-android-release.ps1`、`scripts/release/README.md`、`docs/RELEASING.md`、`README.md`、`CONTRIBUTING.md`
+- Android 软件包名切换：
+  - 主 APK `applicationId` 改为 `io.github.hctec.keyflow`，debug 变体对应 `io.github.hctec.keyflow.debug`
+  - 宿主包名联动的插件 convention / manifest 查询 / release 脚本默认 APK 前缀同步到新包名
+  - Android fork README 与发布文档补充当前 fork 的 package name 说明
+  - 相关文件：`TODO/ime-research/repos/fcitx5-android/app/build.gradle.kts`、`TODO/ime-research/repos/fcitx5-android/build-logic/convention/src/main/kotlin/AndroidPluginAppConventionPlugin.kt`、`TODO/ime-research/repos/fcitx5-android/lib/plugin-base/src/main/AndroidManifest.xml`、`TODO/ime-research/repos/fcitx5-android/lib/plugin-base/src/debug/AndroidManifest.xml`、`TODO/ime-research/repos/fcitx5-android/app/src/main/AndroidManifest.xml`、`TODO/ime-research/repos/fcitx5-android/README.md`、`scripts/release/publish-keyflow-android-release.ps1`、`docs/RELEASING.md`
 
 2026-04-08 KitStudio 可用性/界面收敛（先修开发者第一屏体验）：
 - 输入链路补强：`targetInput` 现在会把 `focus/blur/input/select/Enter` 显式变成宿主状态更新；已注册 `send.intercept.ime_action` 时，Enter 直接触发 IME intent，便于验证“打字/发送”链路：

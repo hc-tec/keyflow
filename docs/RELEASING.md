@@ -125,6 +125,7 @@ The publisher script will:
 For the current fork, the Android APK source-of-truth is:
 
 - repo: `https://github.com/hc-tec/fcitx5-android`
+- package name: `io.github.hctec.keyflow`
 - license: `LGPL-2.1-or-later`
 
 Do not present `keyflow`'s root `Apache-2.0` license as the APK license. The APK release note must point back to the Android fork and its LGPL terms.
@@ -151,4 +152,4 @@ powershell -ExecutionPolicy Bypass -File .\scripts\release\export-android-signin
 - Back up the keystore file and the password together before the first public release.
 - Keep at least two encrypted backups outside the git workspace.
 - Record the SHA-256 signer fingerprint wherever release operations are tracked.
-- Never delete or rotate this keystore unless you are intentionally abandoning upgrade compatibility for `org.fcitx.fcitx5.android`.
+- Never delete or rotate this keystore unless you are intentionally abandoning upgrade compatibility for `io.github.hctec.keyflow`.

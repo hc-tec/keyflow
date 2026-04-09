@@ -14,7 +14,7 @@ param(
     [string]$SourceCommit,
     [string]$ApkDirectory,
     [string]$ReleaseAssetPrefix = 'keyflow',
-    [string]$SourceApkPrefix = 'org.fcitx.fcitx5.android',
+    [string]$SourceApkPrefix = 'io.github.hctec.keyflow',
     [string[]]$ExpectedBundledKitIds = @('kit-store', 'shared'),
     [switch]$SkipBundledKitVerification,
     [switch]$MakeLatest = $true

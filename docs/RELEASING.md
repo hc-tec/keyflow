@@ -96,6 +96,29 @@ powershell -ExecutionPolicy Bypass -File .\scripts\release\build-fcitx5-android-
 
 The helper reads `.local-secrets/android-release/signing.env`, exports `SIGN_KEY_*` for the build process, adds `gettext` to `PATH` on Windows when available, and runs `:app:assembleRelease` in `fcitx5-android`.
 
+### Publish The Android Release
+
+After the formally signed APKs are built, publish them to `keyflow` with:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\release\publish-keyflow-android-release.ps1 -ApkVersion 0.1.3
+```
+
+The publisher script will:
+
+- resolve GitHub auth from the existing git credential helper
+- create or update the target GitHub Release by tag
+- verify that all APKs have the same signer SHA-256 digest
+- verify bundled Function Kits against the expected release set (`kit-store` + `shared` by default)
+- generate `SHA256SUMS.txt`
+- upload all ABI APKs plus `SHA256SUMS.txt`
+
+For debug-signed test builds, switch the tag/release mode:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\release\publish-keyflow-android-release.ps1 -ApkVersion 0.1.3 -SigningMode debug -PreRelease
+```
+
 ### Export For CI Or Another Machine
 
 If you later need GitHub Actions or another machine to use the same keystore, export the current env block:

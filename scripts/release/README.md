@@ -10,6 +10,8 @@ These scripts standardize how the workspace creates and uses the formal Android 
   - loads `SIGN_KEY_*` from `signing.env` and runs `:app:assembleRelease`
 - `export-android-signing-env.ps1`
   - prints the current signing env block, optionally including `SIGN_KEY_BASE64`
+- `publish-keyflow-android-release.ps1`
+  - creates or updates the `keyflow` Android GitHub Release, verifies signer + bundled kits, uploads APKs and `SHA256SUMS.txt`
 
 ## Recommended Flow
 
@@ -25,7 +27,13 @@ These scripts standardize how the workspace creates and uses the formal Android 
    powershell -ExecutionPolicy Bypass -File .\scripts\release\build-fcitx5-android-release.ps1 -VersionName 0.1.3
    ```
 
-3. If CI needs the same key, export the env block:
+3. Publish the Android release to `keyflow`:
+
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File .\scripts\release\publish-keyflow-android-release.ps1 -ApkVersion 0.1.3
+   ```
+
+4. If CI needs the same key, export the env block:
 
    ```powershell
    powershell -ExecutionPolicy Bypass -File .\scripts\release\export-android-signing-env.ps1 -Format dotenv -IncludeBase64

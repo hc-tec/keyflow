@@ -27,6 +27,11 @@
   - `docs/RELEASING.md`
   - `README.md`
   - `CONTRIBUTING.md`
+- 补齐 Android GitHub Release 发布脚本：
+  - `scripts/release/publish-keyflow-android-release.ps1`
+  - `scripts/release/README.md`
+  - `docs/RELEASING.md`
+  - 已用现有正式 release `fcitx5-android-0.1.3` 做真实 smoke：脚本可自动验 signer、验内置 kits、重传 4 个 APK 和 `SHA256SUMS.txt`
 - 已生成正式 release keystore，并完成 `fcitx5-android` `0.1.3` 正式签名构建：
   - 本地 keystore 元数据：`.local-secrets/android-release/keystore-metadata.json`
   - 正式 APK 输出：`TODO/ime-research/repos/fcitx5-android/app/build/outputs/apk/release/`

@@ -14,6 +14,17 @@
 我需要保持住任务进展的追踪，每完成一项任务，你记得记录下来各种文档路径
 别去看根目录下面的md啊！那是OpenClaw的md啊！！不是你要读取的
 
+2026-04-10 Android 下载中心细粒度权限开关：
+- `Function Kit` 详情页的运行时权限从弹窗改为行内开关，直接支持逐项允许/拒绝；开关状态会自动和全局策略对齐，长按可恢复默认策略：
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitDetailFragment.kt`
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/modified/MySwitchPreference.kt`
+- 权限策略补充 `defaultEnabled(...)`，修正 `kit-store` 这类内置特权权限的来源显示，避免 `kits.manage/files.download` 继续按“全局拒绝”误报：
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitPermissionPolicy.kt`
+- 权限中文名词补齐，并补上 `kits.manage`、`files.download`、`ai.agent.list`、`ai.agent.run` 的可读标题；中英繁体文案同步：
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values/strings.xml`
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values-zh-rCN/strings.xml`
+  - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values-zh-rTW/strings.xml`
+
 2026-04-09 Android 正式 release keystore 方案落地：
 - 根仓库新增正式签名 helper：
   - `scripts/release/new-android-release-keystore.ps1`

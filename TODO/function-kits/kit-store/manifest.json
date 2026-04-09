@@ -3,7 +3,10 @@
   "name": "下载中心",
   "version": "0.1.0",
   "description": "发现、安装、卸载与管理 Function Kits。",
-  "platforms": ["android", "windows"],
+  "platforms": [
+    "android",
+    "windows"
+  ],
   "entry": {
     "type": "browser-app",
     "bundle": {
@@ -32,14 +35,21 @@
   "triggers": {
     "manual": true,
     "selectionRequired": false,
-    "contextTypes": ["system"]
+    "contextTypes": [
+      "system"
+    ]
   },
   "bindings": [
     {
       "id": "store.open",
       "title": "打开下载中心",
-      "triggers": ["manual"],
-      "categories": ["store", "manage"],
+      "triggers": [
+        "manual"
+      ],
+      "categories": [
+        "store",
+        "manage"
+      ],
       "preferredPresentation": "panel"
     }
   ],
@@ -49,9 +59,19 @@
     "launchMode": "panel",
     "slash": {
       "enabled": true,
-      "commands": ["store"],
-      "aliases": ["kit-store", "download-center"],
-      "tags": ["store", "download", "install", "kits"],
+      "commands": [
+        "store"
+      ],
+      "aliases": [
+        "kit-store",
+        "download-center"
+      ],
+      "tags": [
+        "store",
+        "download",
+        "install",
+        "kits"
+      ],
       "minQueryLength": 1
     },
     "ranking": {
@@ -74,6 +94,13 @@
     "files.download",
     "kits.manage",
     "panel.state.write"
-  ]
+  ],
+  "icons": {
+    "48": "icons/icon-48.png",
+    "64": "icons/icon-64.png",
+    "96": "icons/icon-96.png",
+    "128": "icons/icon-128.png",
+    "256": "icons/icon-256.png"
+  },
+  "icon": "icons/icon-128.png"
 }
-

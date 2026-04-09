@@ -56,6 +56,20 @@
 - 开发文档明确推荐的功能件图标规格，避免后面继续只放单个 `128` 或单张原图：
   - `TODO/function-kits/INDEX.md`
   - `TODO/function-kits/DEVELOPER_GUIDE.md`
+- 已基于用户提供的原始透明 PNG 实际落地两套功能件图标：
+  - `TODO/function-kits/kit-store/icons/icon-{48,64,96,128,256}.png`
+  - `TODO/function-kits/tone-rewrite/icons/icon-{48,64,96,128,256}.png`
+  - `TODO/function-kits/kit-store/manifest.json`
+  - `TODO/function-kits/tone-rewrite/manifest.json`
+- Android 宿主的功能件图标消费改成 `local-first`：
+  - IME 工具栏、状态区、功能件卡片继续直接吃 `manifest.icon/icons`
+  - 设置页 `Function Kit` 列表、功能件详情页头部、旧下载中心的已安装项也统一显示 manifest 图标：
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitManagerFragment.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitDetailFragment.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitDownloadCenterFragment.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitPreferenceIcons.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitDisplayIconLoader.kt`
+- 明确不采用 `catalog.json` 内嵌 `base64/data:` 图标方案，避免 catalog 体积膨胀和 JSON 编辑/渲染卡顿；如果后面要做“下载前 logo”，应改为 npm catalog 包内的 sidecar icon 文件，而不是往 JSON 里塞图片正文。
 
 2026-04-09 Android 正式 release keystore 方案落地：
 - 根仓库新增正式签名 helper：

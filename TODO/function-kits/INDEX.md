@@ -60,8 +60,16 @@
   - `webp`
   - `bmp`
   - `ico`
+- 建议直接准备一套固定规格，至少：
+  - `48`
+  - `64`
+  - `96`
+  - `128`
+  - `256`
 - 示例：
-  - `"icons": { "64": "icons/my-kit.png", "128": "icons/my-kit.ico" }`
+  - `"icons": { "48": "icons/icon-48.png", "64": "icons/icon-64.png", "96": "icons/icon-96.png", "128": "icons/icon-128.png", "256": "icons/icon-256.png" }`
+- 批量生成可直接用：
+  - `python tmp/build_function_kit_icon_set.py --src tmp/my-kit-logo.png --kit-dir TODO/function-kits/<kitId>`
 - AI / Agent 型功能件应额外提供：
   - `skills/<name>/SKILL.md`
   - `tools/<tool-name>/input.schema.json`

@@ -59,7 +59,11 @@ TODO/function-kits/<kitId>/
       main.js
       styles.css
   icons/
+    icon-48.png
+    icon-64.png
+    icon-96.png
     icon-128.png
+    icon-256.png
   tests/
     fixtures/
       *.json
@@ -356,7 +360,7 @@ Android Host 当前解析的核心字段：
 
 - `id`（必填）
 - `name` / `description`
-- `icon` / `icons`（多种写法都支持）
+- `icon` / `icons`（多种写法都支持；推荐明确给多规格）
 - `entry.bundle.html`（你的入口 HTML）
 - `runtimePermissions`（**强制的权限 allowlist**）
 - `ai.executionMode` / `ai.backendHints.*`（给宿主 AI Router 的提示）
@@ -375,7 +379,13 @@ Android Host 当前解析的核心字段：
   "name": "常用短语",
   "description": "本地短语槽位样板（storage + insert/replace）",
 
-  "icons": { "128": "icons/icon-128.png" },
+  "icons": {
+    "48": "icons/icon-48.png",
+    "64": "icons/icon-64.png",
+    "96": "icons/icon-96.png",
+    "128": "icons/icon-128.png",
+    "256": "icons/icon-256.png"
+  },
 
   "entry": {
     "bundle": { "html": "ui/app/index.html" }

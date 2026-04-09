@@ -51,6 +51,12 @@
   - `tmp/keyflow-logo/keyflow-adaptive-foreground.png`
   - `tmp/keyflow-logo/keyflow-monochrome.svg`
 
+2026-04-10 Function Kit 多规格 logo 产线补齐：
+- 新增 `tmp/build_function_kit_icon_set.py`，可从单张源图批量生成 `48/64/96/128/256` PNG，并自动回写功能件 `manifest.json` 的 `icon/icons` 字段。
+- 开发文档明确推荐的功能件图标规格，避免后面继续只放单个 `128` 或单张原图：
+  - `TODO/function-kits/INDEX.md`
+  - `TODO/function-kits/DEVELOPER_GUIDE.md`
+
 2026-04-09 Android 正式 release keystore 方案落地：
 - 根仓库新增正式签名 helper：
   - `scripts/release/new-android-release-keystore.ps1`

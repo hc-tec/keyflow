@@ -162,7 +162,7 @@
             iconClass: "kit-icon--meme",
             sub: {
               tag: (pkg?.tag ?? "娱乐").toString(),
-              desc: (pkg?.description ?? "输入关键词即出图").toString()
+              desc: (pkg?.description ?? "从 catalog 下载并安装到输入法。").toString()
             },
             action: isInstalled
               ? isEnabled

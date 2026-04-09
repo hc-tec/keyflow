@@ -73,6 +73,10 @@
   - 根 README 新增 `License Scope`，明确 `Apache-2.0` 只作为 `keyflow` 根仓库默认许可，不覆盖 Android APK release
   - 新增 `THIRD_PARTY_LICENSES.md`，列出 Android APK 的 `LGPL-2.1-or-later` 边界，以及 vendored `petite-vue` / `shadcn/ui` token provenance
   - 相关文件：`README.md`、`THIRD_PARTY_LICENSES.md`
+- 修复 `语气改写` 描述串位：
+  - `kit-store` 发现页的错误兜底文案 `输入关键词即出图` 已改为通用安装说明，避免 catalog 缺描述时把其它功能件误显示成出图工具
+  - 重新生成并发布 official catalog（`@keyflow2/keyflow-kit-catalog@0.0.2`），使 `tone-rewrite` 等 npm 功能件条目携带 `manifest.description`
+  - 相关文件：`TODO/function-kits/kit-store/ui/app/main.js`、`catalog/official.catalog.json`
 
 2026-04-08 KitStudio 可用性/界面收敛（先修开发者第一屏体验）：
 - 输入链路补强：`targetInput` 现在会把 `focus/blur/input/select/Enter` 显式变成宿主状态更新；已注册 `send.intercept.ime_action` 时，Enter 直接触发 IME intent，便于验证“打字/发送”链路：

@@ -4,6 +4,8 @@ param(
     [string]$WorkspaceRoot,
     [string]$ReleaseRepo = 'hc-tec/keyflow',
     [string]$SourceRepo = 'fcitx5-android',
+    [string]$SourceRepoSlug = 'hc-tec/fcitx5-android',
+    [string]$SourceLicense = 'LGPL-2.1-or-later',
     [ValidateSet('formal', 'debug')][string]$SigningMode = 'formal',
     [switch]$PreRelease,
     [string]$Tag,
@@ -238,7 +240,11 @@ function Invoke-GitHubJson {
 function New-ReleaseBody {
     param(
         [Parameter(Mandatory = $true)][string]$SourceRepoName,
+        [Parameter(Mandatory = $true)][string]$SourceRepoUrl,
         [Parameter(Mandatory = $true)][string]$SourceCommitHash,
+        [Parameter(Mandatory = $true)][string]$SourceCommitUrl,
+        [Parameter(Mandatory = $true)][string]$SourceArchiveUrl,
+        [Parameter(Mandatory = $true)][string]$SourceLicenseId,
         [Parameter(Mandatory = $true)][string]$SigningDescription,
         [Parameter(Mandatory = $true)][bool]$IsPreRelease,
         [Parameter(Mandatory = $true)][string[]]$AssetNames,
@@ -254,7 +260,11 @@ function New-ReleaseBody {
         ('Android APK release for `{0}` {1}.' -f $SourceRepoName, $ApkVersion),
         '',
         ('- Source repo: `{0}`' -f $SourceRepoName),
+        ('- Source URL: {0}' -f $SourceRepoUrl),
         ('- Source commit: `{0}`' -f $SourceCommitHash),
+        ('- Source commit URL: {0}' -f $SourceCommitUrl),
+        ('- Source archive URL: {0}' -f $SourceArchiveUrl),
+        ('- License: `{0}`' -f $SourceLicenseId),
         ('- Signing: `{0}`' -f $SigningDescription),
         ('- Release type: {0}' -f $releaseType),
         ('- Attached assets: {0}' -f $assetSummary),
@@ -288,6 +298,9 @@ if (-not $RootCommit) {
 if (-not $SourceCommit) {
     $SourceCommit = Invoke-Git -RepositoryPath $androidRepoPath -Arguments @('rev-parse', 'HEAD')
 }
+$sourceRepoUrl = 'https://github.com/{0}' -f $SourceRepoSlug
+$sourceCommitUrl = '{0}/commit/{1}' -f $sourceRepoUrl, $SourceCommit
+$sourceArchiveUrl = '{0}/archive/{1}.tar.gz' -f $sourceRepoUrl, $SourceCommit
 if (-not $ApkDirectory) {
     $ApkDirectory = Join-Path $androidRepoPath 'app\build\outputs\apk\release'
 }
@@ -350,7 +363,19 @@ Write-Utf8File -Path $sha256Path -Content (($sha256Lines -join [Environment]::Ne
 $signingDescription = if ($SigningMode -eq 'formal') { 'formal release keystore' } else { 'local debug.keystore' }
 $assetPaths = @($apkFiles.FullName) + $sha256Path
 $assetNames = $assetPaths | ForEach-Object { [System.IO.Path]::GetFileName($_) }
-$releaseBody = New-ReleaseBody -SourceRepoName $SourceRepo -SourceCommitHash $SourceCommit -SigningDescription $signingDescription -IsPreRelease $PreRelease.IsPresent -AssetNames $assetNames -BundledKitIds $bundledKitIds -SignerDigest $signerDigest
+$releaseBody =
+    New-ReleaseBody `
+        -SourceRepoName $SourceRepo `
+        -SourceRepoUrl $sourceRepoUrl `
+        -SourceCommitHash $SourceCommit `
+        -SourceCommitUrl $sourceCommitUrl `
+        -SourceArchiveUrl $sourceArchiveUrl `
+        -SourceLicenseId $SourceLicense `
+        -SigningDescription $signingDescription `
+        -IsPreRelease $PreRelease.IsPresent `
+        -AssetNames $assetNames `
+        -BundledKitIds $bundledKitIds `
+        -SignerDigest $signerDigest
 
 $credential = Get-GitHubCredential
 $headers = New-GitHubHeaders -Credential $credential
@@ -404,5 +429,8 @@ $release = Invoke-GitHubJson -Headers $headers -Method Get -Uri "$repoApi/releas
 Write-Host ("Published release: {0}" -f $release.html_url)
 Write-Host ("Tag: {0}" -f $Tag)
 Write-Host ("Source commit: {0}" -f $SourceCommit)
+Write-Host ("Source repo URL: {0}" -f $sourceRepoUrl)
+Write-Host ("Source archive URL: {0}" -f $sourceArchiveUrl)
+Write-Host ("License: {0}" -f $SourceLicense)
 Write-Host ("Signer SHA-256: {0}" -f $signerDigest)
 Write-Host ("Assets: {0}" -f ($assetNames -join ', '))

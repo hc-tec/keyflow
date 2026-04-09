@@ -110,8 +110,20 @@ The publisher script will:
 - create or update the target GitHub Release by tag
 - verify that all APKs have the same signer SHA-256 digest
 - verify bundled Function Kits against the expected release set (`kit-store` + `shared` by default)
+- write Android source metadata into the release note:
+  - source repo URL
+  - source commit URL
+  - source archive URL
+  - `LGPL-2.1-or-later`
 - generate `SHA256SUMS.txt`
 - upload all ABI APKs plus `SHA256SUMS.txt`
+
+For the current fork, the Android APK source-of-truth is:
+
+- repo: `https://github.com/hc-tec/fcitx5-android`
+- license: `LGPL-2.1-or-later`
+
+Do not present `keyflow`'s root `Apache-2.0` license as the APK license. The APK release note must point back to the Android fork and its LGPL terms.
 
 For debug-signed test builds, switch the tag/release mode:
 

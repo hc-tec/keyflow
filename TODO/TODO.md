@@ -45,6 +45,10 @@
   - `About` 页面新增“项目来源”，明确当前构建来自 `hc-tec/fcitx5-android`，并注明基于上游 `Fcitx5 for Android`
   - `About` 页源码链接改为当前 fork；上游仓库单独提供入口
   - 相关文件：`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/AboutFragment.kt`、`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/utils/Const.kt`、`app/src/main/res/values*/strings.xml`
+- LGPL 发布合规性收口补强：
+  - Android GitHub Release 发布脚本现在会自动写入 source repo URL / source commit URL / source archive URL / `LGPL-2.1-or-later`
+  - 已给本轮改过的 Android fork 源文件补显式修改声明（`Modified by hc-tec on 2026-04-09`）
+  - 相关文件：`scripts/release/publish-keyflow-android-release.ps1`、`docs/RELEASING.md`、`scripts/release/README.md`、`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/AboutFragment.kt`、`TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/utils/Const.kt`、`app/src/main/res/values*/strings.xml`
 
 2026-04-08 KitStudio 可用性/界面收敛（先修开发者第一屏体验）：
 - 输入链路补强：`targetInput` 现在会把 `focus/blur/input/select/Enter` 显式变成宿主状态更新；已注册 `send.intercept.ime_action` 时，Enter 直接触发 IME intent，便于验证“打字/发送”链路：

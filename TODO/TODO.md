@@ -14,6 +14,63 @@
 我需要保持住任务进展的追踪，每完成一项任务，你记得记录下来各种文档路径
 别去看根目录下面的md啊！那是OpenClaw的md啊！！不是你要读取的
 
+2026-04-10 wx-reply npm 发布 + Keyflow Android 0.1.4 release：
+- `wx-reply` 已按“非即装即用”口径更新描述并发布到 npm；描述明确依赖电脑端 `wechat-decrypt` 本地解密服务，需先在电脑运行并让手机可访问：
+  - manifest：`TODO/function-kits/wx-reply/manifest.json`
+  - npm：`@keyflow2/keyflow-kit-wx-reply@0.2.9`
+  - tarball：`https://registry.npmjs.org/@keyflow2/keyflow-kit-wx-reply/-/keyflow-kit-wx-reply-0.2.9.tgz`
+  - integrity：`sha512-uqZ5u3NmOBf17bbUQe4Zbamx2/te70jLVU5B/tGlb1ONRoOHTxjNjWjqNqXykCv/cLgQRiyAi5jz9t3OxeDOqw==`
+  - 按用户要求：未加入 `catalog/official.packages.json`，未发布新版 official catalog。
+- Android APK release 命名改为 `keyflow-` 前缀：
+  - 发布脚本默认 tag/name：`keyflow-<apkVersion>` / `keyflow-<apkVersion>-debug`
+  - 上传 APK asset 仍统一为 `keyflow-<apkVersion>-<abi>-release.apk`
+  - `Invoke-RestMethod -InFile` 上传大 APK 不稳定，发布脚本新增 `curl.exe --data-binary` 上传路径：
+    - `scripts/release/publish-keyflow-android-release.ps1`
+  - 文档同步：
+    - `docs/RELEASING.md`
+    - `README.md`
+    - `CONTRIBUTING.md`
+- Android 版本与应用名：
+  - `fcitx5-android` 版本升到 `0.1.4`，`baseVersionCode=12`
+  - release/debug 应用名改为 `Keyflow`
+  - Android commits：
+    - `faba02cc`：`Bump Android release version to 0.1.4`
+    - `114278cf`：`Rename Android app label to Keyflow`
+  - 相关文件：
+    - `TODO/ime-research/repos/fcitx5-android/build-logic/convention/src/main/kotlin/Versions.kt`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values/strings.xml`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values-zh-rCN/strings.xml`
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/res/values-zh-rTW/strings.xml`
+- 已发布正式 Android Release（仅 `keyflow` 仓库挂 APK）：
+  - GitHub Release：`https://github.com/hc-tec/keyflow/releases/tag/keyflow-0.1.4`
+  - root tag：`keyflow-0.1.4` -> `keyflow@8d16968`
+  - source repo / commit：`fcitx5-android@114278cf`
+  - package name：`io.github.hctec.keyflow`
+  - app label：`Keyflow`
+  - versionName：`0.1.4`
+  - versionCode：`121/122/123/124`（armeabi-v7a / arm64-v8a / x86 / x86_64）
+  - signer SHA-256：`D7:F1:F9:74:5A:42:2C:DC:2E:1A:5E:69:FB:DE:6E:93:2A:ED:48:09:8A:4C:D6:25:1A:71:32:DC:D6:A5:C7:DB`
+  - assets：
+    - `keyflow-0.1.4-arm64-v8a-release.apk`
+    - `keyflow-0.1.4-armeabi-v7a-release.apk`
+    - `keyflow-0.1.4-x86-release.apk`
+    - `keyflow-0.1.4-x86_64-release.apk`
+    - `SHA256SUMS.txt`
+  - release APK 内置功能件已核对为 `kit-store + shared`，不包含 `wx-reply` / `tone-rewrite` / 调试功能件。
+  - 中断时残留的错误前缀 `fcitx5-android-0.1.4` release/tag 已清理。
+- 验证：
+  - `node scripts/npm/build-kits.mjs --kit wx-reply --scope keyflow2`
+  - `node scripts/npm/verify-kit-tgz.mjs --tgz artifacts/npm/tarballs/wx-reply/keyflow2-keyflow-kit-wx-reply-0.2.9.tgz`
+  - `node scripts/npm/publish-kits.mjs --kit wx-reply --token-file tmp/npm-token.txt`
+  - `npm view @keyflow2/keyflow-kit-wx-reply@0.2.9 name version description dist.tarball dist.integrity --registry https://registry.npmjs.org/`
+  - `.\gradlew.bat clean --console=plain --warning-mode=all`（workdir=`TODO/ime-research/repos/fcitx5-android`）
+  - `powershell -ExecutionPolicy Bypass -File .\scripts\release\build-fcitx5-android-release.ps1 -VersionName 0.1.4`
+  - `aapt dump badging <apk>`（确认 package/versionName/app label）
+  - `apksigner verify --print-certs <apk>`（确认正式 signer）
+  - `tar -tf <apk>`（确认 `assets/function-kits/` 只有 `kit-store + shared`）
+  - `powershell -ExecutionPolicy Bypass -File .\scripts\release\publish-keyflow-android-release.ps1 -ApkVersion 0.1.4`
+  - GitHub API 校验 release assets 与 tag target。
+
 2026-04-10 Android 下载中心细粒度权限开关：
 - `Function Kit` 详情页的运行时权限从弹窗改为行内开关，直接支持逐项允许/拒绝；开关状态会自动和全局策略对齐，长按可恢复默认策略：
   - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitDetailFragment.kt`

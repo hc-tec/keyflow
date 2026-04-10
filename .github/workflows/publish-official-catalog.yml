@@ -47,7 +47,7 @@ jobs:
       - name: Verify published catalog (retry)
         shell: bash
         run: |
-          PKG=$(node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('artifacts/npm/catalog-package.json','utf8'));process.stdout.write(`${j.name}@${j.version}`);")
+          PKG=$(node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('artifacts/npm/catalog-package.json','utf8'));if(!j.name||!j.version) throw new Error('Missing name/version in artifacts/npm/catalog-package.json');process.stdout.write(j.name+'@'+j.version);")
           echo "Verifying: $PKG"
           for i in {1..12}; do
             if node scripts/npm/verify-npm-catalog.mjs --pkg "$PKG" --registry https://registry.npmjs.org/; then

@@ -1,7 +1,7 @@
 {
   "id": "tone-rewrite",
   "name": "语气改写",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "一键把聊天内容改成更短、更长、更礼貌、更口语，或加上合适 emoji。",
   "platforms": [
     "android"

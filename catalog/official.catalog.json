@@ -1,16 +1,16 @@
 {
   "kind": "keyflow.npm.catalog.v0",
-  "generatedAt": "2026-04-09T17:42:15.853Z",
+  "generatedAt": "2026-04-10T03:34:20.024Z",
   "registry": "https://registry.npmjs.org/",
   "packages": [
     {
       "kitId": "tone-rewrite",
       "name": "语气改写",
       "description": "一键把聊天内容改成更短、更长、更礼貌、更口语，或加上合适 emoji。",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "npm": {
         "name": "@keyflow2/keyflow-kit-tone-rewrite",
-        "version": "0.2.0",
+        "version": "0.2.1",
         "scope": "keyflow2",
         "keywords": [
           "keyflow",
@@ -22,7 +22,7 @@
         "maintainers": [
           "ncu-titto"
         ],
-        "publishedAt": "2026-04-07T12:40:25.132Z"
+        "publishedAt": "2026-04-10T03:31:46.925Z"
       },
       "platforms": [
         "android"
@@ -46,6 +46,14 @@
         "rewrite",
         "ai"
       ],
+      "icons": {
+        "48": "icons/tone-rewrite/icons/icon-48.png",
+        "64": "icons/tone-rewrite/icons/icon-64.png",
+        "96": "icons/tone-rewrite/icons/icon-96.png",
+        "128": "icons/tone-rewrite/icons/icon-128.png",
+        "256": "icons/tone-rewrite/icons/icon-256.png"
+      },
+      "icon": "icons/tone-rewrite/icons/icon-128.png",
       "bindingCount": 5,
       "links": {
         "homepage": "https://github.com/hc-tec/keyflow#readme",
@@ -53,12 +61,12 @@
         "bugs": "https://github.com/hc-tec/keyflow/issues"
       },
       "dist": {
-        "tarball": "https://registry.npmjs.org/@keyflow2/keyflow-kit-tone-rewrite/-/keyflow-kit-tone-rewrite-0.2.0.tgz",
-        "integrity": "sha512-1OJthgl6ahRpu1yFLw7313K85tRKqKGBhT7Ry3sMjzAMGss/asQI+ieEcY6d+x6PRvOeYHEaUCSADfboTfwyZg==",
-        "sha256": "a5e198379ac597110ba89bfb065d3a59be4c2111dbe5e3d1425cb9814d817b92",
-        "sizeBytes": 20611,
-        "unpackedSize": 63826,
-        "fileCount": 7
+        "tarball": "https://registry.npmjs.org/@keyflow2/keyflow-kit-tone-rewrite/-/keyflow-kit-tone-rewrite-0.2.1.tgz",
+        "integrity": "sha512-zzCqL9psp9HQsEUyeFGqrUvheLOxJw7s+y8IHG7LEEvd2ltv4Lki4z+gMmDKfLDN5kvZDSeYiYSPmKtrKHnxGg==",
+        "sha256": "7cf45c9cfffc00cb6fa917290d0df0e7d88f5bf7417969ec6197cfab2198b0ea",
+        "sizeBytes": 66079,
+        "unpackedSize": 109580,
+        "fileCount": 12
       }
     }
   ]

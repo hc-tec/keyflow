@@ -52,6 +52,14 @@
   "categories": ["chat", "rewrite", "tone", "writing"],
   "tag": "chat",
   "tags": ["chat", "rewrite", "tone", "writing", "ai"],
+  "icons": {
+    "48": "icons/tone-rewrite/icon-48.png",
+    "64": "icons/tone-rewrite/icon-64.png",
+    "96": "icons/tone-rewrite/icon-96.png",
+    "128": "icons/tone-rewrite/icon-128.png",
+    "256": "icons/tone-rewrite/icon-256.png"
+  },
+  "icon": "icons/tone-rewrite/icon-128.png",
   "bindingCount": 6,
   "links": {
     "homepage": "https://github.com/hc-tec/keyflow#readme",
@@ -81,6 +89,8 @@
 - `categories`（string[]，可选）：分类/标签（推荐从 `manifest.bindings[].categories` 聚合去重；也可由 catalog 维护者补充/覆盖）
 - `tag`（string，可选）：单个主标签，给只能展示一个 chip 的消费者用；通常取 `tags[0]`
 - `tags`（string[]，可选）：展示/搜索用标签；推荐由 `discovery.slash.tags`、`categories`、以及必要的能力标签（如 `ai`）聚合而来
+- `icons`（object，可选）：下载前展示用图标，多尺寸映射；值是 catalog npm 包内的相对路径（sidecar file），不要使用 base64/data URL
+- `icon`（string，可选）：默认图标路径；值同样是 catalog npm 包内的相对路径，通常指向 `128` 或最适合列表展示的图
 - `bindingCount`（number/int，可选）：该 kit 暴露的 binding 数量（便于在目录中快速评估“有多少动作”）
 - `links`（object，可选）：相关链接（通常来自 npm 元数据 `homepage/repository/bugs`）
 - `dist`（object，可选但强烈建议）
@@ -111,8 +121,15 @@
 
 - `package.json`
 - `catalog.json`
+- `icons/<kitId>/...`（可选，sidecar 图标文件）
 
-消费者（Host / 工具）可通过下载 tarball → 校验 `dist.integrity` → 解包 `catalog.json` 来获取目录。
+消费者（Host / 工具）可通过下载 tarball → 校验 `dist.integrity` → 解包 `catalog.json` 和 sidecar icons 来获取目录。
+
+图标不要内嵌到 `catalog.json`：
+
+- 不要使用 `data:image/png;base64,...`
+- 避免 catalog JSON 体积膨胀和编辑/渲染卡顿
+- 无 VPS/域名时，使用 npm catalog 包内的 sidecar icon 文件即可
 
 本仓库提供脚本：
 

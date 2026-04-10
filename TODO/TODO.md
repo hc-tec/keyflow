@@ -70,6 +70,34 @@
     - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/ui/main/settings/functionkit/FunctionKitPreferenceIcons.kt`
     - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitDisplayIconLoader.kt`
 - 明确不采用 `catalog.json` 内嵌 `base64/data:` 图标方案，避免 catalog 体积膨胀和 JSON 编辑/渲染卡顿；如果后面要做“下载前 logo”，应改为 npm catalog 包内的 sidecar icon 文件，而不是往 JSON 里塞图片正文。
+- npm catalog sidecar icons 已落地：
+  - `tone-rewrite` 升级并发布到 npm：`@keyflow2/keyflow-kit-tone-rewrite@0.2.1`，包内包含 `manifest.icon/icons` 与多规格 `icons/icon-{48,64,96,128,256}.png`
+  - 官方 catalog 重新生成并发布：`@keyflow2/keyflow-kit-catalog@0.0.3`，npm 包内包含 `catalog.json + icons/tone-rewrite/...`，`catalog.json` 只保存短相对路径：
+    - `catalog/official.catalog.json`
+    - `catalog/official.catalog.assets/icons/tone-rewrite/icons/icon-{48,64,96,128,256}.png`
+    - `catalog/official.packages.json`
+  - npm 生成/发布/校验链已支持 sidecar icons：
+    - `scripts/npm/generate-catalog-from-registry.mjs`
+    - `scripts/npm/publish-catalog-package.mjs`
+    - `scripts/npm/verify-catalog-tgz.mjs`
+    - `scripts/npm/README.md`
+    - `catalog/README.md`
+    - `TODO/function-kits/KIT_CATALOG_NPM_SPEC.md`
+  - Android Host 的 `npm:` catalog 源会把 catalog 包解到本地 `_catalog-cache`，并把 icon 路径改写成 `function-kit.local/assets/function-kits/_catalog-cache/...`；Store Kit 发现页会直接显示这些下载前 logo：
+    - `TODO/ime-research/repos/fcitx5-android/app/src/main/java/org/fcitx/fcitx5/android/input/functionkit/FunctionKitWindow.kt`
+    - `TODO/function-kits/kit-store/ui/app/main.js`
+  - 验证：
+    - `node scripts/npm/build-kits.mjs --kit tone-rewrite --scope keyflow2`
+    - `node scripts/npm/verify-kit-tgz.mjs --tgz artifacts/npm/tarballs/tone-rewrite/keyflow2-keyflow-kit-tone-rewrite-0.2.1.tgz`
+    - `node scripts/npm/verify-npm-kit.mjs --pkg @keyflow2/keyflow-kit-tone-rewrite@0.2.1`
+    - `node scripts/npm/generate-catalog-from-registry.mjs --packages-file catalog/official.packages.json --out-file catalog/official.catalog.json`
+    - `node scripts/npm/publish-catalog-package.mjs --catalog catalog/official.catalog.json --name @keyflow2/keyflow-kit-catalog --token-file tmp/npm-token.txt`
+    - `node scripts/npm/verify-npm-catalog.mjs --pkg @keyflow2/keyflow-kit-catalog@0.0.3`
+    - `node --check scripts/npm/generate-catalog-from-registry.mjs`
+    - `node --check scripts/npm/publish-catalog-package.mjs`
+    - `node --check scripts/npm/verify-catalog-tgz.mjs`
+    - `node --check TODO/function-kits/kit-store/ui/app/main.js`
+    - `.\gradlew.bat :app:compileDebugKotlin :app:compileReleaseKotlin --console=plain --warning-mode=all`（workdir=`TODO/ime-research/repos/fcitx5-android`）
 
 2026-04-09 Android 正式 release keystore 方案落地：
 - 根仓库新增正式签名 helper：

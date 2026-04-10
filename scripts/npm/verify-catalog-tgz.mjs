@@ -48,6 +48,19 @@ if (String(catalog.kind ?? "") !== "keyflow.npm.catalog.v0") {
   process.exit(1);
 }
 
+function normalizeRelativePackagePath(raw) {
+  const normalized = String(raw ?? "")
+    .replaceAll("\\", "/")
+    .trim()
+    .replace(/^\/+/, "")
+    .replace(/^package\//, "");
+  if (!normalized) return null;
+  if (/^https?:\/\//i.test(normalized)) return null;
+  const parts = normalized.split("/");
+  if (parts.some((part) => !part || part === "." || part === "..")) return null;
+  return parts.join("/");
+}
+
 for (const p of catalog.packages) {
   const kitId = String(p?.kitId ?? "");
   const npmName = String(p?.npm?.name ?? "");
@@ -56,6 +69,25 @@ for (const p of catalog.packages) {
     console.error(`[npm] ERROR: invalid package entry (need kitId + npm.name + npm.version)`);
     console.error(JSON.stringify(p, null, 2));
     process.exit(1);
+  }
+
+  const iconCandidates = [];
+  const icon = normalizeRelativePackagePath(p?.icon);
+  if (icon) iconCandidates.push(icon);
+  const icons = p?.icons;
+  if (icons && typeof icons === "object" && !Array.isArray(icons)) {
+    for (const value of Object.values(icons)) {
+      const normalized = normalizeRelativePackagePath(value);
+      if (normalized) iconCandidates.push(normalized);
+    }
+  }
+
+  for (const relative of [...new Set(iconCandidates)]) {
+    const packagePath = `package/${relative}`;
+    if (!files.includes(packagePath)) {
+      console.error(`[npm] ERROR: missing icon sidecar referenced by catalog: ${packagePath}`);
+      process.exit(1);
+    }
   }
 }
 

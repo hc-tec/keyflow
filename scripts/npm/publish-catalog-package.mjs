@@ -27,6 +27,11 @@ if (!catalogArg || typeof catalogArg !== "string") {
 }
 
 const catalogPath = path.resolve(repoRoot, String(catalogArg));
+const assetsDirArg = args.get("assets-dir");
+const assetsDir = path.resolve(
+  repoRoot,
+  String(assetsDirArg ?? path.join(path.dirname(catalogPath), `${path.basename(catalogPath, path.extname(catalogPath))}.assets`))
+);
 const registry = String(args.get("registry") ?? "https://registry.npmjs.org/");
 const dryRun = args.get("dry-run") === true;
 const otp = typeof args.get("otp") === "string" ? String(args.get("otp")) : null;
@@ -42,6 +47,24 @@ if (!token && tokenFile) {
   const tokenPath = path.resolve(repoRoot, tokenFile);
   const raw = await fs.readFile(tokenPath, "utf8");
   token = raw.startsWith("\uFEFF") ? raw.slice(1).trim() : raw.trim();
+}
+
+async function copyDirContents(srcDir, destDir) {
+  await fs.mkdir(destDir, { recursive: true });
+  const entries = await fs.readdir(srcDir, { withFileTypes: true });
+  for (const entry of entries) {
+    const src = path.join(srcDir, entry.name);
+    const dest = path.join(destDir, entry.name);
+    if (entry.isDirectory()) {
+      await copyDirContents(src, dest);
+      continue;
+    }
+    if (!entry.isFile()) {
+      continue;
+    }
+    await fs.mkdir(path.dirname(dest), { recursive: true });
+    await fs.copyFile(src, dest);
+  }
 }
 
 async function getNextVersion() {
@@ -75,6 +98,14 @@ async function main() {
   await fs.mkdir(buildDir, { recursive: true });
 
   await fs.copyFile(catalogPath, path.join(buildDir, "catalog.json"));
+  const hasAssets =
+    await fs
+      .access(assetsDir)
+      .then(async () => (await fs.stat(assetsDir)).isDirectory())
+      .catch(() => false);
+  if (hasAssets) {
+    await copyDirContents(assetsDir, buildDir);
+  }
 
   const pkgJson = {
     name,
@@ -90,13 +121,16 @@ async function main() {
       url: "https://github.com/hc-tec/keyflow/issues",
     },
     homepage: "https://github.com/hc-tec/keyflow#readme",
-    files: ["catalog.json"],
+    files: hasAssets ? ["catalog.json", "icons"] : ["catalog.json"],
     keyflow: {
       kind: "function-kit-catalog",
       catalog: "catalog.json",
       format: String(catalog.kind ?? "unknown"),
     },
   };
+  if (hasAssets) {
+    pkgJson.keyflow.assetsDir = "icons";
+  }
 
   await fs.writeFile(path.join(buildDir, "package.json"), JSON.stringify(pkgJson, null, 2) + "\n", "utf8");
 
@@ -106,6 +140,7 @@ async function main() {
     version,
     registry,
     catalogPath: path.relative(repoRoot, catalogPath),
+    assetsDir: hasAssets ? path.relative(repoRoot, assetsDir) : null,
     buildDir: path.relative(repoRoot, buildDir),
   });
 
@@ -139,4 +174,3 @@ async function main() {
 }
 
 await main();
-

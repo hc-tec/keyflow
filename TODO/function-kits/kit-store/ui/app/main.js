@@ -106,7 +106,9 @@
   function resolveIconUrl(kitRecord) {
     const preferred = kitRecord?.preferredIconAssetPath ?? kitRecord?.icon ?? null;
     if (typeof preferred === "string" && preferred.trim()) {
-      return buildLocalAssetUrl(preferred);
+      const raw = preferred.trim();
+      if (/^https?:\/\//i.test(raw)) return raw;
+      return buildLocalAssetUrl(raw);
     }
     return null;
   }
@@ -229,7 +231,7 @@
             kitId: id,
             featured: featuredKitIds.has(id),
             title,
-            iconUrl: null,
+            iconUrl: resolveIconUrl(pkg),
             iconClass: "kit-icon--meme",
             sub: {
               tags,

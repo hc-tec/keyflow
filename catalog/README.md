@@ -8,6 +8,7 @@
 
 - 由 `keyflow2` 组织维护
 - 内容是一个 JSON：`catalog/official.catalog.json`
+- 下载前 logo 不写进 JSON 正文，而是放在 sidecar 目录：`catalog/official.catalog.assets/icons/...`
 - 由 npm 分发成一个“catalog 包”：`@keyflow2/keyflow-kit-catalog`
 
 这样用户侧即使访问不到 GitHub raw，也可以通过 npm registry / 国内镜像拿到官方目录。
@@ -17,8 +18,8 @@
 任何开发者都可以：
 
 1. 把自己的 kit 发布到 npm（例如 `@yourname/keyflow-kit-xxx`）
-2. 生成一个自己的 `catalog.json`
-3. 把这个 `catalog.json` 再发布成 npm 包（例如 `@yourname/keyflow-kit-catalog`）
+2. 生成一个自己的 `catalog.json` 和 sidecar icons
+3. 把 `catalog.json + icons/` 再发布成 npm 包（例如 `@yourname/keyflow-kit-catalog`）
 
 最终用户只需要添加/订阅这个 catalog（未来 Host 支持 `npm:` source 后可以做到“只粘贴包名”）。
 
@@ -30,6 +31,8 @@
    ```bash
    node scripts/npm/generate-catalog-from-registry.mjs --packages-file catalog/official.packages.json --out-file catalog/official.catalog.json
    ```
+
+   这一步会同时生成 `catalog/official.catalog.assets/icons/...`，用于下载前展示 logo，不需要 VPS/CDN，也不把 base64 图片塞进 JSON。
 
 3. 发布目录包（推荐一键）：
 

@@ -52,6 +52,13 @@ node scripts/npm/generate-catalog.mjs
 node scripts/npm/generate-catalog-from-registry.mjs --packages-file catalog/official.packages.json --out-file catalog/official.catalog.json
 ```
 
+生成器会同时输出 sidecar icons：
+
+- `catalog/official.catalog.json`
+- `catalog/official.catalog.assets/icons/<kitId>/...`
+
+这些图标来自已发布 kit npm 包里的 `manifest.icon/icons`，发布 catalog 包时会一起打进 npm 包。不要把图片转成 `data:image/...;base64` 放进 JSON。
+
 一键生成 + 发布官方 catalog 包：
 
 ```bash
@@ -111,6 +118,8 @@ node scripts/npm/verify-npm-kit.mjs --registry https://registry.npmmirror.com/ -
 ```bash
 node scripts/npm/publish-catalog-package.mjs --catalog catalog/official.catalog.json --name @keyflow2/keyflow-kit-catalog --token-file tmp/npm-token.txt
 ```
+
+默认会自动查找同名 sidecar 目录，例如 `catalog/official.catalog.assets/`，并把其中的 `icons/` 一起发布。
 
 发布后验证：
 

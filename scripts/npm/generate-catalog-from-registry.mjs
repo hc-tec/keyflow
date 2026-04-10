@@ -9,6 +9,11 @@ const registry = String(args.get("registry") ?? "https://registry.npmjs.org/");
 
 const outFileArg = args.get("out-file");
 const outFile = path.resolve(repoRoot, String(outFileArg ?? "catalog/official.catalog.json"));
+const assetsDirArg = args.get("assets-dir");
+const assetsDir = path.resolve(
+  repoRoot,
+  String(assetsDirArg ?? path.join(path.dirname(outFile), `${path.basename(outFile, path.extname(outFile))}.assets`))
+);
 
 const packagesFileArg = args.get("packages-file");
 const packagesFile = packagesFileArg ? path.resolve(repoRoot, String(packagesFileArg)) : null;
@@ -41,6 +46,7 @@ if (pkgSpecs.length === 0) {
       "  --registry <url>          npm registry (default: https://registry.npmjs.org/)",
       "  --packages-file <path>    JSON array of package specs",
       "  --out-file <path>         output catalog JSON path",
+      "  --assets-dir <path>       output sidecar assets dir (default: sibling *.assets)",
     ].join("\n")
   );
   process.exit(2);
@@ -57,8 +63,97 @@ async function download(tarballUrl, tgzPath) {
 async function extractManifest(tgzPath, extractDir) {
   await fs.rm(extractDir, { recursive: true, force: true });
   await fs.mkdir(extractDir, { recursive: true });
-  await run("tar", ["-xzf", tgzPath, "-C", extractDir, "package/manifest.json"]);
+  await run("tar", ["-xzf", tgzPath, "-C", extractDir]);
   return path.join(extractDir, "package", "manifest.json");
+}
+
+function normalizeRelativePackagePath(raw) {
+  const normalized = String(raw ?? "")
+    .replaceAll("\\", "/")
+    .trim()
+    .replace(/^\/+/, "")
+    .replace(/^package\//, "");
+  if (!normalized) return null;
+  const parts = normalized.split("/");
+  if (parts.some((part) => !part || part === "." || part === "..")) return null;
+  return parts.join("/");
+}
+
+function collectManifestIconPaths(manifest) {
+  const iconMap = new Map();
+  const icons = manifest?.icons;
+  if (icons && typeof icons === "object" && !Array.isArray(icons)) {
+    for (const [sizeKey, value] of Object.entries(icons)) {
+      const relative = normalizeRelativePackagePath(value);
+      if (!relative) continue;
+      iconMap.set(String(sizeKey), relative);
+    }
+  }
+
+  const explicitIcon = normalizeRelativePackagePath(manifest?.icon);
+  return {
+    explicitIcon,
+    icons: Object.fromEntries(iconMap),
+  };
+}
+
+function preferredIconPath(iconRecord) {
+  if (iconRecord.explicitIcon) return iconRecord.explicitIcon;
+  const sized = Object.entries(iconRecord.icons)
+    .map(([size, relative]) => ({ size: Number.parseInt(size, 10), relative }))
+    .filter((entry) => Number.isFinite(entry.size) && entry.size > 0 && entry.relative);
+  if (sized.length === 0) return null;
+  sized.sort((left, right) => right.size - left.size);
+  return sized[0].relative;
+}
+
+async function copyCatalogSidecarIcons({ extractDir, assetsDir, kitId, iconRecord }) {
+  const copiedIcons = {};
+  const copyTasks = [];
+  for (const [sizeKey, relative] of Object.entries(iconRecord.icons)) {
+    const src = path.join(extractDir, "package", relative);
+    const destRelative = path.posix.join("icons", kitId, relative.replaceAll("\\", "/"));
+    const dest = path.join(assetsDir, destRelative);
+    copyTasks.push(
+      fs
+        .access(src)
+        .then(async () => {
+          await fs.mkdir(path.dirname(dest), { recursive: true });
+          await fs.copyFile(src, dest);
+          copiedIcons[sizeKey] = destRelative;
+        })
+        .catch(() => {})
+    );
+  }
+
+  const explicitIconRelative = iconRecord.explicitIcon;
+  let copiedExplicitIcon = null;
+  if (explicitIconRelative) {
+    const src = path.join(extractDir, "package", explicitIconRelative);
+    const destRelative = path.posix.join("icons", kitId, explicitIconRelative.replaceAll("\\", "/"));
+    const dest = path.join(assetsDir, destRelative);
+    copyTasks.push(
+      fs
+        .access(src)
+        .then(async () => {
+          await fs.mkdir(path.dirname(dest), { recursive: true });
+          await fs.copyFile(src, dest);
+          copiedExplicitIcon = destRelative;
+        })
+        .catch(() => {})
+    );
+  }
+
+  await Promise.all(copyTasks);
+  const explicitIcon =
+    copiedExplicitIcon ??
+    (explicitIconRelative
+      ? Object.values(copiedIcons).find((candidate) => candidate.endsWith(explicitIconRelative.replaceAll("\\", "/"))) ?? null
+      : null);
+  return {
+    explicitIcon,
+    icons: copiedIcons,
+  };
 }
 
 function parseUserFromPersonString(s) {
@@ -174,6 +269,8 @@ function validateKitIdOrThrow(kitId, pkg) {
 
 async function main() {
   const entries = [];
+  await fs.rm(assetsDir, { recursive: true, force: true });
+  await fs.mkdir(assetsDir, { recursive: true });
 
   for (const spec of pkgSpecs) {
     const { stdout: viewOut } = await run("npm", ["view", spec, "--registry", registry, "--json"]);
@@ -222,6 +319,13 @@ async function main() {
     const runtimePermissions = Array.isArray(manifest?.runtimePermissions)
       ? manifest.runtimePermissions.map((p) => String(p))
       : null;
+    const iconRecord = collectManifestIconPaths(manifest);
+    const copiedIconRecord = await copyCatalogSidecarIcons({
+      extractDir,
+      assetsDir,
+      kitId,
+      iconRecord,
+    });
     const tags = collectCatalogTags(manifest, categories, runtimePermissions);
     const primaryTag = tags[0] ?? null;
 
@@ -250,6 +354,8 @@ async function main() {
       categories,
       tag: primaryTag,
       tags,
+      icons: Object.keys(copiedIconRecord.icons).length > 0 ? copiedIconRecord.icons : null,
+      icon: copiedIconRecord.explicitIcon ?? preferredIconPath(copiedIconRecord) ?? null,
       bindingCount: Array.isArray(manifest?.bindings) ? manifest.bindings.length : null,
       links: {
         homepage: meta?.homepage ? String(meta.homepage) : null,
@@ -316,6 +422,7 @@ async function main() {
 
   await writeJson(outFile, catalog);
   console.log(`[npm] wrote: ${path.relative(repoRoot, outFile)}`);
+  console.log(`[npm] assets: ${path.relative(repoRoot, assetsDir)}`);
   console.log(`[npm] packages: ${entries.length}`);
 }
 

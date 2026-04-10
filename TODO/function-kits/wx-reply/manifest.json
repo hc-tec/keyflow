@@ -1,13 +1,16 @@
 {
   "id": "wx-reply",
   "name": "WX 回复",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "微信聊天回复助手：依赖电脑端 wechat-decrypt 本地解密服务（https://github.com/hc-tec/wechat-decrypt）读取会话，再结合宿主共享 AI 生成候选回复；不是下载后即可直接使用，需先在电脑运行该服务并让手机可访问。",
   "icons": {
     "48": "icons/icon-48.png",
+    "64": "icons/icon-64.png",
     "96": "icons/icon-96.png",
-    "128": "icons/icon-128.png"
+    "128": "icons/icon-128.png",
+    "256": "icons/icon-256.png"
   },
+  "icon": "icons/icon-128.png",
   "entry": {
     "bundle": { "html": "ui/app/index.html" }
   },

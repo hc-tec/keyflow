@@ -14,6 +14,33 @@
 我需要保持住任务进展的追踪，每完成一项任务，你记得记录下来各种文档路径
 别去看根目录下面的md啊！那是OpenClaw的md啊！！不是你要读取的
 
+2026-04-10 wx-reply logo 接入并重新发布：
+- 基于用户提供的透明 PNG：`tmp/wx-reply.png`，只做整张透明画布缩放，不做背景移除、不裁剪透明边距，避免改变原图构图。
+- `wx-reply` 图标已补齐为 Function Kit 标准规格：
+  - `TODO/function-kits/wx-reply/icons/icon-48.png`
+  - `TODO/function-kits/wx-reply/icons/icon-64.png`
+  - `TODO/function-kits/wx-reply/icons/icon-96.png`
+  - `TODO/function-kits/wx-reply/icons/icon-128.png`
+  - `TODO/function-kits/wx-reply/icons/icon-256.png`
+- `manifest.json` 已新增 `icon=icons/icon-128.png`，`icons` 覆盖 `48/64/96/128/256`，版本升到 `0.2.10`：
+  - `TODO/function-kits/wx-reply/manifest.json`
+- 已发布新版 npm 包：
+  - npm：`@keyflow2/keyflow-kit-wx-reply@0.2.10`
+  - latest：`0.2.10`
+  - tarball：`https://registry.npmjs.org/@keyflow2/keyflow-kit-wx-reply/-/keyflow-kit-wx-reply-0.2.10.tgz`
+  - integrity：`sha512-LP0ZPY5xPERwIH5y5e0sYSHJGAUz/qpJwF3BrBMzeLah0gQd3TA1C7kOnoSNGt7ijPEaOJ4mEfzyu6XdcIYuWw==`
+  - fileCount：`13`
+  - unpackedSize：`135278`
+- 按用户要求：仍未加入 `catalog/official.packages.json`，未发布新版 official catalog。
+- 验证：
+  - `node --check TODO/function-kits/wx-reply/ui/app/main.js`
+  - `node scripts/npm/build-kits.mjs --kit wx-reply --scope keyflow2`
+  - `node scripts/npm/verify-kit-tgz.mjs --tgz artifacts/npm/tarballs/wx-reply/keyflow2-keyflow-kit-wx-reply-0.2.10.tgz`
+  - `tar -tzf artifacts/npm/tarballs/wx-reply/keyflow2-keyflow-kit-wx-reply-0.2.10.tgz`
+  - `node scripts/npm/publish-kits.mjs --kit wx-reply --token-file tmp/npm-token.txt`
+  - `node scripts/npm/verify-npm-kit.mjs --pkg @keyflow2/keyflow-kit-wx-reply@0.2.10`
+  - `npm view @keyflow2/keyflow-kit-wx-reply dist-tags versions --json --registry https://registry.npmjs.org/`
+
 2026-04-10 wx-reply npm 发布 + Keyflow Android 0.1.4 release：
 - `wx-reply` 已按“非即装即用”口径更新描述并发布到 npm；描述明确依赖电脑端 `wechat-decrypt` 本地解密服务，需先在电脑运行并让手机可访问：
   - manifest：`TODO/function-kits/wx-reply/manifest.json`

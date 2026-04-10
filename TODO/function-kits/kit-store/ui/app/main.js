@@ -103,14 +103,33 @@
     return `https://function-kit.local/assets/${raw}`;
   }
 
-  function resolveIconUrl(kitRecord) {
+  function resolveIconAssetPath(kitRecord) {
     const preferred = kitRecord?.preferredIconAssetPath ?? kitRecord?.icon ?? null;
-    if (typeof preferred === "string" && preferred.trim()) {
-      const raw = preferred.trim();
-      if (/^https?:\/\//i.test(raw)) return raw;
-      return buildLocalAssetUrl(raw);
-    }
-    return null;
+    if (typeof preferred === "string" && preferred.trim()) return preferred.trim();
+    const icons = kitRecord?.icons;
+    if (!icons || typeof icons !== "object") return null;
+    const sized = Object.entries(icons)
+      .map(([size, path]) => ({ size: Number(size), path: safeText(path) }))
+      .filter((item) => Number.isFinite(item.size) && item.size > 0 && item.path)
+      .sort((a, b) => {
+        const aBucket = a.size >= 128 ? 0 : 1;
+        const bBucket = b.size >= 128 ? 0 : 1;
+        if (aBucket !== bBucket) return aBucket - bBucket;
+        return Math.abs(a.size - 128) - Math.abs(b.size - 128);
+      });
+    return sized[0]?.path ?? null;
+  }
+
+  function resolveIconUrl(kitRecord) {
+    const raw = resolveIconAssetPath(kitRecord);
+    if (!raw) return null;
+    if (/^https?:\/\//i.test(raw)) return raw;
+    if (/^data:/i.test(raw)) return raw;
+    return buildLocalAssetUrl(raw);
+  }
+
+  function isNpmSpec(value) {
+    return /^npm:/i.test(safeText(value));
   }
 
   function emojiFor(kitIdValue) {
@@ -594,11 +613,15 @@
     async installImportUrl() {
       const value = safeText(this.importUrl);
       if (!value) {
-        this.showToast("请输入 URL");
+        this.showToast("请输入 URL 或 npm:包名@版本");
         return;
       }
+      const npmSpec = isNpmSpec(value);
       try {
-        await kit?.kits?.install?.({ task: { title: "安装：URL" }, source: { kind: "url", url: value } });
+        await kit?.kits?.install?.({
+          task: { title: npmSpec ? "安装：npm" : "安装：URL" },
+          source: npmSpec ? { kind: "npm", spec: value } : { kind: "url", url: value }
+        });
         this.showToast("已安装");
         this.setRoute("home");
         await syncData();

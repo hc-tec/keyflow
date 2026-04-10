@@ -23,6 +23,16 @@ Android 宿主仓库在：
 
 - `TODO/ime-research/repos/` 是本地调研时拉取的第三方开源项目/fork 工作区，默认不纳入本仓库版本控制（见 `.gitignore`）。
 
+## Function Kits（功能件）开发入口
+
+如果你打开这个仓库是为了「写一个功能件」，从这几个入口开始最不容易迷路：
+
+- 功能件索引（现有 kits + 下一步该做什么）：[TODO/function-kits/INDEX.md](TODO/function-kits/INDEX.md)
+- 从 0 创建一个 kit：`npx @keyflow2/create-function-kit <dir> --kit-id <scope>.<slug> --name "..."`（详见 [templates/create-function-kit/README.md](templates/create-function-kit/README.md)）
+- 开发手册（manifest / host bridge / lifecycle / 打包）：[TODO/function-kits/DEVELOPER_GUIDE.md](TODO/function-kits/DEVELOPER_GUIDE.md)
+- 选题与待办（不知道做什么就从这里挑）：[TODO/function-kits/IDEA_BANK.md](TODO/function-kits/IDEA_BANK.md)、[TODO/function-kits/DEVELOPER_PLATFORM_GAPS.md](TODO/function-kits/DEVELOPER_PLATFORM_GAPS.md)
+- 发布与上架（npm + 官方 catalog）：[scripts/npm/README.md](scripts/npm/README.md)、[catalog/README.md](catalog/README.md)
+
 ## 快速开始（Runtime SDK）
 
 ```bash

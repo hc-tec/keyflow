@@ -24,8 +24,8 @@ Use this when publishing installable `fcitx5-android` builds through `keyflow`.
 - Repository: `keyflow`
 - Source repo: `fcitx5-android`
 - Tag formats:
-  - Formal signing: `fcitx5-android-<apkVersion>`
-  - Debug keystore / test build: `fcitx5-android-<apkVersion>-debug`
+  - Formal signing: `keyflow-<apkVersion>`
+  - Debug keystore / test build: `keyflow-<apkVersion>-debug`
 - Uploaded APK asset names:
   - Formal signing: `keyflow-<apkVersion>-<abi>-release.apk`
   - Debug keystore / test build: `keyflow-<apkVersion>-<abi>-release-debug.apk`

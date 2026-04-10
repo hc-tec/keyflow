@@ -50,9 +50,9 @@ node templates/create-function-kit/bin/create-function-kit.mjs artifacts/smoke/c
 - `keyflow` 是对外分发入口；Android APK 只发布到 `keyflow` GitHub Releases。
 - `fcitx5-android` 仓库只保留源码与构建流程，不上传 APK assets。
 - `v*` tag 只用于 `keyflow` 自身工具链/模板发布，不混挂 Android APK。
-- Android APK 发布必须单独命名，并把 APK 版本与签名级别写进 tag / release name：
-  - 正式签名：`fcitx5-android-<apkVersion>`
-  - debug keystore：`fcitx5-android-<apkVersion>-debug`
+- Android APK 发布必须使用 `keyflow-` 开头的单独 tag / release name，并把 APK 版本与签名级别写进去：
+  - 正式签名：`keyflow-<apkVersion>`
+  - debug keystore：`keyflow-<apkVersion>-debug`
 - Android APK assets 上传到 `keyflow` Release 时，文件名前缀统一改为 `keyflow-`：
   - 正式签名：`keyflow-<apkVersion>-<abi>-release.apk`
   - debug keystore：`keyflow-<apkVersion>-<abi>-release-debug.apk`

@@ -54,9 +54,9 @@ npm test
 - `keyflow` GitHub Releases 用于发布本项目对外分发物。
 - Android APK 只挂在 `keyflow` Releases；`fcitx5-android` 仓库（[hc-tec/fcitx5-android](https://github.com/hc-tec/fcitx5-android)）只保留源码与构建说明，不再上传 APK assets。
 - `keyflow` 工具链/模板发布继续使用 `v*` tag（例如 `v0.1.0`），不要混挂 Android APK。
-- Android APK 发布在 `keyflow` 上使用单独 tag，并显式写明 APK 版本与签名级别：
-  - 正式签名：`fcitx5-android-<apkVersion>`
-  - debug keystore 测试包：`fcitx5-android-<apkVersion>-debug`
+- Android APK 发布在 `keyflow` 上使用 `keyflow-` 开头的单独 tag，并显式写明 APK 版本与签名级别：
+  - 正式签名：`keyflow-<apkVersion>`
+  - debug keystore 测试包：`keyflow-<apkVersion>-debug`
 - Android APK assets 的文件名前缀统一使用 `keyflow-`，例如：
   - 正式签名：`keyflow-<apkVersion>-<abi>-release.apk`
   - debug keystore 测试包：`keyflow-<apkVersion>-<abi>-release-debug.apk`

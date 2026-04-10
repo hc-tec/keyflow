@@ -316,7 +316,7 @@ if (-not (Test-Path $androidRepoPath)) {
 }
 
 if (-not $Tag) {
-    $Tag = if ($SigningMode -eq 'formal') { "fcitx5-android-$ApkVersion" } else { "fcitx5-android-$ApkVersion-debug" }
+    $Tag = if ($SigningMode -eq 'formal') { "keyflow-$ApkVersion" } else { "keyflow-$ApkVersion-debug" }
 }
 if (-not $ReleaseName) {
     $ReleaseName = $Tag

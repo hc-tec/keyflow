@@ -104,7 +104,7 @@ The helper reads `.local-secrets/android-release/signing.env`, exports `SIGN_KEY
 After the formally signed APKs are built, publish them to `keyflow` with:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\release\publish-keyflow-android-release.ps1 -ApkVersion 0.1.3
+powershell -ExecutionPolicy Bypass -File .\scripts\release\publish-keyflow-android-release.ps1 -ApkVersion 0.1.3 -ReleaseNotesPath .\docs\release-notes\android\0.1.3.md
 ```
 
 The publisher script will:
@@ -121,6 +121,8 @@ The publisher script will:
   - `LGPL-2.1-or-later`
 - generate `SHA256SUMS.txt`
 - upload all ABI APKs plus `SHA256SUMS.txt`
+- append release notes (`## 更新内容`) from `-ReleaseNotesPath`
+- append an APK download guide (`## 下载哪个 APK？`) based on uploaded assets
 
 For the current fork, the Android APK source-of-truth is:
 
@@ -133,8 +135,14 @@ Do not present `keyflow`'s root `Apache-2.0` license as the APK license. The APK
 For debug-signed test builds, switch the tag/release mode:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\release\publish-keyflow-android-release.ps1 -ApkVersion 0.1.3 -SigningMode debug -PreRelease
+powershell -ExecutionPolicy Bypass -File .\scripts\release\publish-keyflow-android-release.ps1 -ApkVersion 0.1.3 -SigningMode debug -ReleaseNotesPath .\docs\release-notes\android\0.1.3-debug.md
 ```
+
+Notes:
+
+- `-SigningMode debug` always publishes a GitHub `pre-release` and will not mark it as `latest`.
+- Stable releases require `-ReleaseNotesPath` unless you explicitly pass `-AllowEmptyReleaseNotes`.
+- To update the release note body without deleting/re-uploading large APK assets, pass `-SkipAssetUpload`.
 
 ### Export For CI Or Another Machine
 

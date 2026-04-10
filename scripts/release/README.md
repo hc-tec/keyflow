@@ -30,7 +30,7 @@ These scripts standardize how the workspace creates and uses the formal Android 
 3. Publish the Android release to `keyflow`:
 
    ```powershell
-   powershell -ExecutionPolicy Bypass -File .\scripts\release\publish-keyflow-android-release.ps1 -ApkVersion 0.1.3
+   powershell -ExecutionPolicy Bypass -File .\scripts\release\publish-keyflow-android-release.ps1 -ApkVersion 0.1.3 -ReleaseNotesPath .\docs\release-notes\android\0.1.3.md
    ```
 
    Uploaded APK assets will be renamed like:
@@ -42,6 +42,10 @@ These scripts standardize how the workspace creates and uses the formal Android 
    - source commit URL
    - source archive URL
    - `LGPL-2.1-or-later`
+   - `## 更新内容` from `-ReleaseNotesPath`
+   - `## 下载哪个 APK？` guide inferred from attached ABI assets
+
+   If you need to update the release note body only (no asset delete/upload), pass `-SkipAssetUpload`.
 
 4. If CI needs the same key, export the env block:
 

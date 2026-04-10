@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)][string]$ApkVersion,
     [string]$WorkspaceRoot,
@@ -10,6 +10,8 @@ param(
     [switch]$PreRelease,
     [string]$Tag,
     [string]$ReleaseName,
+    [string]$ReleaseNotesPath,
+    [switch]$AllowEmptyReleaseNotes,
     [string]$RootCommit,
     [string]$SourceCommit,
     [string]$ApkDirectory,
@@ -17,6 +19,7 @@ param(
     [string]$SourceApkPrefix = 'io.github.hctec.keyflow',
     [string[]]$ExpectedBundledKitIds = @('kit-store', 'shared'),
     [switch]$SkipBundledKitVerification,
+    [switch]$SkipAssetUpload,
     [switch]$MakeLatest = $true
 )
 
@@ -299,8 +302,71 @@ function Upload-GitHubReleaseAsset {
     }
 }
 
+function Read-Utf8TextFileOrEmpty {
+    param([string]$Path)
+
+    if (-not $Path) {
+        return ''
+    }
+    if (-not (Test-Path $Path)) {
+        throw "Release notes file not found: $Path"
+    }
+    return (Get-Content -Encoding UTF8 -Raw $Path).Trim()
+}
+
+function Build-DownloadGuide {
+    param(
+        [Parameter(Mandatory = $true)][string]$ApkVersion,
+        [Parameter(Mandatory = $true)][string[]]$AssetNames
+    )
+
+    $apkNames = @($AssetNames | Where-Object { $_ -like '*.apk' })
+    if (-not $apkNames) {
+        return ''
+    }
+
+    $hasUniversal = $apkNames | Where-Object { $_ -match '(^|-)universal(-|\\.)' } | Select-Object -First 1
+    $hasArm64 = $apkNames | Where-Object { $_ -match '(^|-)arm64-v8a(-|\\.)' } | Select-Object -First 1
+    $hasArm32 = $apkNames | Where-Object { $_ -match '(^|-)armeabi-v7a(-|\\.)' } | Select-Object -First 1
+    $hasX8664 = $apkNames | Where-Object { $_ -match '(^|-)x86_64(-|\\.)' } | Select-Object -First 1
+    $hasX86 = $apkNames | Where-Object { $_ -match '(^|-)x86(-|\\.)' } | Select-Object -First 1
+
+    $lines = @(
+        '## 下载哪个 APK？',
+        '',
+        '按设备 CPU 架构选择：'
+    )
+
+    if ($hasUniversal) {
+        $lines += ('- 优先推荐：`keyflow-{0}-universal-release.apk`（体积更大，但兼容性最好）' -f $ApkVersion)
+    } elseif ($hasArm64) {
+        $lines += ('- 大多数安卓手机/平板：`keyflow-{0}-arm64-v8a-release.apk`' -f $ApkVersion)
+    }
+
+    if ($hasArm64) {
+        $lines += ('- `arm64-v8a`：主流安卓手机（2018+ 基本都是 64 位）' )
+    }
+    if ($hasArm32) {
+        $lines += ('- `armeabi-v7a`：较老的 32 位设备' )
+    }
+    if ($hasX8664) {
+        $lines += ('- `x86_64`：大多数 Android 模拟器 / 部分 x86_64 设备' )
+    }
+    if ($hasX86) {
+        $lines += ('- `x86`：较老的 x86 模拟器 / 设备' )
+    }
+
+    $lines += ''
+    $lines += '不确定架构时：'
+    $lines += '- 电脑连接手机后执行：`adb shell getprop ro.product.cpu.abi`'
+    $lines += '- 或在手机上用 CPU-Z / DevCheck 查看 ABI'
+
+    return ($lines -join "`n")
+}
+
 function New-ReleaseBody {
     param(
+        [Parameter(Mandatory = $true)][string]$ApkVersion,
         [Parameter(Mandatory = $true)][string]$SourceRepoName,
         [Parameter(Mandatory = $true)][string]$SourceRepoUrl,
         [Parameter(Mandatory = $true)][string]$SourceCommitHash,
@@ -309,6 +375,8 @@ function New-ReleaseBody {
         [Parameter(Mandatory = $true)][string]$SourceLicenseId,
         [Parameter(Mandatory = $true)][string]$SigningDescription,
         [Parameter(Mandatory = $true)][bool]$IsPreRelease,
+        [string]$ReleaseNotes,
+        [string]$DownloadGuide,
         [Parameter(Mandatory = $true)][string[]]$AssetNames,
         [Parameter(Mandatory = $true)][string[]]$BundledKitIds,
         [string]$SignerDigest
@@ -338,6 +406,16 @@ function New-ReleaseBody {
     if ($IsPreRelease) {
         $lines += '- This build is for install/testing only.'
     }
+    if ($ReleaseNotes) {
+        $lines += ''
+        $lines += '## 更新内容'
+        $lines += ''
+        $lines += $ReleaseNotes
+    }
+    if ($DownloadGuide) {
+        $lines += ''
+        $lines += $DownloadGuide
+    }
     return $lines -join "`n"
 }
 
@@ -354,6 +432,8 @@ if (-not $Tag) {
 if (-not $ReleaseName) {
     $ReleaseName = $Tag
 }
+$effectivePreRelease = $PreRelease.IsPresent -or ($SigningMode -ne 'formal')
+$effectiveMakeLatest = ([bool]$MakeLatest) -and (-not $effectivePreRelease)
 if (-not $RootCommit) {
     $RootCommit = Invoke-Git -RepositoryPath $rootRepoPath -Arguments @('rev-parse', 'HEAD')
 }
@@ -438,8 +518,18 @@ $signingDescription = if ($SigningMode -eq 'formal') { 'formal release keystore'
 $assetPaths = @($stagedApkPaths) + $sha256Path
 $assetNames = $assetPaths | ForEach-Object { [System.IO.Path]::GetFileName($_) }
 $assetNamesToReplace = (@($apkFiles.Name) + @($assetNames)) | Sort-Object -Unique
+$releaseNotes = Read-Utf8TextFileOrEmpty -Path $ReleaseNotesPath
+if (-not $effectivePreRelease -and -not $releaseNotes) {
+    if ($AllowEmptyReleaseNotes.IsPresent) {
+        Write-Warning 'Release notes are empty. Provide -ReleaseNotesPath to include what changed in this release.'
+    } else {
+        throw 'Release notes are required for stable releases. Provide -ReleaseNotesPath, or pass -AllowEmptyReleaseNotes to bypass.'
+    }
+}
+$downloadGuide = Build-DownloadGuide -ApkVersion $ApkVersion -AssetNames $assetNames
 $releaseBody =
     New-ReleaseBody `
+        -ApkVersion $ApkVersion `
         -SourceRepoName $SourceRepo `
         -SourceRepoUrl $sourceRepoUrl `
         -SourceCommitHash $SourceCommit `
@@ -447,7 +537,9 @@ $releaseBody =
         -SourceArchiveUrl $sourceArchiveUrl `
         -SourceLicenseId $SourceLicense `
         -SigningDescription $signingDescription `
-        -IsPreRelease $PreRelease.IsPresent `
+        -IsPreRelease $effectivePreRelease `
+        -ReleaseNotes $releaseNotes `
+        -DownloadGuide $downloadGuide `
         -AssetNames $assetNames `
         -BundledKitIds $bundledKitIds `
         -SignerDigest $signerDigest
@@ -464,8 +556,8 @@ try {
         name = $ReleaseName
         body = $releaseBody
         draft = $false
-        prerelease = $PreRelease.IsPresent
-        make_latest = ($(if ($MakeLatest) { 'true' } else { 'false' }))
+        prerelease = $effectivePreRelease
+        make_latest = ($(if ($effectiveMakeLatest) { 'true' } else { 'false' }))
     }
 } catch {
     $statusCode = $null
@@ -481,23 +573,27 @@ try {
         name = $ReleaseName
         body = $releaseBody
         draft = $false
-        prerelease = $PreRelease.IsPresent
-        make_latest = ($(if ($MakeLatest) { 'true' } else { 'false' }))
+        prerelease = $effectivePreRelease
+        make_latest = ($(if ($effectiveMakeLatest) { 'true' } else { 'false' }))
     }
 }
 
-foreach ($asset in @($release.assets)) {
-    if ($assetNamesToReplace -contains $asset.name) {
-        Invoke-RestMethod -Headers $headers -Uri "$repoApi/releases/assets/$($asset.id)" -Method Delete | Out-Null
+if (-not $SkipAssetUpload) {
+    foreach ($asset in @($release.assets)) {
+        if ($assetNamesToReplace -contains $asset.name) {
+            Invoke-RestMethod -Headers $headers -Uri "$repoApi/releases/assets/$($asset.id)" -Method Delete | Out-Null
+        }
     }
-}
 
-$release = Invoke-GitHubJson -Headers $headers -Method Get -Uri "$repoApi/releases/$($release.id)"
-$uploadBase = $release.upload_url.ToString().Replace('{?name,label}', '')
-foreach ($assetPath in $assetPaths) {
-    $assetName = [System.IO.Path]::GetFileName($assetPath)
-    $uploadUrl = '{0}?name={1}' -f $uploadBase, [Uri]::EscapeDataString($assetName)
-    Upload-GitHubReleaseAsset -Headers $headers -UploadUrl $uploadUrl -AssetPath $assetPath
+    $release = Invoke-GitHubJson -Headers $headers -Method Get -Uri "$repoApi/releases/$($release.id)"
+    $uploadBase = $release.upload_url.ToString().Replace('{?name,label}', '')
+    foreach ($assetPath in $assetPaths) {
+        $assetName = [System.IO.Path]::GetFileName($assetPath)
+        $uploadUrl = '{0}?name={1}' -f $uploadBase, [Uri]::EscapeDataString($assetName)
+        Upload-GitHubReleaseAsset -Headers $headers -UploadUrl $uploadUrl -AssetPath $assetPath
+    }
+} else {
+    Write-Warning 'SkipAssetUpload enabled: updated release metadata only (no asset upload/deletion).'
 }
 
 $release = Invoke-GitHubJson -Headers $headers -Method Get -Uri "$repoApi/releases/$($release.id)"

@@ -22,13 +22,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          registry-url: "https://registry.npmjs.org/"
+          scope: "@keyflow2"
+
+      - name: Check npm publish token
+        shell: bash
+        env:
+          NPM_PUBLISH_TOKEN: ${{ secrets.NPM_TOKEN_KEYFLOW2 || secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NPM_PUBLISH_TOKEN" ]; then
+            echo "::error title=Missing npm publish token::Set repository secret NPM_TOKEN_KEYFLOW2 (or NPM_TOKEN) to an npm automation/access token with publish permission for @keyflow2."
+            exit 1
+          fi
 
       - name: Generate official catalog.json
         run: node scripts/npm/generate-catalog-from-registry.mjs --packages-file catalog/official.packages.json --out-file catalog/official.catalog.json
 
       - name: Publish catalog package to npm
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN_KEYFLOW2 }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN_KEYFLOW2 || secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_KEYFLOW2 || secrets.NPM_TOKEN }}
         run: node scripts/npm/publish-catalog-package.mjs --catalog catalog/official.catalog.json --name @keyflow2/keyflow-kit-catalog --registry https://registry.npmjs.org/
 
       - name: Verify published catalog (retry)
@@ -58,4 +71,3 @@ jobs:
           git add catalog/official.catalog.json
           git commit -m "chore: update official catalog [skip ci]"
           git push
-

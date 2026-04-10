@@ -14,6 +14,18 @@
 我需要保持住任务进展的追踪，每完成一项任务，你记得记录下来各种文档路径
 别去看根目录下面的md啊！那是OpenClaw的md啊！！不是你要读取的
 
+2026-04-10 GitHub Actions 官方 catalog npm 发布鉴权修复：
+- 现象：`publish-official-catalog` 的 `Publish catalog package to npm` 步骤已经生成 `@keyflow2/keyflow-kit-catalog@0.0.5`，但日志显示 `token not provided`，随后 `npm publish` 报 `ENEEDAUTH`。
+- 根因：workflow 只把 `secrets.NPM_TOKEN_KEYFLOW2` 注入为 `NPM_TOKEN`；当该 secret 未配置/不可用时，发布脚本会回退到 `~/.npmrc` 登录态，而 GitHub hosted runner 没有 npm 登录态。
+- 修复：
+  - `.github/workflows/publish-official-catalog.yml`：`setup-node` 增加 npm registry/scope；新增 token 预检；发布步骤同时传 `NPM_TOKEN` 与 `NODE_AUTH_TOKEN`；支持 `NPM_TOKEN_KEYFLOW2`，并兼容常见的 `NPM_TOKEN` secret 名。
+  - `scripts/npm/publish-catalog-package.mjs`：环境变量 token 会 trim；GitHub Actions 非 dry-run 且无 token 时 fail fast，错误信息明确提示配置 `NPM_TOKEN_KEYFLOW2` / `NPM_TOKEN`；dry-run 完成日志改成不误报真实发布。
+- 验证：
+  - `node --check scripts\npm\publish-catalog-package.mjs`
+  - 模拟 `GITHUB_ACTIONS=true` 且无 `NPM_TOKEN/NODE_AUTH_TOKEN`，脚本立即报 `Missing npm auth token in GitHub Actions`
+  - `node scripts/npm/publish-catalog-package.mjs --catalog catalog/official.catalog.json --name @keyflow2/keyflow-kit-catalog --registry https://registry.npmjs.org/ --dry-run --out artifacts/npm/catalog-auth-smoke`
+- 后续操作：在 GitHub 仓库 `Settings -> Secrets and variables -> Actions` 配置 `NPM_TOKEN_KEYFLOW2`（或 `NPM_TOKEN`）为 npm automation/access token，且 token 需要有 `@keyflow2/keyflow-kit-catalog`/`@keyflow2` scope 的发布权限。
+
 2026-04-10 wx-reply logo 接入并重新发布：
 - 基于用户提供的透明 PNG：`tmp/wx-reply.png`，只做整张透明画布缩放，不做背景移除、不裁剪透明边距，避免改变原图构图。
 - `wx-reply` 图标已补齐为 Function Kit 标准规格：

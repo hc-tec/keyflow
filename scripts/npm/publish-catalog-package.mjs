@@ -42,7 +42,11 @@ const outRoot = path.resolve(repoRoot, String(args.get("out") ?? "artifacts/npm"
 const buildDir = path.join(outRoot, "build-catalog");
 
 const tokenFile = typeof args.get("token-file") === "string" ? String(args.get("token-file")) : null;
-let token = process.env.NPM_TOKEN || process.env.NODE_AUTH_TOKEN;
+function cleanToken(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+let token = cleanToken(process.env.NPM_TOKEN) || cleanToken(process.env.NODE_AUTH_TOKEN);
 if (!token && tokenFile) {
   const tokenPath = path.resolve(repoRoot, tokenFile);
   const raw = await fs.readFile(tokenPath, "utf8");
@@ -86,6 +90,16 @@ async function getNextVersion() {
 }
 
 async function main() {
+  if (!dryRun && !token && process.env.GITHUB_ACTIONS === "true") {
+    throw new Error(
+      [
+        "[npm] Missing npm auth token in GitHub Actions.",
+        "Set repository secret NPM_TOKEN_KEYFLOW2 (or NPM_TOKEN) to an npm automation/access token",
+        "with publish permission for the catalog package scope.",
+      ].join(" ")
+    );
+  }
+
   // Validate catalog JSON early.
   const catalog = await readJson(catalogPath);
   if (!catalog || typeof catalog !== "object" || !Array.isArray(catalog.packages)) {
@@ -170,7 +184,7 @@ async function main() {
     await fs.rm(npmrcPath, { force: true });
   }
 
-  console.log("[npm] done: published catalog package");
+  console.log(dryRun ? "[npm] done: dry-run completed for catalog package" : "[npm] done: published catalog package");
 }
 
 await main();

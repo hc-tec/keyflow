@@ -266,6 +266,39 @@ function Invoke-GitHubJson {
     return Invoke-RestMethod @params
 }
 
+function Upload-GitHubReleaseAsset {
+    param(
+        [Parameter(Mandatory = $true)]$Headers,
+        [Parameter(Mandatory = $true)][string]$UploadUrl,
+        [Parameter(Mandatory = $true)][string]$AssetPath
+    )
+
+    $curl = Get-Command curl.exe -ErrorAction SilentlyContinue
+    if (-not $curl) {
+        Invoke-RestMethod -Headers $Headers -Uri $UploadUrl -Method Post -ContentType 'application/octet-stream' -InFile $AssetPath | Out-Null
+        return
+    }
+
+    $curlArgs = @(
+        '--fail',
+        '--silent',
+        '--show-error',
+        '--location',
+        '--request', 'POST',
+        '--header', ('Authorization: {0}' -f $Headers.Authorization),
+        '--header', ('Accept: {0}' -f $Headers.Accept),
+        '--header', ('User-Agent: {0}' -f $Headers.'User-Agent'),
+        '--header', ('X-GitHub-Api-Version: {0}' -f $Headers.'X-GitHub-Api-Version'),
+        '--header', 'Content-Type: application/octet-stream',
+        '--data-binary', ('@{0}' -f $AssetPath),
+        $UploadUrl
+    )
+    $output = & $curl.Source @curlArgs 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        throw ("GitHub asset upload failed for {0}: {1}" -f $AssetPath, ($output -join [Environment]::NewLine))
+    }
+}
+
 function New-ReleaseBody {
     param(
         [Parameter(Mandatory = $true)][string]$SourceRepoName,
@@ -464,7 +497,7 @@ $uploadBase = $release.upload_url.ToString().Replace('{?name,label}', '')
 foreach ($assetPath in $assetPaths) {
     $assetName = [System.IO.Path]::GetFileName($assetPath)
     $uploadUrl = '{0}?name={1}' -f $uploadBase, [Uri]::EscapeDataString($assetName)
-    Invoke-RestMethod -Headers $headers -Uri $uploadUrl -Method Post -ContentType 'application/octet-stream' -InFile $assetPath | Out-Null
+    Upload-GitHubReleaseAsset -Headers $headers -UploadUrl $uploadUrl -AssetPath $assetPath
 }
 
 $release = Invoke-GitHubJson -Headers $headers -Method Get -Uri "$repoApi/releases/$($release.id)"

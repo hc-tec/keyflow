@@ -9,6 +9,7 @@
 - 由 `keyflow2` 组织维护
 - 内容是一个 JSON：`catalog/official.catalog.json`
 - 下载前 logo 不写进 JSON 正文，而是放在 sidecar 目录：`catalog/official.catalog.assets/icons/...`
+- catalog sidecar 只推荐放一张 `128px` 预览图；功能件安装包内部仍可保留多规格图标
 - 由 npm 分发成一个“catalog 包”：`@keyflow2/keyflow-kit-catalog`
 
 这样用户侧即使访问不到 GitHub raw，也可以通过 npm registry / 国内镜像拿到官方目录。
@@ -32,7 +33,7 @@
    node scripts/npm/generate-catalog-from-registry.mjs --packages-file catalog/official.packages.json --out-file catalog/official.catalog.json
    ```
 
-   这一步会同时生成 `catalog/official.catalog.assets/icons/...`，用于下载前展示 logo，不需要 VPS/CDN，也不把 base64 图片塞进 JSON。
+   这一步会同时生成 `catalog/official.catalog.assets/icons/...`，用于下载前展示 logo，不需要 VPS/CDN，也不把 base64 图片塞进 JSON。默认只复制一张 `128px` 预览图，避免 catalog 包因为多规格图标变大。
 
 3. 发布目录包（推荐一键）：
 

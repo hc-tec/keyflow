@@ -57,7 +57,7 @@ node scripts/npm/generate-catalog-from-registry.mjs --packages-file catalog/offi
 - `catalog/official.catalog.json`
 - `catalog/official.catalog.assets/icons/<kitId>/...`
 
-这些图标来自已发布 kit npm 包里的 `manifest.icon/icons`，发布 catalog 包时会一起打进 npm 包。不要把图片转成 `data:image/...;base64` 放进 JSON。
+这些图标来自已发布 kit npm 包里的 `manifest.icon/icons`，发布 catalog 包时会一起打进 npm 包。默认只复制一张 `128px` 预览图；不要把图片转成 `data:image/...;base64` 放进 JSON，也不要把功能件内部的全套多规格图标全部塞进 catalog 包。
 
 一键生成 + 发布官方 catalog 包：
 

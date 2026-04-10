@@ -72,10 +72,11 @@
 - 明确不采用 `catalog.json` 内嵌 `base64/data:` 图标方案，避免 catalog 体积膨胀和 JSON 编辑/渲染卡顿；如果后面要做“下载前 logo”，应改为 npm catalog 包内的 sidecar icon 文件，而不是往 JSON 里塞图片正文。
 - npm catalog sidecar icons 已落地：
   - `tone-rewrite` 升级并发布到 npm：`@keyflow2/keyflow-kit-tone-rewrite@0.2.1`，包内包含 `manifest.icon/icons` 与多规格 `icons/icon-{48,64,96,128,256}.png`
-  - 官方 catalog 重新生成并发布：`@keyflow2/keyflow-kit-catalog@0.0.3`，npm 包内包含 `catalog.json + icons/tone-rewrite/...`，`catalog.json` 只保存短相对路径：
+  - 官方 catalog 重新生成并发布：`@keyflow2/keyflow-kit-catalog@0.0.4`，npm 包内只包含 `catalog.json + icons/tone-rewrite/icons/icon-128.png`，`catalog.json` 只保存短相对路径：
     - `catalog/official.catalog.json`
-    - `catalog/official.catalog.assets/icons/tone-rewrite/icons/icon-{48,64,96,128,256}.png`
+    - `catalog/official.catalog.assets/icons/tone-rewrite/icons/icon-128.png`
     - `catalog/official.packages.json`
+  - 基于下载中心实际展示尺寸（列表 52px、详情 68px），catalog sidecar 不再复制功能件内部的全套多规格图标，只发布一张 `128px` 预览图；功能件 npm 包内部仍保留多规格图标供安装后宿主按需选择。
   - npm 生成/发布/校验链已支持 sidecar icons：
     - `scripts/npm/generate-catalog-from-registry.mjs`
     - `scripts/npm/publish-catalog-package.mjs`
@@ -92,7 +93,7 @@
     - `node scripts/npm/verify-npm-kit.mjs --pkg @keyflow2/keyflow-kit-tone-rewrite@0.2.1`
     - `node scripts/npm/generate-catalog-from-registry.mjs --packages-file catalog/official.packages.json --out-file catalog/official.catalog.json`
     - `node scripts/npm/publish-catalog-package.mjs --catalog catalog/official.catalog.json --name @keyflow2/keyflow-kit-catalog --token-file tmp/npm-token.txt`
-    - `node scripts/npm/verify-npm-catalog.mjs --pkg @keyflow2/keyflow-kit-catalog@0.0.3`
+    - `node scripts/npm/verify-npm-catalog.mjs --pkg @keyflow2/keyflow-kit-catalog@0.0.4`
     - `node --check scripts/npm/generate-catalog-from-registry.mjs`
     - `node --check scripts/npm/publish-catalog-package.mjs`
     - `node --check scripts/npm/verify-catalog-tgz.mjs`

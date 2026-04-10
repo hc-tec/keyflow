@@ -19,6 +19,7 @@ const packagesFileArg = args.get("packages-file");
 const packagesFile = packagesFileArg ? path.resolve(repoRoot, String(packagesFileArg)) : null;
 
 const pkgArg = args.get("pkg");
+const catalogPreviewIconSize = Number.parseInt(String(args.get("catalog-icon-size") ?? "128"), 10);
 
 const pkgSpecs = [];
 if (typeof pkgArg === "string") pkgSpecs.push(pkgArg);
@@ -47,6 +48,7 @@ if (pkgSpecs.length === 0) {
       "  --packages-file <path>    JSON array of package specs",
       "  --out-file <path>         output catalog JSON path",
       "  --assets-dir <path>       output sidecar assets dir (default: sibling *.assets)",
+      "  --catalog-icon-size <px>  one preview icon size to copy into catalog package (default: 128)",
     ].join("\n")
   );
   process.exit(2);
@@ -97,62 +99,46 @@ function collectManifestIconPaths(manifest) {
   };
 }
 
-function preferredIconPath(iconRecord) {
-  if (iconRecord.explicitIcon) return iconRecord.explicitIcon;
+function selectCatalogPreviewIcon(iconRecord, targetSize) {
   const sized = Object.entries(iconRecord.icons)
     .map(([size, relative]) => ({ size: Number.parseInt(size, 10), relative }))
     .filter((entry) => Number.isFinite(entry.size) && entry.size > 0 && entry.relative);
-  if (sized.length === 0) return null;
-  sized.sort((left, right) => right.size - left.size);
-  return sized[0].relative;
+  if (sized.length > 0) {
+    sized.sort((left, right) => {
+      const leftBucket = left.size >= targetSize ? 0 : 1;
+      const rightBucket = right.size >= targetSize ? 0 : 1;
+      if (leftBucket !== rightBucket) return leftBucket - rightBucket;
+      const leftDistance = Math.abs(left.size - targetSize);
+      const rightDistance = Math.abs(right.size - targetSize);
+      if (leftDistance !== rightDistance) return leftDistance - rightDistance;
+      return right.size - left.size;
+    });
+    return sized[0];
+  }
+  if (iconRecord.explicitIcon) return { size: targetSize, relative: iconRecord.explicitIcon };
+  return null;
 }
 
-async function copyCatalogSidecarIcons({ extractDir, assetsDir, kitId, iconRecord }) {
-  const copiedIcons = {};
-  const copyTasks = [];
-  for (const [sizeKey, relative] of Object.entries(iconRecord.icons)) {
-    const src = path.join(extractDir, "package", relative);
-    const destRelative = path.posix.join("icons", kitId, relative.replaceAll("\\", "/"));
-    const dest = path.join(assetsDir, destRelative);
-    copyTasks.push(
-      fs
-        .access(src)
-        .then(async () => {
-          await fs.mkdir(path.dirname(dest), { recursive: true });
-          await fs.copyFile(src, dest);
-          copiedIcons[sizeKey] = destRelative;
-        })
-        .catch(() => {})
-    );
+async function copyCatalogSidecarIcon({ extractDir, assetsDir, kitId, iconRecord, targetSize }) {
+  const selected = selectCatalogPreviewIcon(iconRecord, targetSize);
+  if (!selected) {
+    return { explicitIcon: null, icons: {} };
   }
 
-  const explicitIconRelative = iconRecord.explicitIcon;
-  let copiedExplicitIcon = null;
-  if (explicitIconRelative) {
-    const src = path.join(extractDir, "package", explicitIconRelative);
-    const destRelative = path.posix.join("icons", kitId, explicitIconRelative.replaceAll("\\", "/"));
-    const dest = path.join(assetsDir, destRelative);
-    copyTasks.push(
-      fs
-        .access(src)
-        .then(async () => {
-          await fs.mkdir(path.dirname(dest), { recursive: true });
-          await fs.copyFile(src, dest);
-          copiedExplicitIcon = destRelative;
-        })
-        .catch(() => {})
-    );
+  const src = path.join(extractDir, "package", selected.relative);
+  const destRelative = path.posix.join("icons", kitId, selected.relative.replaceAll("\\", "/"));
+  const dest = path.join(assetsDir, destRelative);
+  const exists = await fs.access(src).then(() => true).catch(() => false);
+  if (!exists) {
+    return { explicitIcon: null, icons: {} };
   }
+  await fs.mkdir(path.dirname(dest), { recursive: true });
+  await fs.copyFile(src, dest);
 
-  await Promise.all(copyTasks);
-  const explicitIcon =
-    copiedExplicitIcon ??
-    (explicitIconRelative
-      ? Object.values(copiedIcons).find((candidate) => candidate.endsWith(explicitIconRelative.replaceAll("\\", "/"))) ?? null
-      : null);
+  const sizeKey = String(selected.size || targetSize);
   return {
-    explicitIcon,
-    icons: copiedIcons,
+    explicitIcon: destRelative,
+    icons: { [sizeKey]: destRelative },
   };
 }
 
@@ -320,11 +306,12 @@ async function main() {
       ? manifest.runtimePermissions.map((p) => String(p))
       : null;
     const iconRecord = collectManifestIconPaths(manifest);
-    const copiedIconRecord = await copyCatalogSidecarIcons({
+    const copiedIconRecord = await copyCatalogSidecarIcon({
       extractDir,
       assetsDir,
       kitId,
       iconRecord,
+      targetSize: Number.isFinite(catalogPreviewIconSize) && catalogPreviewIconSize > 0 ? catalogPreviewIconSize : 128,
     });
     const tags = collectCatalogTags(manifest, categories, runtimePermissions);
     const primaryTag = tags[0] ?? null;
@@ -355,7 +342,7 @@ async function main() {
       tag: primaryTag,
       tags,
       icons: Object.keys(copiedIconRecord.icons).length > 0 ? copiedIconRecord.icons : null,
-      icon: copiedIconRecord.explicitIcon ?? preferredIconPath(copiedIconRecord) ?? null,
+      icon: copiedIconRecord.explicitIcon ?? null,
       bindingCount: Array.isArray(manifest?.bindings) ? manifest.bindings.length : null,
       links: {
         homepage: meta?.homepage ? String(meta.homepage) : null,

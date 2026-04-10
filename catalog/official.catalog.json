@@ -1,6 +1,6 @@
 {
   "kind": "keyflow.npm.catalog.v0",
-  "generatedAt": "2026-04-10T03:34:20.024Z",
+  "generatedAt": "2026-04-10T03:57:59.303Z",
   "registry": "https://registry.npmjs.org/",
   "packages": [
     {
@@ -47,11 +47,7 @@
         "ai"
       ],
       "icons": {
-        "48": "icons/tone-rewrite/icons/icon-48.png",
-        "64": "icons/tone-rewrite/icons/icon-64.png",
-        "96": "icons/tone-rewrite/icons/icon-96.png",
-        "128": "icons/tone-rewrite/icons/icon-128.png",
-        "256": "icons/tone-rewrite/icons/icon-256.png"
+        "128": "icons/tone-rewrite/icons/icon-128.png"
       },
       "icon": "icons/tone-rewrite/icons/icon-128.png",
       "bindingCount": 5,

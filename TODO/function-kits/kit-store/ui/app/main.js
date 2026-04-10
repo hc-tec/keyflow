@@ -45,9 +45,131 @@
 
   let kit = null;
   let toastTimer = null;
+  let updateToastShown = false;
 
   function safeText(value) {
     return typeof value === "string" ? value.trim() : "";
+  }
+
+  function normalizeSemver(value) {
+    const raw = safeText(value);
+    if (!raw) return "";
+    if (raw.startsWith("v") || raw.startsWith("V")) return raw.slice(1);
+    return raw;
+  }
+
+  function parseSemver(value) {
+    const raw = normalizeSemver(value);
+    const match = /^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?(?:\+([0-9A-Za-z.-]+))?$/.exec(raw);
+    if (!match) return null;
+    const major = Number(match[1]);
+    const minor = Number(match[2]);
+    const patch = Number(match[3]);
+    if (!Number.isFinite(major) || !Number.isFinite(minor) || !Number.isFinite(patch)) return null;
+    const prerelease = match[4] ? match[4].split(".") : [];
+    return { major, minor, patch, prerelease };
+  }
+
+  function isNumericIdentifier(value) {
+    return /^[0-9]+$/.test(value);
+  }
+
+  function comparePrereleaseIdentifiers(a, b) {
+    if (a === b) return 0;
+    const aNum = isNumericIdentifier(a);
+    const bNum = isNumericIdentifier(b);
+    if (aNum && bNum) return Number(a) - Number(b);
+    if (aNum && !bNum) return -1;
+    if (!aNum && bNum) return 1;
+    return a < b ? -1 : 1;
+  }
+
+  function compareSemver(aValue, bValue) {
+    const a = parseSemver(aValue);
+    const b = parseSemver(bValue);
+    if (!a || !b) return 0;
+    if (a.major !== b.major) return a.major - b.major;
+    if (a.minor !== b.minor) return a.minor - b.minor;
+    if (a.patch !== b.patch) return a.patch - b.patch;
+
+    const aPre = a.prerelease;
+    const bPre = b.prerelease;
+    if (aPre.length === 0 && bPre.length === 0) return 0;
+    if (aPre.length === 0) return 1; // release > prerelease
+    if (bPre.length === 0) return -1;
+
+    const limit = Math.max(aPre.length, bPre.length);
+    for (let i = 0; i < limit; i++) {
+      const left = aPre[i];
+      const right = bPre[i];
+      if (left == null) return -1;
+      if (right == null) return 1;
+      const diff = comparePrereleaseIdentifiers(left, right);
+      if (diff !== 0) return diff;
+    }
+    return 0;
+  }
+
+  function parseNpmSpecVersion(value) {
+    const raw = safeText(value);
+    if (!raw) return "";
+    if (!/^npm:/i.test(raw)) return "";
+    const rest = raw.slice(4);
+    const at = rest.lastIndexOf("@");
+    if (at <= 0 || at === rest.length - 1) return "";
+    return safeText(rest.slice(at + 1));
+  }
+
+  function getInstalledVersion(record) {
+    if (!record || typeof record !== "object") return "";
+    const direct = safeText(record.version ?? record.manifest?.version ?? record.pkg?.version ?? "");
+    if (direct) return direct;
+    return parseNpmSpecVersion(record.installKey ?? record.source ?? record.installSource ?? "");
+  }
+
+  function getCatalogVersion(pkg) {
+    if (!pkg || typeof pkg !== "object") return "";
+    return safeText(pkg.version ?? pkg?.npm?.version ?? "");
+  }
+
+  function buildLatestPackageByKitId(packages) {
+    const list = Array.isArray(packages) ? packages : [];
+    const latest = new Map();
+    for (const pkg of list) {
+      const id = normalizeKitId(pkg?.kitId ?? pkg?.id);
+      if (!id) continue;
+
+      const existing = latest.get(id);
+      if (!existing) {
+        latest.set(id, pkg);
+        continue;
+      }
+
+      const existingVersion = getCatalogVersion(existing);
+      const nextVersion = getCatalogVersion(pkg);
+      if (!existingVersion || !nextVersion) continue;
+      if (compareSemver(nextVersion, existingVersion) > 0) {
+        latest.set(id, pkg);
+      }
+    }
+    return latest;
+  }
+
+  function computeUpdateCount(installed, packages) {
+    const installedList = Array.isArray(installed) ? installed : [];
+    const latestById = buildLatestPackageByKitId(packages);
+    let count = 0;
+    for (const record of installedList) {
+      const id = normalizeKitId(record?.kitId ?? record?.id);
+      if (!id) continue;
+      const pkg = latestById.get(id) ?? null;
+      if (!pkg) continue;
+      const installedVersion = getInstalledVersion(record);
+      const latestVersion = getCatalogVersion(pkg);
+      if (!installedVersion || !latestVersion) continue;
+      if (compareSemver(installedVersion, latestVersion) < 0) count++;
+    }
+    return count;
   }
 
   function normalizeKitId(value) {
@@ -209,6 +331,7 @@
     detailTab: "overview",
     selected: { kind: null, kitId: null },
     installed: [],
+    updateCount: 0,
     catalogSources: preview.sources.slice(),
     catalogPackages: [],
     catalogAddUrl: "",
@@ -236,33 +359,51 @@
       );
 
       const packages = Array.isArray(this.catalogPackages) ? this.catalogPackages : [];
+      const latestById = buildLatestPackageByKitId(packages);
+      const seen = new Set();
       return packages
         .map((pkg) => {
           const id = normalizeKitId(pkg?.kitId ?? pkg?.id);
           if (!id) return null;
+          const latestPkg = latestById.get(id) ?? null;
+          if (!latestPkg || latestPkg !== pkg) return null;
+          if (seen.has(id)) return null;
+          seen.add(id);
           const title = (pkg?.name ?? pkg?.displayName ?? id).toString();
           const installedRecord = installedById.get(id) ?? null;
           const isInstalled = Boolean(installedRecord);
           const isEnabled = installedRecord?.enabled !== false;
-          const tags = deriveCatalogTags(pkg);
+          const installedVersion = getInstalledVersion(installedRecord);
+          const latestVersion = getCatalogVersion(latestPkg);
+          const updateAvailable =
+            Boolean(installedRecord) &&
+            Boolean(installedVersion) &&
+            Boolean(latestVersion) &&
+            compareSemver(installedVersion, latestVersion) < 0;
+          const tags = deriveCatalogTags(latestPkg);
           return {
             kind: "package",
             kitId: id,
             featured: featuredKitIds.has(id),
+            updateAvailable,
+            installedVersion: installedVersion || null,
+            latestVersion: latestVersion || null,
             title,
-            iconUrl: resolveIconUrl(pkg),
+            iconUrl: resolveIconUrl(latestPkg),
             iconClass: "kit-icon--meme",
             sub: {
               tags,
               tag: tags[0] ?? "",
-              desc: (pkg?.description ?? "从 catalog 下载并安装到输入法。").toString()
+              desc: (latestPkg?.description ?? "从 catalog 下载并安装到输入法。").toString()
             },
-            action: isInstalled
-              ? isEnabled
-                ? { label: "打开", kind: "open" }
-                : { label: "启用", kind: "enable" }
-              : { label: "获取", kind: "install" },
-            pkg
+            action: !isInstalled
+              ? { label: "获取", kind: "install" }
+              : updateAvailable
+                ? { label: "更新", kind: "update" }
+                : !isEnabled
+                  ? { label: "启用", kind: "enable" }
+                  : { label: "打开", kind: "open" },
+            pkg: latestPkg
           };
         })
         .filter(Boolean);
@@ -270,17 +411,26 @@
 
     get manageItems() {
       const installed = Array.isArray(this.installed) ? this.installed : [];
+      const latestById = buildLatestPackageByKitId(this.catalogPackages);
       return installed
         .map((record) => {
           const id = normalizeKitId(record?.kitId ?? record?.id);
           if (!id) return null;
+          const pkg = latestById.get(id) ?? null;
           const title = (record?.displayName ?? record?.name ?? id).toString();
           const desc = (record?.description ?? "").toString();
           const enabled = record?.enabled !== false;
+          const installedVersion = getInstalledVersion(record);
+          const latestVersion = getCatalogVersion(pkg);
+          const updateAvailable =
+            Boolean(pkg) && Boolean(installedVersion) && Boolean(latestVersion) && compareSemver(installedVersion, latestVersion) < 0;
           return {
             kind: "installed",
             kitId: id,
             featured: featuredKitIds.has(id),
+            updateAvailable,
+            installedVersion: installedVersion || null,
+            latestVersion: latestVersion || null,
             title,
             iconUrl: resolveIconUrl(record),
             iconClass: id.includes("ocr") ? "kit-icon--ocr" : id.includes("clip") ? "kit-icon--clip" : "kit-icon--ai",
@@ -288,8 +438,9 @@
               tags: deriveTagsFromRuntimePermissions(record?.runtimePermissions),
               desc: desc || ""
             },
-            action: enabled ? { label: "打开", kind: "open" } : { label: "启用", kind: "enable" },
-            record
+            action: updateAvailable ? { label: "更新", kind: "update" } : enabled ? { label: "打开", kind: "open" } : { label: "启用", kind: "enable" },
+            record,
+            pkg
           };
         })
         .filter(Boolean);
@@ -341,10 +492,18 @@
       const current = this.selectedItem;
       if (!current) return "";
       if (current.kind === "package") {
-        const versionText = safeText(current.pkg?.version ?? "");
+        const versionText = safeText(current.latestVersion ?? current.pkg?.version ?? "");
+        if (current.updateAvailable && current.installedVersion && versionText) {
+          return `已安装 ${current.installedVersion} · 最新 ${versionText}`;
+        }
         return versionText ? `版本 ${versionText}` : "版本";
       }
-      return "版本";
+      const installedVersion = safeText(current.installedVersion ?? "");
+      const latestVersion = safeText(current.latestVersion ?? "");
+      if (current.updateAvailable && installedVersion && latestVersion) {
+        return `已安装 ${installedVersion} · 最新 ${latestVersion}`;
+      }
+      return installedVersion ? `版本 ${installedVersion}` : "版本";
     },
 
     get versionSize() {
@@ -464,6 +623,10 @@
         await this.installPackage(item?.pkg);
         return;
       }
+      if (action === "update") {
+        await this.installPackage(item?.pkg);
+        return;
+      }
       if (action === "enable") {
         await this.enableKit(item?.kitId);
         return;
@@ -513,29 +676,59 @@
     async installPackage(pkg) {
       const resolvedPkg = pkg && typeof pkg === "object" ? pkg : null;
       const id = normalizeKitId(resolvedPkg?.kitId ?? resolvedPkg?.id);
-      const url = safeText(resolvedPkg?.resolvedZipUrl ?? resolvedPkg?.zipUrl ?? "");
-      const sha256 = safeText(resolvedPkg?.sha256 ?? "");
+      const url = safeText(resolvedPkg?.resolvedZipUrl ?? resolvedPkg?.zipUrl ?? resolvedPkg?.dist?.tarball ?? "");
+      const sha256 = safeText(resolvedPkg?.sha256 ?? resolvedPkg?.dist?.sha256 ?? "");
       const integrity = safeText(resolvedPkg?.integrity ?? resolvedPkg?.dist?.integrity ?? "");
       const installKey = safeText(resolvedPkg?.installKey ?? "");
+      const npmName = safeText(resolvedPkg?.npm?.name ?? "");
+      const npmVersion = safeText(resolvedPkg?.npm?.version ?? resolvedPkg?.version ?? "");
+      const npmSpec = npmName && npmVersion ? `npm:${npmName}@${npmVersion}` : "";
       if (!id) {
         this.showToast("无法安装：缺少 kitId");
         return;
       }
-      if (!url) {
-        this.showToast("无法安装：缺少安装包 URL");
-        return;
-      }
       try {
-        await kit?.kits?.install?.({
-          task: { title: `安装：${resolvedPkg?.name ?? id}` },
-          source: {
-            kind: "url",
-            url,
-            sha256: sha256 || undefined,
-            integrity: integrity || undefined,
-            installKey: installKey || undefined
+        if (npmSpec) {
+          try {
+            await kit?.kits?.install?.({
+              task: { title: `安装：${resolvedPkg?.name ?? id}` },
+              source: {
+                kind: "npm",
+                spec: npmSpec,
+                sha256: sha256 || undefined,
+                integrity: integrity || undefined,
+                installKey: installKey || undefined
+              }
+            });
+          } catch (error) {
+            if (!url) throw error;
+            await kit?.kits?.install?.({
+              task: { title: `安装：${resolvedPkg?.name ?? id}` },
+              source: {
+                kind: "url",
+                url,
+                sha256: sha256 || undefined,
+                integrity: integrity || undefined,
+                installKey: installKey || undefined
+              }
+            });
           }
-        });
+        } else {
+          if (!url) {
+            this.showToast("无法安装：缺少安装包 URL");
+            return;
+          }
+          await kit?.kits?.install?.({
+            task: { title: `安装：${resolvedPkg?.name ?? id}` },
+            source: {
+              kind: "url",
+              url,
+              sha256: sha256 || undefined,
+              integrity: integrity || undefined,
+              installKey: installKey || undefined
+            }
+          });
+        }
         this.showToast("已安装");
         await syncData();
       } catch (error) {
@@ -657,6 +850,8 @@
 
     const packages = getCatalogPackages();
     store.catalogPackages = Array.isArray(packages) ? [...packages] : [];
+
+    store.updateCount = computeUpdateCount(store.installed, store.catalogPackages);
   }
 
   async function syncData() {
@@ -762,6 +957,11 @@
     refreshRuntimeSnapshot();
     initSwipeNavigation();
     await syncData();
+
+    if (!updateToastShown && store.updateCount > 0) {
+      updateToastShown = true;
+      store.showToast(`发现 ${store.updateCount} 个更新`);
+    }
   }
 
   boot();

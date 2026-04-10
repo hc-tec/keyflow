@@ -17,6 +17,7 @@
           </button>
           <button class="store-tab" type="button" :aria-selected="tab === 'manage' ? 'true' : 'false'" @click="setTab('manage')">
             管理
+            <span class="tab-badge" v-if="updateCount > 0">{{ updateCount > 99 ? '99+' : updateCount }}</span>
           </button>
         </div>
         <div class="store-actions" aria-label="actions">
@@ -96,7 +97,9 @@
         <section class="store-list" aria-label="discover list" :hidden="tab !== 'discover' || searchOpen">
           <div class="empty" v-if="discoverItems.length === 0">暂无可用目录，请先在设置里添加 Catalog 源</div>
           <article class="kit-card" v-for="item in discoverItems" :key="item.kitId" :data-kit-id="item.kitId" @click="openDetail(item)">
-            <div class="ribbon" v-if="item.featured">精选</div>
+            <div class="ribbon" v-if="item.updateAvailable || item.featured" :class="item.updateAvailable ? 'ribbon--update' : ''">
+              {{ item.updateAvailable ? '更新' : '精选' }}
+            </div>
             <div class="kit-icon" :class="item.iconClass">
               <img v-if="item.iconUrl" :src="item.iconUrl" alt="" decoding="async" loading="lazy" />
               <span v-else>{{ emojiFor(item.kitId) }}</span>
@@ -116,7 +119,7 @@
             <button
               class="kit-action"
               type="button"
-              :class="item.action && item.action.kind === 'install' ? 'kit-action--get' : 'kit-action--open'"
+              :class="item.action && (item.action.kind === 'install' || item.action.kind === 'update') ? 'kit-action--get' : 'kit-action--open'"
               @click.stop="handleCardAction(item)"
             >
               {{ (item.action && item.action.label) || '打开' }}
@@ -127,7 +130,9 @@
         <section class="store-list" aria-label="manage list" :hidden="tab !== 'manage' || searchOpen">
           <div class="empty" v-if="manageItems.length === 0">暂无已安装功能件</div>
           <article class="kit-card" v-for="item in manageItems" :key="item.kitId" :data-kit-id="item.kitId" @click="openDetail(item)">
-            <div class="ribbon" v-if="item.featured">精选</div>
+            <div class="ribbon" v-if="item.updateAvailable || item.featured" :class="item.updateAvailable ? 'ribbon--update' : ''">
+              {{ item.updateAvailable ? '更新' : '精选' }}
+            </div>
             <div class="kit-icon" :class="item.iconClass">
               <img v-if="item.iconUrl" :src="item.iconUrl" alt="" decoding="async" loading="lazy" />
               <span v-else>{{ emojiFor(item.kitId) }}</span>
@@ -145,8 +150,9 @@
               </div>
             </div>
             <button
-              class="kit-action kit-action--open"
+              class="kit-action"
               type="button"
+              :class="item.action && (item.action.kind === 'install' || item.action.kind === 'update') ? 'kit-action--get' : 'kit-action--open'"
               @click.stop="handleCardAction(item)"
             >
               {{ (item.action && item.action.label) || '打开' }}
@@ -163,7 +169,9 @@
             :data-kit-id="item.kitId"
             @click="openDetail(item)"
           >
-            <div class="ribbon" v-if="item.featured">精选</div>
+            <div class="ribbon" v-if="item.updateAvailable || item.featured" :class="item.updateAvailable ? 'ribbon--update' : ''">
+              {{ item.updateAvailable ? '更新' : '精选' }}
+            </div>
             <div class="kit-icon" :class="item.iconClass">
               <img v-if="item.iconUrl" :src="item.iconUrl" alt="" decoding="async" loading="lazy" />
               <span v-else>{{ emojiFor(item.kitId) }}</span>
@@ -183,7 +191,7 @@
             <button
               class="kit-action"
               type="button"
-              :class="item.action && item.action.kind === 'install' ? 'kit-action--get' : 'kit-action--open'"
+              :class="item.action && (item.action.kind === 'install' || item.action.kind === 'update') ? 'kit-action--get' : 'kit-action--open'"
               @click.stop="handleCardAction(item)"
             >
               {{ (item.action && item.action.label) || '打开' }}
@@ -291,7 +299,7 @@
               type="button"
               @click="installPackage(selectedItem.pkg)"
             >
-              {{ selectedItem.action && selectedItem.action.kind === 'install' ? '获取' : '重新安装' }}
+              {{ selectedItem.action && selectedItem.action.kind === 'install' ? '获取' : selectedItem.action && selectedItem.action.kind === 'update' ? '更新' : '重新安装' }}
             </button>
           </section>
 

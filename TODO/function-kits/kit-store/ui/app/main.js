@@ -359,8 +359,12 @@
     catalogAddUrl: "",
     importUrl: "",
     syncing: false,
+    initialSyncDone: false,
+    settingsBusy: false,
+    importBusy: false,
     busyByKitId: {},
     toast: { open: false, text: "" },
+    confirm: { open: false, kind: "", title: "", message: "", actionLabel: "" },
     securityLinks: [
       { label: "隐私政策", kind: "blue", icon: "upright" },
       { label: "问题反馈", kind: "blue", icon: "upright" },
@@ -414,6 +418,7 @@
             iconUrl: resolveIconUrl(latestPkg),
             iconClass: "kit-icon--meme",
             downloadsLastWeek,
+            record: installedRecord,
             sub: {
               tags,
               tag: tags[0] ?? "",
@@ -527,15 +532,13 @@
     get detailMeta() {
       const current = this.selectedItem;
       if (!current) return "";
-      return current.kind === "installed" ? "IME 官方 · 4.8★" : "Catalog · 4.8★";
+      return current.record ? "已安装 · 4.8★" : "Catalog · 4.8★";
     },
 
     get overviewText() {
       const current = this.selectedItem;
       if (!current) return "";
-      if (current.kind === "installed") {
-        return (current.record?.description ?? current.sub?.desc ?? "").toString();
-      }
+      if (current.record) return (current.record?.description ?? current.sub?.desc ?? "").toString();
       return (current.pkg?.description ?? current.sub?.desc ?? "").toString();
     },
 
@@ -570,27 +573,60 @@
       return formatCompactCountValue(value);
     },
 
+    getInstalledRecord(targetKitId) {
+      const id = normalizeKitId(targetKitId);
+      if (!id) return null;
+      const installed = Array.isArray(this.installed) ? this.installed : [];
+      return installed.find((record) => normalizeKitId(record?.kitId ?? record?.id) === id) ?? null;
+    },
+
+    get selectedRecord() {
+      const current = this.selectedItem;
+      if (!current) return null;
+      return current.record ?? this.getInstalledRecord(current.kitId);
+    },
+
+    get canReinstallSelected() {
+      const current = this.selectedItem;
+      if (!current) return false;
+      const record = this.selectedRecord;
+      if (!record) return false;
+      if (current.kitId === kitId) return false;
+      if (!kit?.kits?.install) return false;
+      return !this.isKitBusy(current.kitId);
+    },
+
+    get canUninstallSelected() {
+      const current = this.selectedItem;
+      if (!current) return false;
+      const record = this.selectedRecord;
+      if (!record || record.userInstalled !== true) return false;
+      if (!kit?.kits?.uninstall) return false;
+      return !this.isKitBusy(current.kitId);
+    },
+
     get detailPermissions() {
       const current = this.selectedItem;
       if (!current) return [];
       const raw =
-        current.kind === "installed"
-          ? current.record?.runtimePermissions
-          : current.pkg?.runtimePermissions ?? current.pkg?.manifest?.runtimePermissions;
+        current.record?.runtimePermissions ??
+        current.record?.manifest?.runtimePermissions ??
+        current.pkg?.runtimePermissions ??
+        current.pkg?.manifest?.runtimePermissions;
       return normalizeTextList(Array.isArray(raw) ? raw : []);
     },
 
     get detailGrantedPermissions() {
-      const current = this.selectedItem;
-      if (!current || current.kind !== "installed") return [];
-      const raw = current.record?.grantedPermissions;
+      const record = this.selectedRecord;
+      if (!record) return [];
+      const raw = record.grantedPermissions;
       return normalizeTextList(Array.isArray(raw) ? raw : []);
     },
 
     get detailPermissionOverrides() {
-      const current = this.selectedItem;
-      if (!current || current.kind !== "installed") return {};
-      const raw = current.record?.permissionOverrides;
+      const record = this.selectedRecord;
+      if (!record) return {};
+      const raw = record.permissionOverrides;
       if (!raw || typeof raw !== "object") return {};
       return raw;
     },
@@ -659,9 +695,10 @@
       const current = this.selectedItem;
       const perm = safeText(permission);
       if (!current || !perm) return false;
-      if (current.kind !== "installed") return true;
+      const record = this.selectedRecord;
+      if (!record) return true;
 
-      const raw = current.record?.grantedPermissions;
+      const raw = record.grantedPermissions;
       if (!Array.isArray(raw)) {
         // Backward compatibility: older hosts did not include grantedPermissions in kits.sync.
         return true;
@@ -672,7 +709,8 @@
     permissionCanToggle(permission) {
       const current = this.selectedItem;
       const perm = safeText(permission);
-      if (!current || !perm || current.kind !== "installed") return false;
+      const record = this.selectedRecord;
+      if (!current || !perm || !record) return false;
       if (!kit?.kits?.updateSettings) return false;
       if (this.isKitBusy(current.kitId)) return false;
 
@@ -686,7 +724,8 @@
     async setKitPermission(permission, enabled) {
       const current = this.selectedItem;
       const perm = safeText(permission);
-      if (!current || current.kind !== "installed" || !perm) return;
+      const record = this.selectedRecord;
+      if (!current || !record || !perm) return;
       if (!this.permissionCanToggle(perm)) {
         this.showToast("该权限不可在此关闭");
         return;
@@ -948,7 +987,7 @@
             }
           });
         }
-        this.showToast(verb === "更新" ? "已更新" : "已安装");
+        this.showToast(verb === "更新" ? "已更新" : verb === "重新安装" ? "已重新安装" : "已安装");
         await syncData();
       } catch (error) {
         this.showToast(error?.message ?? "安装失败");
@@ -977,15 +1016,117 @@
     async uninstallSelected() {
       const current = this.selectedItem;
       if (!current) return;
-      if (current.kind !== "installed" || current.record?.userInstalled !== true) {
+      const record = this.selectedRecord;
+      if (!record || record.userInstalled !== true) {
         this.showToast("仅支持卸载外部导入的功能件");
         return;
       }
       await this.uninstallKit(current.kitId);
     },
 
+    requestReinstallSelected() {
+      const current = this.selectedItem;
+      if (!current) return;
+      if (!this.canReinstallSelected) {
+        this.showToast(current.kitId === kitId ? "下载中心是内置组件，请通过更新 APK 升级" : "当前不可重新安装");
+        return;
+      }
+      this.confirm = {
+        open: true,
+        kind: "reinstall",
+        title: "重新安装",
+        message: `将覆盖当前已安装的 ${current.title}，用于修复或强制更新。`,
+        actionLabel: "重新安装"
+      };
+    },
+
+    requestUninstallSelected() {
+      const current = this.selectedItem;
+      if (!current) return;
+      if (!this.canUninstallSelected) {
+        this.showToast("当前不可卸载");
+        return;
+      }
+      this.confirm = {
+        open: true,
+        kind: "uninstall",
+        title: "卸载组件",
+        message: `将从本机移除 ${current.title} 以及它的本地数据。`,
+        actionLabel: "卸载"
+      };
+    },
+
+    closeConfirm() {
+      this.confirm = { open: false, kind: "", title: "", message: "", actionLabel: "" };
+    },
+
+    async confirmProceed() {
+      const kind = safeText(this.confirm?.kind);
+      this.closeConfirm();
+      if (kind === "reinstall") {
+        await this.reinstallSelected();
+      } else if (kind === "uninstall") {
+        await this.uninstallSelected();
+      }
+    },
+
+    async reinstallSelected() {
+      const current = this.selectedItem;
+      if (!current) return;
+      if (!this.canReinstallSelected) {
+        this.showToast(current.kitId === kitId ? "下载中心是内置组件，请通过更新 APK 升级" : "当前不可重新安装");
+        return;
+      }
+
+      const record = this.selectedRecord;
+      if (!record) {
+        this.showToast("请先安装该功能件");
+        return;
+      }
+
+      const pkg = current.pkg ?? null;
+      if (pkg) {
+        await this.installPackage(pkg, "reinstall");
+        return;
+      }
+
+      const sourceCandidates = [record.installSource, record.source, record.installKey].map(safeText).filter(Boolean);
+      const source = sourceCandidates[0] || "";
+      if (!source) {
+        this.showToast("无法重新安装：缺少安装来源");
+        return;
+      }
+
+      if (this.isKitBusy(current.kitId)) return;
+      try {
+        this.setKitBusy(current.kitId, "重新安装中...");
+        if (isNpmSpec(source)) {
+          await kit?.kits?.install?.({
+            task: { title: `重新安装：${current.title}` },
+            source: { kind: "npm", spec: source }
+          });
+        } else if (/^https?:\/\//i.test(source)) {
+          await kit?.kits?.install?.({
+            task: { title: `重新安装：${current.title}` },
+            source: { kind: "url", url: source }
+          });
+        } else {
+          this.showToast("无法重新安装：不支持的来源");
+          return;
+        }
+        this.showToast("已重新安装");
+        await syncData();
+      } catch (error) {
+        this.showToast(error?.message ?? "重新安装失败");
+      } finally {
+        this.clearKitBusy(current.kitId);
+      }
+    },
+
     async setCatalogSources(sources) {
       const next = Array.isArray(sources) ? sources : [];
+      if (this.settingsBusy) return false;
+      this.settingsBusy = true;
       try {
         await kit?.catalog?.setSources?.({ task: { title: "更新 Catalog 源" }, sources: next });
         this.catalogSources = next;
@@ -995,6 +1136,8 @@
       } catch (error) {
         this.showToast(error?.message ?? "更新失败");
         return false;
+      } finally {
+        this.settingsBusy = false;
       }
     },
 
@@ -1034,8 +1177,10 @@
         this.showToast("请输入 URL 或 npm:包名@版本");
         return;
       }
+      if (this.importBusy) return;
       const npmSpec = isNpmSpec(value);
       try {
+        this.importBusy = true;
         await kit?.kits?.install?.({
           task: { title: npmSpec ? "安装：npm" : "安装：URL" },
           source: npmSpec ? { kind: "npm", spec: value } : { kind: "url", url: value }
@@ -1045,11 +1190,15 @@
         await syncData();
       } catch (error) {
         this.showToast(error?.message ?? "安装失败");
+      } finally {
+        this.importBusy = false;
       }
     },
 
     async installFromZip() {
+      if (this.importBusy) return;
       try {
+        this.importBusy = true;
         const pick = await kit?.files?.pick?.({ acceptMimeTypes: ["application/zip"], multiple: false });
         const fileId = pick?.files?.[0]?.fileId;
         if (!fileId) {
@@ -1062,6 +1211,8 @@
         await syncData();
       } catch (error) {
         this.showToast(error?.message ?? "安装失败");
+      } finally {
+        this.importBusy = false;
       }
     }
   });
@@ -1121,6 +1272,7 @@
       }
     } finally {
       store.syncing = false;
+      store.initialSyncDone = true;
       syncInFlight = null;
     }
   }

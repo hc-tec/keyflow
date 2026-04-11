@@ -127,7 +127,8 @@
                <span>只看有下载</span>
              </label>
            </div>
-           <div class="empty" v-if="catalogPackages.length === 0">暂无可用目录，请先在设置里添加 Catalog 源</div>
+           <div class="empty" v-if="syncing && !initialSyncDone">正在刷新目录...</div>
+           <div class="empty" v-else-if="catalogPackages.length === 0">暂无可用目录，请先在设置里添加 Catalog 源</div>
            <div class="empty" v-else-if="discoverItems.length === 0">没有符合筛选条件的功能件</div>
            <article class="kit-card" v-for="item in discoverItems" :key="item.kitId" :data-kit-id="item.kitId" @click="openDetail(item)">
              <div class="ribbon" v-if="item.updateAvailable || item.featured" :class="item.updateAvailable ? 'ribbon--update' : ''">
@@ -164,7 +165,8 @@
         </section>
 
         <section class="store-list" aria-label="manage list" :hidden="tab !== 'manage' || searchOpen">
-          <div class="empty" v-if="manageItems.length === 0">暂无已安装功能件</div>
+          <div class="empty" v-if="syncing && !initialSyncDone">正在读取已安装功能件...</div>
+          <div class="empty" v-else-if="manageItems.length === 0">暂无已安装功能件</div>
           <article class="kit-card" v-for="item in manageItems" :key="item.kitId" :data-kit-id="item.kitId" @click="openDetail(item)">
             <div class="ribbon" v-if="item.updateAvailable || item.featured" :class="item.updateAvailable ? 'ribbon--update' : ''">
               {{ item.updateAvailable ? '更新' : '精选' }}
@@ -269,16 +271,19 @@
           <div class="settings-list">
             <div class="settings-item" v-for="source in catalogSources" :key="source.url">
               <div class="settings-url">{{ source.url }}</div>
-              <button class="settings-remove" type="button" @click="removeCatalogSource(source.url)">移除</button>
+              <button class="settings-remove" type="button" :disabled="settingsBusy" @click="removeCatalogSource(source.url)">移除</button>
             </div>
           </div>
 
           <div class="settings-row settings-row--add">
-            <input class="settings-input" placeholder="新 JSON 源" v-model="catalogAddUrl" />
-            <button class="pill pill--primary" type="button" @click="addCatalogSource">添加</button>
+            <input class="settings-input" placeholder="新 JSON 源" v-model="catalogAddUrl" :disabled="settingsBusy" />
+            <button class="pill pill--primary" type="button" :disabled="settingsBusy || !catalogAddUrl.trim()" @click="addCatalogSource">
+              <span class="btn-spinner" v-if="settingsBusy" aria-hidden="true"></span>
+              {{ settingsBusy ? '处理中' : '添加' }}
+            </button>
           </div>
 
-          <button class="danger-link" type="button" @click="resetCatalogSources">恢复兜底默认设置</button>
+          <button class="danger-link" type="button" :disabled="settingsBusy" @click="resetCatalogSources">恢复兜底默认设置</button>
         </section>
       </main>
 
@@ -290,12 +295,15 @@
         </header>
 
         <section class="import-section">
-          <input class="import-input" placeholder="npm:@keyflow2/keyflow-kit-wx-reply@0.2.10 或 https://...(.tgz/.zip)" v-model="importUrl" />
-          <button class="primary-wide" type="button" @click="installImportUrl">验证并安装</button>
+          <input class="import-input" placeholder="npm:@keyflow2/keyflow-kit-wx-reply@0.2.10 或 https://...(.tgz/.zip)" v-model="importUrl" :disabled="importBusy" />
+          <button class="primary-wide" type="button" :disabled="importBusy || !importUrl.trim()" @click="installImportUrl">
+            <span class="btn-spinner" v-if="importBusy" aria-hidden="true"></span>
+            {{ importBusy ? '安装中...' : '验证并安装' }}
+          </button>
           <div class="or-divider">
             <span>OR</span>
           </div>
-          <button class="secondary-wide" type="button" @click="installFromZip">
+          <button class="secondary-wide" type="button" :disabled="importBusy" @click="installFromZip">
             <span class="plus" aria-hidden="true">＋</span>
             从本地选择 ZIP
           </button>
@@ -335,29 +343,10 @@
               <div class="detail-meta">{{ detailMeta }}</div>
             </div>
             <button
-              v-if="selectedItem.kind === 'package'"
-              class="kit-action kit-action--get"
-              type="button"
-              :disabled="syncing || isKitBusy(selectedItem.kitId)"
-              @click="installPackage(selectedItem.pkg, selectedItem.action && selectedItem.action.kind === 'update' ? 'update' : selectedItem.action && selectedItem.action.kind === 'install' ? 'install' : 'reinstall')"
-            >
-              <span class="btn-spinner" v-if="isKitBusy(selectedItem.kitId)" aria-hidden="true"></span>
-              {{
-                isKitBusy(selectedItem.kitId)
-                  ? kitBusyLabel(selectedItem.kitId)
-                  : selectedItem.action && selectedItem.action.kind === 'install'
-                    ? '获取'
-                    : selectedItem.action && selectedItem.action.kind === 'update'
-                      ? '更新'
-                      : '重新安装'
-              }}
-            </button>
-            <button
-              v-else-if="selectedItem.kind === 'installed'"
               class="kit-action"
               type="button"
               :disabled="syncing || isKitBusy(selectedItem.kitId)"
-              :class="selectedItem.action && selectedItem.action.kind === 'update' ? 'kit-action--get' : 'kit-action--open'"
+              :class="selectedItem.action && (selectedItem.action.kind === 'install' || selectedItem.action.kind === 'update') ? 'kit-action--get' : 'kit-action--open'"
               @click="handleCardAction(selectedItem)"
             >
               <span class="btn-spinner" v-if="isKitBusy(selectedItem.kitId)" aria-hidden="true"></span>
@@ -463,11 +452,40 @@
                 </span>
               </div>
 
-              <button class="uninstall" type="button" @click="uninstallSelected">卸载组件</button>
+              <button
+                v-if="selectedRecord && selectedItem && selectedItem.kitId !== 'kit-store'"
+                class="reinstall"
+                type="button"
+                :disabled="!canReinstallSelected"
+                @click="requestReinstallSelected"
+              >
+                重新安装（覆盖）
+              </button>
+              <button
+                v-if="selectedRecord"
+                class="uninstall"
+                type="button"
+                :disabled="!canUninstallSelected"
+                @click="requestUninstallSelected"
+              >
+                卸载组件
+              </button>
+              <div class="hint" v-if="selectedRecord && selectedRecord.userInstalled !== true">仅支持卸载外部导入的功能件</div>
             </section>
           </section>
         </div>
       </main>
+
+      <div class="modal" :hidden="!confirm.open" @click.self="closeConfirm">
+        <div class="modal-sheet" role="dialog" aria-modal="true">
+          <div class="modal-title">{{ confirm.title }}</div>
+          <div class="modal-message">{{ confirm.message }}</div>
+          <div class="modal-actions">
+            <button class="modal-btn" type="button" @click="closeConfirm">取消</button>
+            <button class="modal-btn modal-btn--danger" type="button" @click="confirmProceed">{{ confirm.actionLabel }}</button>
+          </div>
+        </div>
+      </div>
 
       <div class="toast" id="toast" :hidden="!toast.open">{{ toast.text }}</div>
     </div>

@@ -53,6 +53,18 @@
   - `node scripts/npm/verify-npm-kit.mjs --pkg @keyflow2/keyflow-kit-wx-reply@0.2.10`
   - `npm view @keyflow2/keyflow-kit-wx-reply dist-tags versions --json --registry https://registry.npmjs.org/`
 
+2026-04-11 wx-reply 探活未使用端口修复并发布：
+- 现象：用户在功能件里配置 host/port 后探活，实际请求未带端口（容易误填只写 host，导致默认走 80）。
+- 修复：`Base URL` 规范化逻辑改为可解析的 URL，并在缺少端口时默认补齐 `:5678`；同时状态文案显示当前探活的 `baseUrl`（便于一眼确认端口是否生效）。
+  - `TODO/function-kits/wx-reply/ui/app/main.js`
+  - `TODO/function-kits/wx-reply/ui/app/index.html`
+- 版本：`TODO/function-kits/wx-reply/manifest.json` -> `0.2.11`
+- 已发布（npmjs）：
+  - `@keyflow2/keyflow-kit-wx-reply@0.2.11`
+  - tarball：`https://registry.npmjs.org/@keyflow2/keyflow-kit-wx-reply/-/keyflow-kit-wx-reply-0.2.11.tgz`
+  - integrity：`sha512-mT7i5Vk7ITbmxDPxJ7jUfx4+gisb65dPHlqV0wR8tZHDhRBOROD04/BCSOOhYk49K/p8MzlaIO8ITWAN3axo7A==`
+  - 验证：`node scripts/npm/verify-kit-tgz.mjs --tgz artifacts/npm/tarballs/wx-reply/keyflow2-keyflow-kit-wx-reply-0.2.11.tgz`
+
 2026-04-10 wx-reply npm 发布 + Keyflow Android 0.1.4 release：
 - `wx-reply` 已按“非即装即用”口径更新描述并发布到 npm；描述明确依赖电脑端 `wechat-decrypt` 本地解密服务，需先在电脑运行并让手机可访问：
   - manifest：`TODO/function-kits/wx-reply/manifest.json`

@@ -162,6 +162,7 @@
     for (const record of installedList) {
       const id = normalizeKitId(record?.kitId ?? record?.id);
       if (!id) continue;
+      if (id === kitId) continue; // store kit updates are shipped via APK
       const pkg = latestById.get(id) ?? null;
       if (!pkg) continue;
       const installedVersion = getInstalledVersion(record);
@@ -358,10 +359,6 @@
     catalogAddUrl: "",
     importUrl: "",
     toast: { open: false, text: "" },
-    reviews: [
-      { name: "Alex", text: "回答户神器!", stars: 5 },
-      { name: "Bob", text: "偶尔说废话", stars: 4 }
-    ],
     securityLinks: [
       { label: "隐私政策", kind: "blue", icon: "upright" },
       { label: "问题反馈", kind: "blue", icon: "upright" },
@@ -386,6 +383,7 @@
         .map((pkg) => {
           const id = normalizeKitId(pkg?.kitId ?? pkg?.id);
           if (!id) return null;
+          if (id === kitId) return null;
           const latestPkg = latestById.get(id) ?? null;
           if (!latestPkg || latestPkg !== pkg) return null;
           if (seen.has(id)) return null;
@@ -463,7 +461,11 @@
           const installedVersion = getInstalledVersion(record);
           const latestVersion = getCatalogVersion(pkg);
           const updateAvailable =
-            Boolean(pkg) && Boolean(installedVersion) && Boolean(latestVersion) && compareSemver(installedVersion, latestVersion) < 0;
+            id !== kitId &&
+            Boolean(pkg) &&
+            Boolean(installedVersion) &&
+            Boolean(latestVersion) &&
+            compareSemver(installedVersion, latestVersion) < 0;
           return {
             kind: "installed",
             kitId: id,
@@ -478,7 +480,14 @@
               tags: deriveTagsFromRuntimePermissions(record?.runtimePermissions),
               desc: desc || ""
             },
-            action: updateAvailable ? { label: "更新", kind: "update" } : enabled ? { label: "打开", kind: "open" } : { label: "启用", kind: "enable" },
+            action:
+              id === kitId
+                ? { label: "打开", kind: "open" }
+                : updateAvailable
+                  ? { label: "更新", kind: "update" }
+                  : enabled
+                    ? { label: "打开", kind: "open" }
+                    : { label: "启用", kind: "enable" },
             record,
             pkg
           };
@@ -561,18 +570,31 @@
 
     get detailPermissions() {
       const current = this.selectedItem;
+      if (!current) return [];
+      const raw =
+        current.kind === "installed"
+          ? current.record?.runtimePermissions
+          : current.pkg?.runtimePermissions ?? current.pkg?.manifest?.runtimePermissions;
+      return normalizeTextList(Array.isArray(raw) ? raw : []);
+    },
+
+    get detailGrantedPermissions() {
+      const current = this.selectedItem;
       if (!current || current.kind !== "installed") return [];
-      return Array.isArray(current.record?.runtimePermissions) ? current.record.runtimePermissions : [];
+      const raw = current.record?.grantedPermissions;
+      return normalizeTextList(Array.isArray(raw) ? raw : []);
+    },
+
+    get detailPermissionOverrides() {
+      const current = this.selectedItem;
+      if (!current || current.kind !== "installed") return {};
+      const raw = current.record?.permissionOverrides;
+      if (!raw || typeof raw !== "object") return {};
+      return raw;
     },
 
     get permissionRisky() {
       return this.detailPermissions.some((permission) => this.isHighRiskPermission(permission));
-    },
-
-    stars(count) {
-      const safeCount = Number.isFinite(count) ? count : Number(count ?? 0);
-      const resolved = Math.max(0, Math.min(5, safeCount));
-      return "★".repeat(resolved);
     },
 
     emojiFor(value) {
@@ -581,18 +603,109 @@
 
     permissionLabel(permission) {
       const map = {
+        "context.read": "读取上下文",
+        "input.insert": "写入输入框(插入)",
+        "input.replace": "写入输入框(替换)",
+        "input.commitImage": "写入输入框(图片)",
+        "input.observe.best_effort": "观察输入(尽力而为)",
+        "candidates.regenerate": "候选项生成",
+        "settings.open": "打开系统设置",
+        "storage.read": "读取存储",
+        "storage.write": "写入存储",
+        "files.pick": "读取本地文件(选择器)",
+        "files.download": "下载文件(缓存)",
+        "panel.state.write": "修改面板状态(收起/展开)",
+        "runtime.message.send": "跨 Kit 通信(发送)",
+        "runtime.message.receive": "跨 Kit 通信(接收)",
         "network.fetch": "网络访问(拉取资源)",
         "ai.request": "网络访问(AI推理)",
-        "context.read": "读取上下文",
-        "input.insert": "写入输入框",
-        "input.replace": "写入输入框",
-        "files.pick": "读取本地文件",
-        "files.download": "下载文件(缓存)",
+        "ai.agent.list": "远程智能体(枚举)",
+        "ai.agent.run": "远程智能体(执行)",
         "kits.manage": "管理功能件(特权)",
-        "storage.read": "读取存储",
-        "storage.write": "写入存储"
+        "send.intercept.ime_action": "拦截发送动作(高风险)"
       };
       return map[permission] ?? permission;
+    },
+
+    permissionNote(permission) {
+      const map = {
+        "context.read": "读取当前应用与输入框上下文信息。",
+        "input.insert": "把内容插入到输入框。",
+        "input.replace": "把选中文本替换为新内容。",
+        "input.commitImage": "向输入框提交图片(部分 App 可能不支持)。",
+        "input.observe.best_effort": "在输入变化时获取快照，可能不稳定。",
+        "candidates.regenerate": "请求宿主刷新候选项。",
+        "settings.open": "跳转到系统设置页。",
+        "storage.read": "读取功能件本地存储数据。",
+        "storage.write": "写入功能件本地存储数据。",
+        "files.pick": "通过系统文件选择器选取文件。",
+        "files.download": "由宿主下载远程资源并缓存到本地(用于图标/README 等)。",
+        "panel.state.write": "控制面板收起/展开等状态。",
+        "runtime.message.send": "向其他功能件发送消息。",
+        "runtime.message.receive": "接收其他功能件的消息。",
+        "network.fetch": "访问网络请求文本/JSON 数据。",
+        "ai.request": "通过网络请求 AI 推理。",
+        "ai.agent.list": "读取已配置的远程智能体列表。",
+        "ai.agent.run": "调用远程智能体执行任务。",
+        "kits.manage": "允许安装/更新/卸载/启用其他功能件。",
+        "send.intercept.ime_action": "在用户点击发送前拦截并做决策。"
+      };
+      return map[permission] ?? "";
+    },
+
+    permissionGranted(permission) {
+      const current = this.selectedItem;
+      const perm = safeText(permission);
+      if (!current || !perm) return false;
+      if (current.kind !== "installed") return true;
+
+      const raw = current.record?.grantedPermissions;
+      if (!Array.isArray(raw)) {
+        // Backward compatibility: older hosts did not include grantedPermissions in kits.sync.
+        return true;
+      }
+      return raw.includes(perm);
+    },
+
+    permissionCanToggle(permission) {
+      const current = this.selectedItem;
+      const perm = safeText(permission);
+      if (!current || !perm || current.kind !== "installed") return false;
+      if (!kit?.kits?.updateSettings) return false;
+
+      // Prevent users from bricking the download center.
+      if (current.kitId === kitId && ["kits.manage", "files.download"].includes(perm)) {
+        return false;
+      }
+      return true;
+    },
+
+    async setKitPermission(permission, enabled) {
+      const current = this.selectedItem;
+      const perm = safeText(permission);
+      if (!current || current.kind !== "installed" || !perm) return;
+      if (!this.permissionCanToggle(perm)) {
+        this.showToast("该权限不可在此关闭");
+        return;
+      }
+
+      try {
+        await kit?.kits?.updateSettings?.({
+          task: { title: `${enabled ? "允许" : "禁用"}权限：${this.permissionLabel(perm)}` },
+          kitId: current.kitId,
+          patch: { permissionOverrides: { [perm]: enabled ? null : false } }
+        });
+        this.showToast("已更新");
+
+        try {
+          await kit?.kits?.sync?.({ includeDisabled: true });
+        } catch {
+          // ignore
+        }
+        refreshRuntimeSnapshot();
+      } catch (error) {
+        this.showToast(error?.message ?? "更新失败");
+      }
     },
 
     isHighRiskPermission(permission) {
@@ -620,7 +733,7 @@
 
     setDetailTab(tab) {
       const next = safeText(tab) || "overview";
-      const allowed = new Set(["overview", "permissions", "reviews", "security"]);
+      const allowed = new Set(["overview", "permissions", "security"]);
       this.detailTab = allowed.has(next) ? next : "overview";
     },
 
@@ -729,6 +842,10 @@
       const npmSpec = npmName && npmVersion ? `npm:${npmName}@${npmVersion}` : "";
       if (!id) {
         this.showToast("无法安装：缺少 kitId");
+        return;
+      }
+      if (id === kitId) {
+        this.showToast("下载中心是内置组件，请通过更新 APK 升级");
         return;
       }
       try {

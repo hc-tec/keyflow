@@ -319,20 +319,17 @@
             </button>
           </section>
 
-          <nav class="segmented" aria-label="detail tabs">
-            <button class="segment" type="button" :aria-selected="detailTab === 'overview' ? 'true' : 'false'" @click="setDetailTab('overview')">
-              概览
-            </button>
-            <button class="segment" type="button" :aria-selected="detailTab === 'permissions' ? 'true' : 'false'" @click="setDetailTab('permissions')">
-              权限
-            </button>
-            <button class="segment" type="button" :aria-selected="detailTab === 'reviews' ? 'true' : 'false'" @click="setDetailTab('reviews')">
-              评价
-            </button>
-            <button class="segment" type="button" :aria-selected="detailTab === 'security' ? 'true' : 'false'" @click="setDetailTab('security')">
-              安全
-            </button>
-          </nav>
+           <nav class="segmented" aria-label="detail tabs">
+             <button class="segment" type="button" :aria-selected="detailTab === 'overview' ? 'true' : 'false'" @click="setDetailTab('overview')">
+               概览
+             </button>
+             <button class="segment" type="button" :aria-selected="detailTab === 'permissions' ? 'true' : 'false'" @click="setDetailTab('permissions')">
+               权限
+             </button>
+             <button class="segment" type="button" :aria-selected="detailTab === 'security' ? 'true' : 'false'" @click="setDetailTab('security')">
+               安全
+             </button>
+           </nav>
 
           <section class="detail-body" v-if="selectedItem">
             <section class="detail-card overview-card" v-if="detailTab === 'overview'">
@@ -346,52 +343,49 @@
               </div>
             </section>
 
-            <section class="detail-card" v-if="detailTab === 'permissions'">
-              <div class="list-header">
-                <span>声明权限</span>
-                <span class="risk" v-if="permissionRisky">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path
-                      d="M12 3 1.8 20.2c-.5.9.1 1.8 1.2 1.8h18c1.1 0 1.7-.9 1.2-1.8L12 3Z"
-                      fill="none"
-                      stroke="#FF3B30"
-                      stroke-width="2"
-                    />
-                    <path d="M12 9v5" stroke="#FF3B30" stroke-width="2" stroke-linecap="round" />
-                    <path d="M12 17.2h.01" stroke="#FF3B30" stroke-width="3" stroke-linecap="round" />
-                  </svg>
-                  高风险
-                </span>
-              </div>
+             <section class="detail-card" v-if="detailTab === 'permissions'">
+               <div class="list-header">
+                 <span>声明权限</span>
+                 <span class="list-header-right">
+                   <span class="risk" v-if="permissionRisky">
+                     <svg viewBox="0 0 24 24" aria-hidden="true">
+                       <path
+                         d="M12 3 1.8 20.2c-.5.9.1 1.8 1.2 1.8h18c1.1 0 1.7-.9 1.2-1.8L12 3Z"
+                         fill="none"
+                         stroke="#FF3B30"
+                         stroke-width="2"
+                       />
+                       <path d="M12 9v5" stroke="#FF3B30" stroke-width="2" stroke-linecap="round" />
+                       <path d="M12 17.2h.01" stroke="#FF3B30" stroke-width="3" stroke-linecap="round" />
+                     </svg>
+                     高风险
+                   </span>
+                   <span class="list-header-col">允许</span>
+                 </span>
+               </div>
 
-              <div class="list-row" v-for="perm in detailPermissions" :key="perm">
-                <div>{{ permissionLabel(perm) }}</div>
-                <div class="row-dot"></div>
-              </div>
-            </section>
+               <div class="empty" v-if="detailPermissions.length === 0">该功能件未声明任何权限</div>
+               <div class="list-row" v-for="perm in detailPermissions" :key="perm">
+                 <div class="perm-label">
+                   <div>{{ permissionLabel(perm) }}</div>
+                   <div class="perm-note" v-if="permissionNote(perm)">{{ permissionNote(perm) }}</div>
+                 </div>
+                 <label class="perm-toggle" :class="{ 'perm-toggle--locked': !permissionCanToggle(perm) }">
+                   <input
+                     type="checkbox"
+                     :checked="permissionGranted(perm)"
+                     :disabled="!permissionCanToggle(perm)"
+                     @change="setKitPermission(perm, $event.target.checked)"
+                   />
+                   <span class="perm-slider" aria-hidden="true"></span>
+                 </label>
+               </div>
+             </section>
 
-            <section class="detail-card" v-if="detailTab === 'reviews'">
-              <div class="rating-head">
-                <div class="rating-left">
-                  <div class="rating-score">4.8</div>
-                  <div class="rating-meta">满分 5.0 (1250人)</div>
-                </div>
-                <button class="rating-action" type="button" @click="showToast('写评价')">写评价</button>
-              </div>
-
-              <div class="review-item" v-for="review in reviews" :key="review.name">
-                <div>
-                  <div class="review-name">{{ review.name }}</div>
-                  <div class="review-text">{{ review.text }}</div>
-                </div>
-                <div class="stars">{{ stars(review.stars) }}</div>
-              </div>
-            </section>
-
-            <section class="detail-card" v-if="detailTab === 'security'">
-              <div
-                class="link-row"
-                v-for="link in securityLinks"
+             <section class="detail-card" v-if="detailTab === 'security'">
+               <div
+                 class="link-row"
+                 v-for="link in securityLinks"
                 :key="link.label"
                 :class="{ 'link-row--danger': link.kind === 'danger' }"
                 @click="showToast(link.label)"

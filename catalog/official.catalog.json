@@ -1,6 +1,6 @@
 {
   "kind": "keyflow.npm.catalog.v0",
-  "generatedAt": "2026-04-10T03:57:59.303Z",
+  "generatedAt": "2026-04-11T11:58:03.958Z",
   "registry": "https://registry.npmjs.org/",
   "packages": [
     {
@@ -8,6 +8,7 @@
       "name": "语气改写",
       "description": "一键把聊天内容改成更短、更长、更礼貌、更口语，或加上合适 emoji。",
       "version": "0.2.1",
+      "downloads_last_week": 284,
       "npm": {
         "name": "@keyflow2/keyflow-kit-tone-rewrite",
         "version": "0.2.1",

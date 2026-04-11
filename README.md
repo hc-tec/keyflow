@@ -72,3 +72,7 @@ npm test
   - debug keystore 测试包：`keyflow-<apkVersion>-<abi>-release-debug.apk`
 - 正式签名 keystore 的本地生成与保存流程见 [docs/RELEASING.md](docs/RELEASING.md) 与 `scripts/release/`。
 - 具体流程见 [docs/RELEASING.md](docs/RELEASING.md)。
+
+## 致谢
+
+本项目受 [LINUX DO](https://linux.do/) 社区启发和支持。

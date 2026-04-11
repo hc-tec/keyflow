@@ -263,8 +263,10 @@ function Invoke-GitHubJson {
         Uri = $Uri
     }
     if ($null -ne $Body) {
-        $params['ContentType'] = 'application/json'
-        $params['Body'] = ($Body | ConvertTo-Json -Depth 6)
+        # Windows PowerShell 5.1 can send string bodies as UTF-16; GitHub expects UTF-8 JSON.
+        $params['ContentType'] = 'application/json; charset=utf-8'
+        $json = ($Body | ConvertTo-Json -Depth 6)
+        $params['Body'] = [System.Text.Encoding]::UTF8.GetBytes($json)
     }
     return Invoke-RestMethod @params
 }

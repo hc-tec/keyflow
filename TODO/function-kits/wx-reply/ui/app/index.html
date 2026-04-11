@@ -181,7 +181,7 @@
               <span>服务端基址 (Base URL)</span>
             </label>
 
-            <input class="config-input" type="url" placeholder="http://<HOST:PORT>" v-model="settings.baseUrl" />
+            <input class="config-input" type="url" placeholder="http://127.0.0.1:5678" v-model="settings.baseUrl" />
 
             <p class="config-hint">功能件只走真实后端；探活成功后才会加载联系人、会话和画像数据。</p>
             <p class="config-status" :data-kind="service.ok === false ? 'error' : 'ok'">

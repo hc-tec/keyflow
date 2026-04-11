@@ -3,7 +3,8 @@
 (() => {
   const kitId = "wx-reply";
   const surface = "panel";
-  const DEFAULT_BASE_URL = "http://<HOST:PORT>";
+  const DEFAULT_PORT = 5678;
+  const DEFAULT_BASE_URL = `http://127.0.0.1:${DEFAULT_PORT}`;
   const LOCAL_PROXY_ORIGIN = "https://function-kit.local";
   const EXTERNAL_RESOURCE_PROXY_BASE = `${LOCAL_PROXY_ORIGIN}/assets/__external__/`;
   const SETTINGS_KEY = "wxReply.settings.v2";
@@ -121,10 +122,11 @@
     },
 
     get serviceStatusText() {
-      if (this.busy.probing) return "正在探活真实后端...";
-      if (this.service.ok === true) return `已连接：last_seq=${this.service.state.last_seq ?? "-"}`;
-      if (this.service.ok === false) return this.service.lastError || "服务不可用";
-      return "尚未探活";
+      const base = normalizeBaseUrl(this.settings.baseUrl);
+      if (this.busy.probing) return `正在探活：${base}`;
+      if (this.service.ok === true) return `已连接：${base} · last_seq=${this.service.state.last_seq ?? "-"}`;
+      if (this.service.ok === false) return `${base} · ${this.service.lastError || "服务不可用"}`;
+      return `尚未探活：${base}`;
     },
 
     get replyLeadText() {
@@ -1002,7 +1004,25 @@
 
   function normalizeBaseUrl(url) {
     const raw = safeText(url) || DEFAULT_BASE_URL;
-    return raw.replace(/\/+$/, "");
+    const trimmed = raw.replace(/\/+$/, "");
+    if (!trimmed || trimmed.includes("<HOST")) {
+      return DEFAULT_BASE_URL;
+    }
+
+    let candidate = trimmed;
+    if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(candidate)) {
+      candidate = `http://${candidate}`;
+    }
+
+    try {
+      const parsed = new URL(candidate);
+      if ((parsed.protocol === "http:" || parsed.protocol === "https:") && !parsed.port) {
+        parsed.port = String(DEFAULT_PORT);
+      }
+      return parsed.origin;
+    } catch (_) {
+      return DEFAULT_BASE_URL;
+    }
   }
 
   function proxyExternalResourceUrl(url) {

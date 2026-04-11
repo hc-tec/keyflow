@@ -1,0 +1,43 @@
+name: collect-release-downloads
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Daily. If you need a different cadence, change this cron.
+    - cron: "17 3 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Fetch release asset download stats
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/stats/fetch-github-release-downloads.mjs --repo hc-tec/keyflow --out tmp/stats/releases.json
+
+      - name: Upload stats artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-downloads
+          path: tmp/stats/releases.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Summary
+        shell: bash
+        run: |
+          echo "### Release download stats" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Artifact: \`release-downloads\` (contains \`tmp/stats/releases.json\`)." >> "$GITHUB_STEP_SUMMARY"
+

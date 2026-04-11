@@ -59,6 +59,8 @@ node scripts/npm/generate-catalog-from-registry.mjs --packages-file catalog/offi
 
 这些图标来自已发布 kit npm 包里的 `manifest.icon/icons`，发布 catalog 包时会一起打进 npm 包。默认只复制一张 `128px` 预览图；不要把图片转成 `data:image/...;base64` 放进 JSON，也不要把功能件内部的全套多规格图标全部塞进 catalog 包。
 
+另外，生成的每个条目会包含 `downloads_last_week`（来自 npm downloads API 的近 7 天下载量，用于下载中心排序/筛选；不是安装量）。
+
 一键生成 + 发布官方 catalog 包：
 
 ```bash

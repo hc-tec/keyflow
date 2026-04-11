@@ -10,6 +10,7 @@
 - 内容是一个 JSON：`catalog/official.catalog.json`
 - 下载前 logo 不写进 JSON 正文，而是放在 sidecar 目录：`catalog/official.catalog.assets/icons/...`
 - catalog sidecar 只推荐放一张 `128px` 预览图；功能件安装包内部仍可保留多规格图标
+- `catalog.json` 条目会包含 `downloads_last_week`（npm 近 7 天下载量，用于下载中心排序/筛选；不是安装量）
 - 由 npm 分发成一个“catalog 包”：`@keyflow2/keyflow-kit-catalog`
 
 这样用户侧即使访问不到 GitHub raw，也可以通过 npm registry / 国内镜像拿到官方目录。

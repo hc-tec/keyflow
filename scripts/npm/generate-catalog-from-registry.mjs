@@ -6,6 +6,8 @@ const { args, positional } = parseArgs(process.argv.slice(2));
 
 const repoRoot = getRepoRoot();
 const registry = String(args.get("registry") ?? "https://registry.npmjs.org/");
+const includeDownloads = args.get("include-downloads") !== false;
+const downloadsApi = String(args.get("downloads-api") ?? "https://api.npmjs.org/");
 
 const outFileArg = args.get("out-file");
 const outFile = path.resolve(repoRoot, String(outFileArg ?? "catalog/official.catalog.json"));
@@ -49,6 +51,8 @@ if (pkgSpecs.length === 0) {
       "  --out-file <path>         output catalog JSON path",
       "  --assets-dir <path>       output sidecar assets dir (default: sibling *.assets)",
       "  --catalog-icon-size <px>  one preview icon size to copy into catalog package (default: 128)",
+      "  --include-downloads       fetch npm downloads (last-week) into downloads_last_week (default: true; use --no-include-downloads to disable)",
+      "  --downloads-api <url>     npm downloads API base (default: https://api.npmjs.org/)",
     ].join("\n")
   );
   process.exit(2);
@@ -56,6 +60,27 @@ if (pkgSpecs.length === 0) {
 
 function fileSafe(s) {
   return String(s).replaceAll("/", "__").replaceAll("@", "_").replaceAll(":", "_");
+}
+
+function isNpmjsRegistryUrl(registryUrl) {
+  try {
+    const u = new URL(String(registryUrl));
+    return u.hostname === "registry.npmjs.org" || u.hostname.endsWith(".npmjs.org") || u.hostname === "npmjs.org";
+  } catch {
+    return false;
+  }
+}
+
+async function fetchNpmDownloadsLastWeek(pkgName) {
+  if (!isNpmjsRegistryUrl(registry)) return null;
+  if (!pkgName) return null;
+  const encoded = encodeURIComponent(String(pkgName));
+  const url = new URL(`downloads/point/last-week/${encoded}`, downloadsApi).toString();
+  const res = await fetch(url, { redirect: "follow" });
+  if (!res.ok) return null;
+  const json = await res.json().catch(() => null);
+  const downloads = Number(json?.downloads);
+  return Number.isFinite(downloads) && downloads >= 0 ? downloads : null;
 }
 
 async function download(tarballUrl, tgzPath) {
@@ -270,6 +295,17 @@ async function main() {
       throw new Error(`[npm] Missing dist.tarball/dist.integrity for ${spec}`);
     }
 
+    let downloadsLastWeek = null;
+    if (includeDownloads) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        downloadsLastWeek = await fetchNpmDownloadsLastWeek(pkgName);
+      } catch (e) {
+        console.warn(`[npm] WARN: failed to fetch downloads for ${pkgName}: ${e?.message ?? e}`);
+        downloadsLastWeek = null;
+      }
+    }
+
     const tarballUrl = String(dist.tarball);
     const expectedIntegrity = String(dist.integrity);
 
@@ -327,6 +363,7 @@ async function main() {
       name: String(manifest?.name ?? kitId),
       description: String(manifest?.description ?? meta?.description ?? ""),
       version: pkgVersion,
+      downloads_last_week: downloadsLastWeek,
       npm: {
         name: pkgName,
         version: pkgVersion,

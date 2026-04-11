@@ -219,6 +219,25 @@
     return `${Math.round(value)}B`;
   }
 
+  function normalizeDownloadCount(value) {
+    const num = typeof value === "number" ? value : typeof value === "string" ? Number(value) : NaN;
+    if (!Number.isFinite(num) || num <= 0) return null;
+    return Math.floor(num);
+  }
+
+  function trimTrailingDotZero(text) {
+    return String(text).replace(/\.0(?=[a-zA-Z\u4e00-\u9fa5]?$)/, "");
+  }
+
+  function formatCompactCountValue(value) {
+    const count = normalizeDownloadCount(value);
+    if (count == null) return "";
+    if (count >= 100000000) return trimTrailingDotZero((count / 100000000).toFixed(1)) + "亿";
+    if (count >= 10000) return trimTrailingDotZero((count / 10000).toFixed(1)) + "万";
+    if (count >= 1000) return trimTrailingDotZero((count / 1000).toFixed(1)) + "k";
+    return String(count);
+  }
+
   function buildLocalAssetUrl(assetPath) {
     const raw = safeText(assetPath).replace(/^\/+/, "");
     if (!raw) return null;
@@ -328,6 +347,8 @@
     tab: "discover",
     searchOpen: false,
     searchQuery: "",
+    discoverSort: "default",
+    discoverOnlyWithDownloads: false,
     detailTab: "overview",
     selected: { kind: null, kitId: null },
     installed: [],
@@ -361,7 +382,7 @@
       const packages = Array.isArray(this.catalogPackages) ? this.catalogPackages : [];
       const latestById = buildLatestPackageByKitId(packages);
       const seen = new Set();
-      return packages
+      let items = packages
         .map((pkg) => {
           const id = normalizeKitId(pkg?.kitId ?? pkg?.id);
           if (!id) return null;
@@ -381,6 +402,7 @@
             Boolean(latestVersion) &&
             compareSemver(installedVersion, latestVersion) < 0;
           const tags = deriveCatalogTags(latestPkg);
+          const downloadsLastWeek = normalizeDownloadCount(latestPkg?.downloads_last_week);
           return {
             kind: "package",
             kitId: id,
@@ -391,6 +413,7 @@
             title,
             iconUrl: resolveIconUrl(latestPkg),
             iconClass: "kit-icon--meme",
+            downloadsLastWeek,
             sub: {
               tags,
               tag: tags[0] ?? "",
@@ -407,6 +430,23 @@
           };
         })
         .filter(Boolean);
+
+      if (this.discoverOnlyWithDownloads) {
+        items = items.filter((item) => (item?.downloadsLastWeek ?? 0) > 0);
+      }
+
+      const sortMode = safeText(this.discoverSort);
+      if (sortMode === "downloads") {
+        items = items.slice().sort((a, b) => {
+          const ad = a?.downloadsLastWeek ?? -1;
+          const bd = b?.downloadsLastWeek ?? -1;
+          if (bd !== ad) return bd - ad;
+          if (Boolean(b?.featured) !== Boolean(a?.featured)) return b?.featured ? 1 : -1;
+          return String(a?.title ?? "").localeCompare(String(b?.title ?? ""));
+        });
+      }
+
+      return items;
     },
 
     get manageItems() {
@@ -510,9 +550,13 @@
       const current = this.selectedItem;
       if (!current) return "";
       if (current.kind === "package") {
-        return formatBytes(current.pkg?.sizeBytes);
+        return formatBytes(current.pkg?.dist?.sizeBytes ?? current.pkg?.sizeBytes);
       }
       return "";
+    },
+
+    formatCompactCount(value) {
+      return formatCompactCountValue(value);
     },
 
     get detailPermissions() {

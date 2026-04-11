@@ -143,8 +143,11 @@ https://img.shields.io/npm/dw/<package>.svg
 - 从 catalog 侧离线生成，避免客户端实时请求
 - UI 明确口径，避免用户误解为“安装量/活跃”
 
-## 7. 后续可做（可选）
+## 7. 已实现（落地）
 
-- 增加 `scripts/stats/`：定时抓取 GitHub release assets `download_count`，输出一份可读报表（例如 `tmp/stats/releases.json`）
-- catalog 构建时注入 npm downloads（`downloads_last_week`），并在 kit-store 列表页支持排序/筛选
-
+- GitHub Release 资产下载统计：
+  - 脚本：`scripts/stats/fetch-github-release-downloads.mjs`
+  - GitHub Actions：`.github/workflows/collect-release-downloads.yml`（产物为 Actions artifact，包含 `tmp/stats/releases.json`）
+- catalog 注入 npm downloads：
+  - `scripts/npm/generate-catalog-from-registry.mjs` 默认写入 `downloads_last_week`
+  - kit-store 列表页支持按下载量排序/筛选

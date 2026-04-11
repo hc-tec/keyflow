@@ -93,13 +93,27 @@
         <button class="text-button" type="button" @click="closeSearch">取消</button>
       </header>
 
-      <main class="store-main" id="homeView" :hidden="route !== 'home'">
-        <section class="store-list" aria-label="discover list" :hidden="tab !== 'discover' || searchOpen">
-          <div class="empty" v-if="discoverItems.length === 0">暂无可用目录，请先在设置里添加 Catalog 源</div>
-          <article class="kit-card" v-for="item in discoverItems" :key="item.kitId" :data-kit-id="item.kitId" @click="openDetail(item)">
-            <div class="ribbon" v-if="item.updateAvailable || item.featured" :class="item.updateAvailable ? 'ribbon--update' : ''">
-              {{ item.updateAvailable ? '更新' : '精选' }}
-            </div>
+       <main class="store-main" id="homeView" :hidden="route !== 'home'">
+         <section class="store-list" aria-label="discover list" :hidden="tab !== 'discover' || searchOpen">
+           <div class="store-filterbar" v-if="catalogPackages.length > 0">
+             <label class="filter-control" aria-label="sort">
+               <span class="filter-label">排序</span>
+               <select class="filter-select" v-model="discoverSort">
+                 <option value="default">默认</option>
+                 <option value="downloads">下载量(近7天)</option>
+               </select>
+             </label>
+             <label class="filter-toggle" aria-label="filter by downloads">
+               <input type="checkbox" v-model="discoverOnlyWithDownloads" />
+               <span>只看有下载</span>
+             </label>
+           </div>
+           <div class="empty" v-if="catalogPackages.length === 0">暂无可用目录，请先在设置里添加 Catalog 源</div>
+           <div class="empty" v-else-if="discoverItems.length === 0">没有符合筛选条件的功能件</div>
+           <article class="kit-card" v-for="item in discoverItems" :key="item.kitId" :data-kit-id="item.kitId" @click="openDetail(item)">
+             <div class="ribbon" v-if="item.updateAvailable || item.featured" :class="item.updateAvailable ? 'ribbon--update' : ''">
+               {{ item.updateAvailable ? '更新' : '精选' }}
+             </div>
             <div class="kit-icon" :class="item.iconClass">
               <img v-if="item.iconUrl" :src="item.iconUrl" alt="" decoding="async" loading="lazy" />
               <span v-else>{{ emojiFor(item.kitId) }}</span>
@@ -113,6 +127,7 @@
                 <span class="tag-row" v-else-if="item.sub && item.sub.tag">
                   <span class="tag">{{ item.sub.tag }}</span>
                 </span>
+                <span class="kit-stat" v-if="item.downloadsLastWeek && item.kind === 'package'">下载 {{ formatCompactCount(item.downloadsLastWeek) }}/周</span>
                 <span class="subtext">{{ (item.sub && item.sub.desc) || '' }}</span>
               </div>
             </div>
@@ -139,16 +154,17 @@
             </div>
             <div class="kit-info">
               <h3 class="kit-title">{{ item.title }}</h3>
-              <div class="kit-subline">
-                <span class="tag-row" v-if="item.sub && item.sub.tags && item.sub.tags.length">
-                  <span class="tag" v-for="tagText in item.sub.tags.slice(0, 2)" :key="tagText">{{ tagText }}</span>
-                </span>
-                <span class="tag-row" v-else-if="item.sub && item.sub.tag">
-                  <span class="tag">{{ item.sub.tag }}</span>
-                </span>
-                <span class="subtext">{{ (item.sub && item.sub.desc) || '' }}</span>
-              </div>
-            </div>
+             <div class="kit-subline">
+               <span class="tag-row" v-if="item.sub && item.sub.tags && item.sub.tags.length">
+                 <span class="tag" v-for="tagText in item.sub.tags.slice(0, 2)" :key="tagText">{{ tagText }}</span>
+               </span>
+               <span class="tag-row" v-else-if="item.sub && item.sub.tag">
+                 <span class="tag">{{ item.sub.tag }}</span>
+               </span>
+               <span class="kit-stat" v-if="item.downloadsLastWeek && item.kind === 'package'">下载 {{ formatCompactCount(item.downloadsLastWeek) }}/周</span>
+               <span class="subtext">{{ (item.sub && item.sub.desc) || '' }}</span>
+             </div>
+           </div>
             <button
               class="kit-action"
               type="button"

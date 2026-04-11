@@ -358,6 +358,8 @@
     catalogPackages: [],
     catalogAddUrl: "",
     importUrl: "",
+    syncing: false,
+    busyByKitId: {},
     toast: { open: false, text: "" },
     securityLinks: [
       { label: "隐私政策", kind: "blue", icon: "upright" },
@@ -672,6 +674,7 @@
       const perm = safeText(permission);
       if (!current || !perm || current.kind !== "installed") return false;
       if (!kit?.kits?.updateSettings) return false;
+      if (this.isKitBusy(current.kitId)) return false;
 
       // Prevent users from bricking the download center.
       if (current.kitId === kitId && ["kits.manage", "files.download"].includes(perm)) {
@@ -690,6 +693,7 @@
       }
 
       try {
+        this.setKitBusy(current.kitId, "保存中...");
         await kit?.kits?.updateSettings?.({
           task: { title: `${enabled ? "允许" : "禁用"}权限：${this.permissionLabel(perm)}` },
           kitId: current.kitId,
@@ -705,11 +709,43 @@
         refreshRuntimeSnapshot();
       } catch (error) {
         this.showToast(error?.message ?? "更新失败");
+      } finally {
+        this.clearKitBusy(current.kitId);
       }
     },
 
     isHighRiskPermission(permission) {
       return ["kits.manage", "ai.request", "network.fetch", "send.intercept.ime_action"].includes(permission);
+    },
+
+    isKitBusy(targetKitId) {
+      const id = normalizeKitId(targetKitId);
+      if (!id) return false;
+      return Boolean(this.busyByKitId && this.busyByKitId[id]);
+    },
+
+    kitBusyLabel(targetKitId) {
+      const id = normalizeKitId(targetKitId);
+      if (!id) return "";
+      return safeText(this.busyByKitId && this.busyByKitId[id]) || "处理中...";
+    },
+
+    setKitBusy(targetKitId, label) {
+      const id = normalizeKitId(targetKitId);
+      if (!id) return;
+      const next = { ...(this.busyByKitId || {}) };
+      next[id] = safeText(label) || "处理中...";
+      this.busyByKitId = next;
+    },
+
+    clearKitBusy(targetKitId) {
+      const id = normalizeKitId(targetKitId);
+      if (!id) return;
+      const current = this.busyByKitId || {};
+      if (!(id in current)) return;
+      const next = { ...current };
+      delete next[id];
+      this.busyByKitId = next;
     },
 
     showToast(message) {
@@ -756,6 +792,10 @@
       this.setRoute("import");
     },
 
+    async manualRefresh() {
+      await syncData({ toastOnSuccess: true });
+    },
+
     backFromSubView() {
       this.setRoute("home");
       this.closeSearch();
@@ -776,12 +816,16 @@
 
     async handleCardAction(item) {
       const action = safeText(item?.action?.kind);
+      const id = normalizeKitId(item?.kitId);
+      if (id && this.isKitBusy(id)) {
+        return;
+      }
       if (action === "install") {
-        await this.installPackage(item?.pkg);
+        await this.installPackage(item?.pkg, "install");
         return;
       }
       if (action === "update") {
-        await this.installPackage(item?.pkg);
+        await this.installPackage(item?.pkg, "update");
         return;
       }
       if (action === "enable") {
@@ -822,15 +866,19 @@
       const id = normalizeKitId(targetKitId);
       if (!id) return;
       try {
+        if (this.isKitBusy(id)) return;
+        this.setKitBusy(id, "启用中...");
         await kit?.kits?.updateSettings?.({ task: { title: `启用：${id}` }, kitId: id, patch: { enabled: true } });
         this.showToast("已启用");
         await syncData();
       } catch (error) {
         this.showToast(error?.message ?? "启用失败");
+      } finally {
+        this.clearKitBusy(id);
       }
     },
 
-    async installPackage(pkg) {
+    async installPackage(pkg, reason) {
       const resolvedPkg = pkg && typeof pkg === "object" ? pkg : null;
       const id = normalizeKitId(resolvedPkg?.kitId ?? resolvedPkg?.id);
       const url = safeText(resolvedPkg?.resolvedZipUrl ?? resolvedPkg?.zipUrl ?? resolvedPkg?.dist?.tarball ?? "");
@@ -848,11 +896,21 @@
         this.showToast("下载中心是内置组件，请通过更新 APK 升级");
         return;
       }
+      if (this.isKitBusy(id)) {
+        return;
+      }
+
+      const verb =
+        safeText(reason) === "update" ? "更新" : safeText(reason) === "reinstall" ? "重新安装" : "安装";
       try {
+        this.setKitBusy(
+          id,
+          verb === "更新" ? "更新中..." : verb === "重新安装" ? "重新安装中..." : "下载中..."
+        );
         if (npmSpec) {
           try {
             await kit?.kits?.install?.({
-              task: { title: `安装：${resolvedPkg?.name ?? id}` },
+              task: { title: `${verb}：${resolvedPkg?.name ?? id}` },
               source: {
                 kind: "npm",
                 spec: npmSpec,
@@ -864,7 +922,7 @@
           } catch (error) {
             if (!url) throw error;
             await kit?.kits?.install?.({
-              task: { title: `安装：${resolvedPkg?.name ?? id}` },
+              task: { title: `${verb}：${resolvedPkg?.name ?? id}` },
               source: {
                 kind: "url",
                 url,
@@ -880,7 +938,7 @@
             return;
           }
           await kit?.kits?.install?.({
-            task: { title: `安装：${resolvedPkg?.name ?? id}` },
+            task: { title: `${verb}：${resolvedPkg?.name ?? id}` },
             source: {
               kind: "url",
               url,
@@ -890,10 +948,12 @@
             }
           });
         }
-        this.showToast("已安装");
+        this.showToast(verb === "更新" ? "已更新" : "已安装");
         await syncData();
       } catch (error) {
         this.showToast(error?.message ?? "安装失败");
+      } finally {
+        this.clearKitBusy(id);
       }
     },
 
@@ -901,12 +961,16 @@
       const id = normalizeKitId(targetKitId);
       if (!id) return;
       try {
+        if (this.isKitBusy(id)) return;
+        this.setKitBusy(id, "卸载中...");
         await kit?.kits?.uninstall?.({ task: { title: `卸载：${id}` }, kitId: id });
         this.showToast("已卸载");
         this.setRoute("home");
         await syncData();
       } catch (error) {
         this.showToast(error?.message ?? "卸载失败");
+      } finally {
+        this.clearKitBusy(id);
       }
     },
 
@@ -1015,31 +1079,50 @@
     store.updateCount = computeUpdateCount(store.installed, store.catalogPackages);
   }
 
-  async function syncData() {
-    if (!kit) {
+  let syncInFlight = null;
+  async function syncData(options) {
+    const opts = options && typeof options === "object" ? options : {};
+    if (syncInFlight) {
+      return syncInFlight;
+    }
+
+    store.syncing = true;
+    syncInFlight = (async () => {
+      if (!kit) {
+        refreshRuntimeSnapshot();
+        return;
+      }
+
+      try {
+        await kit.kits.sync({ includeDisabled: true });
+      } catch {
+        // ignore
+      }
+
+      try {
+        await kit.catalog.getSources({ task: { title: "读取 Catalog 源" } });
+      } catch {
+        // ignore
+      }
+
+      try {
+        await kit.catalog.refresh({ task: { title: "刷新目录" } });
+      } catch (error) {
+        store.showToast(error?.message ?? "刷新目录失败");
+      }
+
       refreshRuntimeSnapshot();
-      return;
-    }
+    })();
 
     try {
-      await kit.kits.sync({ includeDisabled: true });
-    } catch {
-      // ignore
+      await syncInFlight;
+      if (opts.toastOnSuccess) {
+        store.showToast("已刷新");
+      }
+    } finally {
+      store.syncing = false;
+      syncInFlight = null;
     }
-
-    try {
-      await kit.catalog.getSources({ task: { title: "读取 Catalog 源" } });
-    } catch {
-      // ignore
-    }
-
-    try {
-      await kit.catalog.refresh({ task: { title: "刷新目录" } });
-    } catch (error) {
-      store.showToast(error?.message ?? "刷新目录失败");
-    }
-
-    refreshRuntimeSnapshot();
   }
 
   function initSwipeNavigation() {

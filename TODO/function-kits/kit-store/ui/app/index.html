@@ -49,6 +49,25 @@
               />
             </svg>
           </button>
+          <button class="icon-button" type="button" aria-label="refresh" :disabled="syncing" @click="manualRefresh">
+            <svg viewBox="0 0 24 24" aria-hidden="true" :class="syncing ? 'icon-spin' : ''">
+              <path
+                d="M20 12a8 8 0 1 1-2.3-5.7"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+              <path
+                d="M20 4v6h-6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
           <button class="icon-button" type="button" aria-label="import" @click="openImport">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path
@@ -134,10 +153,12 @@
             <button
               class="kit-action"
               type="button"
+              :disabled="syncing || isKitBusy(item.kitId)"
               :class="item.action && (item.action.kind === 'install' || item.action.kind === 'update') ? 'kit-action--get' : 'kit-action--open'"
               @click.stop="handleCardAction(item)"
             >
-              {{ (item.action && item.action.label) || '打开' }}
+              <span class="btn-spinner" v-if="isKitBusy(item.kitId)" aria-hidden="true"></span>
+              {{ isKitBusy(item.kitId) ? kitBusyLabel(item.kitId) : (item.action && item.action.label) || '打开' }}
             </button>
           </article>
         </section>
@@ -168,10 +189,12 @@
             <button
               class="kit-action"
               type="button"
+              :disabled="syncing || isKitBusy(item.kitId)"
               :class="item.action && (item.action.kind === 'install' || item.action.kind === 'update') ? 'kit-action--get' : 'kit-action--open'"
               @click.stop="handleCardAction(item)"
             >
-              {{ (item.action && item.action.label) || '打开' }}
+              <span class="btn-spinner" v-if="isKitBusy(item.kitId)" aria-hidden="true"></span>
+              {{ isKitBusy(item.kitId) ? kitBusyLabel(item.kitId) : (item.action && item.action.label) || '打开' }}
             </button>
           </article>
         </section>
@@ -207,10 +230,12 @@
             <button
               class="kit-action"
               type="button"
+              :disabled="syncing || isKitBusy(item.kitId)"
               :class="item.action && (item.action.kind === 'install' || item.action.kind === 'update') ? 'kit-action--get' : 'kit-action--open'"
               @click.stop="handleCardAction(item)"
             >
-              {{ (item.action && item.action.label) || '打开' }}
+              <span class="btn-spinner" v-if="isKitBusy(item.kitId)" aria-hidden="true"></span>
+              {{ isKitBusy(item.kitId) ? kitBusyLabel(item.kitId) : (item.action && item.action.label) || '打开' }}
             </button>
           </article>
         </section>
@@ -313,9 +338,30 @@
               v-if="selectedItem.kind === 'package'"
               class="kit-action kit-action--get"
               type="button"
-              @click="installPackage(selectedItem.pkg)"
+              :disabled="syncing || isKitBusy(selectedItem.kitId)"
+              @click="installPackage(selectedItem.pkg, selectedItem.action && selectedItem.action.kind === 'update' ? 'update' : selectedItem.action && selectedItem.action.kind === 'install' ? 'install' : 'reinstall')"
             >
-              {{ selectedItem.action && selectedItem.action.kind === 'install' ? '获取' : selectedItem.action && selectedItem.action.kind === 'update' ? '更新' : '重新安装' }}
+              <span class="btn-spinner" v-if="isKitBusy(selectedItem.kitId)" aria-hidden="true"></span>
+              {{
+                isKitBusy(selectedItem.kitId)
+                  ? kitBusyLabel(selectedItem.kitId)
+                  : selectedItem.action && selectedItem.action.kind === 'install'
+                    ? '获取'
+                    : selectedItem.action && selectedItem.action.kind === 'update'
+                      ? '更新'
+                      : '重新安装'
+              }}
+            </button>
+            <button
+              v-else-if="selectedItem.kind === 'installed'"
+              class="kit-action"
+              type="button"
+              :disabled="syncing || isKitBusy(selectedItem.kitId)"
+              :class="selectedItem.action && selectedItem.action.kind === 'update' ? 'kit-action--get' : 'kit-action--open'"
+              @click="handleCardAction(selectedItem)"
+            >
+              <span class="btn-spinner" v-if="isKitBusy(selectedItem.kitId)" aria-hidden="true"></span>
+              {{ isKitBusy(selectedItem.kitId) ? kitBusyLabel(selectedItem.kitId) : (selectedItem.action && selectedItem.action.label) || '打开' }}
             </button>
           </section>
 

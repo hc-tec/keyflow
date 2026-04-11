@@ -128,6 +128,25 @@ input {
   height: 20px;
 }
 
+.icon-button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.icon-spin {
+  animation: store-spin 900ms linear infinite;
+  transform-origin: 50% 50%;
+}
+
+@keyframes store-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .search-topbar {
   display: flex;
   align-items: center;
@@ -409,6 +428,34 @@ input {
   font-size: 13px;
   font-weight: 900;
   flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 140ms ease, filter 140ms ease, opacity 140ms ease;
+}
+
+.kit-action:active:not([disabled]) {
+  transform: scale(0.98);
+}
+
+.kit-action[disabled] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-top-color: rgba(255, 255, 255, 0.95);
+  animation: store-spin 900ms linear infinite;
+}
+
+.kit-action--open .btn-spinner {
+  border-color: rgba(18, 19, 22, 0.22);
+  border-top-color: rgba(18, 19, 22, 0.62);
 }
 
 .kit-action--get {

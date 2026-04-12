@@ -399,7 +399,14 @@
                  </span>
                </div>
 
-               <div class="empty" v-if="detailPermissions.length === 0">该功能件未声明任何权限</div>
+               <div class="hint" v-if="!selectedRecord && detailPermissions.length > 0">提示：安装后可在此开关权限</div>
+               <div class="empty" v-if="detailPermissions.length === 0">
+                 {{
+                   selectedRecord
+                     ? '该功能件未声明任何权限'
+                     : '该功能件的权限信息需要在安装后才能读取。安装后可在这里查看并管理权限。'
+                 }}
+               </div>
                <div class="list-row" v-for="perm in detailPermissions" :key="perm">
                  <div class="perm-label">
                    <div>{{ permissionLabel(perm) }}</div>

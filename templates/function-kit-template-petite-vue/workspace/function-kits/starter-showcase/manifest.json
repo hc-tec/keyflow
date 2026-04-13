@@ -1,7 +1,7 @@
 {
   "id": "starter-showcase",
   "name": "Starter Showcase",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A petite-vue starter wired to vendored runtime assets and a KitStudio-ready landing-page preview.",
   "icons": {
     "64": "icons/starter-showcase.svg"

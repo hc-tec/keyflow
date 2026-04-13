@@ -44,20 +44,66 @@ async function pathExists(targetPath, type = null) {
   }
 }
 
-async function resolveDefaultKitId() {
+async function readWorkspaceDefaultKitId() {
   const packageJsonPath = path.join(packageRoot, "package.json");
   if (!(await pathExists(packageJsonPath, "file"))) {
-    return defaultStarterKitId;
+    return "";
   }
 
   try {
     const packageJsonRaw = await fs.readFile(packageJsonPath, "utf8");
     const packageJson = JSON.parse(packageJsonRaw);
-    const candidate = safeText(packageJson?.keyflow?.defaultKitId);
-    return candidate || defaultStarterKitId;
+    return safeText(packageJson?.keyflow?.defaultKitId);
   } catch {
-    return defaultStarterKitId;
+    return "";
   }
+}
+
+async function listKitCandidates() {
+  if (!(await pathExists(functionKitsRoot, "dir"))) {
+    return [];
+  }
+
+  const entries = await fs.readdir(functionKitsRoot, { withFileTypes: true });
+  const kits = [];
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    if (entry.name.startsWith(".")) continue;
+    const manifestPath = path.join(functionKitsRoot, entry.name, "manifest.json");
+    // eslint-disable-next-line no-await-in-loop
+    if (await pathExists(manifestPath, "file")) {
+      kits.push(entry.name);
+    }
+  }
+  return kits;
+}
+
+async function resolveDefaultKitId() {
+  const candidate = await readWorkspaceDefaultKitId();
+  if (candidate) {
+    const manifestPath = path.join(functionKitsRoot, candidate, "manifest.json");
+    if (await pathExists(manifestPath, "file")) {
+      return { kitId: candidate, candidates: [] };
+    }
+  }
+
+  const candidates = await listKitCandidates();
+  if (candidates.length === 1) {
+    return { kitId: candidates[0], candidates };
+  }
+
+  if (candidates.length === 0) {
+    return { kitId: defaultStarterKitId, candidates };
+  }
+
+  if (candidates.includes(defaultStarterKitId)) {
+    const manifestPath = path.join(functionKitsRoot, defaultStarterKitId, "manifest.json");
+    if (await pathExists(manifestPath, "file")) {
+      return { kitId: defaultStarterKitId, candidates };
+    }
+  }
+
+  return { kitId: "", candidates };
 }
 
 async function resolveKitStudioRoot(explicitRoot) {
@@ -161,7 +207,9 @@ if (!Number.isFinite(port) || port <= 0) {
 
 const shouldOpenBrowser = args.get("open") !== false;
 const dryRun = args.get("dry-run") === true;
-const defaultKitId = await resolveDefaultKitId();
+const kitResolution = await resolveDefaultKitId();
+const defaultKitId = kitResolution.kitId;
+const kitCandidates = kitResolution.candidates;
 
 const kitStudioRoot = await resolveKitStudioRoot(args.get("kit-studio-root"));
 if (!kitStudioRoot) {
@@ -176,10 +224,9 @@ if (!kitStudioRoot) {
   process.exit(2);
 }
 
-if (!(await pathExists(path.join(functionKitsRoot, defaultKitId, "manifest.json"), "file"))) {
-  console.error(
-    `[starter] The starter workspace is incomplete: missing workspace/function-kits/${defaultKitId}/manifest.json`
-  );
+const kitIdForChecks = defaultKitId || kitCandidates[0] || defaultStarterKitId;
+if (!(await pathExists(path.join(functionKitsRoot, kitIdForChecks, "manifest.json"), "file"))) {
+  console.error(`[starter] The starter workspace is incomplete: missing workspace/function-kits/*/manifest.json`);
   process.exit(2);
 }
 
@@ -201,23 +248,35 @@ if (!env.KITSTUDIO_RUNTIME_SDK_ROOT && (await pathExists(runtimeSdkRoot, "dir"))
   env.KITSTUDIO_RUNTIME_SDK_ROOT = runtimeSdkRoot;
 }
 
-const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
-const npmArgs = ["run", "dev"];
+const serverEntrypoint = path.join(kitStudioRoot, "src", "server.mjs");
+const launchCommand = process.execPath;
+const launchArgs = [serverEntrypoint];
 const baseUrl = `http://${host}:${port}/`;
 const healthUrl = `${baseUrl}api/health`;
 
 console.log(`[starter] KitStudio root : ${kitStudioRoot}`);
 console.log(`[starter] Kits mount     : ${functionKitsRoot}`);
-console.log(`[starter] Default kit    : ${defaultKitId}`);
+if (defaultKitId) {
+  console.log(`[starter] Default kit    : ${defaultKitId}`);
+} else if (kitCandidates.length > 1) {
+  console.log(`[starter] Default kit    : (not set; ${kitCandidates.length} kits found)`);
+} else {
+  console.log(`[starter] Default kit    : ${kitIdForChecks}`);
+}
 console.log(`[starter] URL            : ${baseUrl}`);
-console.log("[starter] Because this workspace only mounts one starter kit, KitStudio will open it by default.");
+if (kitCandidates.length <= 1) {
+  console.log("[starter] Because this workspace only mounts one starter kit, KitStudio will open it by default.");
+} else {
+  console.log("[starter] This workspace mounts multiple kits; KitStudio will start at the kit list.");
+  console.log("[starter] Tip: set package.json -> keyflow.defaultKitId for a deterministic default.");
+}
 
 if (dryRun) {
-  console.log(`[starter] Dry run command: ${npmCommand} ${npmArgs.join(" ")}`);
+  console.log(`[starter] Dry run command: ${launchCommand} ${launchArgs.join(" ")}`);
   process.exit(0);
 }
 
-const child = spawn(npmCommand, npmArgs, {
+const child = spawn(launchCommand, launchArgs, {
   cwd: kitStudioRoot,
   env,
   stdio: "inherit",

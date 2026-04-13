@@ -7,6 +7,7 @@ const packageRoot = path.resolve(__dirname, "..");
 const functionKitsRoot = path.join(packageRoot, "workspace", "function-kits");
 const defaultSourceDir = "starter-showcase";
 const kitIdPattern = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/;
+const workspaceReadmeMarker = "<!-- keyflow:function-kit-workspace-readme -->";
 
 function parseArgs(argv) {
   const args = new Map();
@@ -63,7 +64,7 @@ function usage() {
       "  --kit-id <id>         required; new manifest.id and directory name",
       "  --name <label>        display name shown in manifest and sample UI",
       "  --description <text>  override sample description",
-      "  --source <dir>        source directory under workspace/function-kits (default: starter-showcase)",
+      "  --source <dir>        source kit directory under workspace/function-kits (default: current workspace kit)",
       "  --workspace-name <n>  override the root package.json name for this local workspace",
       "  --force               allow overwriting an existing target directory",
     ].join("\n")
@@ -79,6 +80,110 @@ async function pathExists(targetPath, type = null) {
   } catch {
     return false;
   }
+}
+
+async function readWorkspaceDefaultKitId() {
+  const packageJsonPath = path.join(packageRoot, "package.json");
+  if (!(await pathExists(packageJsonPath, "file"))) {
+    return "";
+  }
+
+  try {
+    const packageJsonRaw = await fs.readFile(packageJsonPath, "utf8");
+    const packageJson = JSON.parse(packageJsonRaw);
+    return safeText(packageJson?.keyflow?.defaultKitId);
+  } catch {
+    return "";
+  }
+}
+
+async function listKitCandidates() {
+  if (!(await pathExists(functionKitsRoot, "dir"))) {
+    return [];
+  }
+
+  const entries = await fs.readdir(functionKitsRoot, { withFileTypes: true });
+  const kits = [];
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    if (entry.name.startsWith(".")) continue;
+    const manifestPath = path.join(functionKitsRoot, entry.name, "manifest.json");
+    // eslint-disable-next-line no-await-in-loop
+    if (await pathExists(manifestPath, "file")) {
+      kits.push(entry.name);
+    }
+  }
+  return kits;
+}
+
+async function resolveSourceDirName(explicitSourceDir) {
+  const override = safeText(explicitSourceDir);
+  if (override) {
+    return { sourceDirName: override, candidates: [] };
+  }
+
+  const packageDefaultKitId = await readWorkspaceDefaultKitId();
+  if (packageDefaultKitId) {
+    const manifestPath = path.join(functionKitsRoot, packageDefaultKitId, "manifest.json");
+    if (await pathExists(manifestPath, "file")) {
+      return { sourceDirName: packageDefaultKitId, candidates: [] };
+    }
+  }
+
+  const candidates = await listKitCandidates();
+  if (candidates.length === 1) {
+    return { sourceDirName: candidates[0], candidates };
+  }
+
+  if (candidates.length === 0) {
+    return { sourceDirName: defaultSourceDir, candidates };
+  }
+
+  if (candidates.includes(defaultSourceDir)) {
+    const manifestPath = path.join(functionKitsRoot, defaultSourceDir, "manifest.json");
+    if (await pathExists(manifestPath, "file")) {
+      return { sourceDirName: defaultSourceDir, candidates };
+    }
+  }
+
+  return { sourceDirName: "", candidates };
+}
+
+function makeWorkspaceReadme({ kitId, name }) {
+  return [
+    `# ${name}`,
+    "",
+    workspaceReadmeMarker,
+    "",
+    "这是一个本地 Keyflow Function Kit 工作区。",
+    "",
+    "## 快速开始",
+    "",
+    "```powershell",
+    "npm run open:kitstudio",
+    "```",
+    "",
+    "如果 KitStudio 不在本项目同级目录 `../kit-studio`，先设置：",
+    "",
+    "```powershell",
+    '$env:KITSTUDIO_ROOT = \"D:\\dev\\kit-studio\"',
+    "npm run open:kitstudio",
+    "```",
+    "",
+    "## 重命名（可选）",
+    "",
+    "```powershell",
+    'npm run rename:starter -- --kit-id yourscope.launchpad --name \"Launchpad\"',
+    "```",
+    "",
+    "## 常改的文件",
+    "",
+    `- workspace/function-kits/${kitId}/manifest.json`,
+    `- workspace/function-kits/${kitId}/ui/app/index.html`,
+    `- workspace/function-kits/${kitId}/ui/app/main.js`,
+    `- workspace/function-kits/${kitId}/ui/app/styles.css`,
+    "",
+  ].join("\n");
 }
 
 const args = parseArgs(process.argv.slice(2));
@@ -97,7 +202,17 @@ if (!kitIdPattern.test(nextKitId)) {
   process.exit(2);
 }
 
-const sourceDirName = safeText(args.get("source")) || defaultSourceDir;
+const { sourceDirName, candidates } = await resolveSourceDirName(args.get("source"));
+if (!sourceDirName) {
+  console.error("[starter] Multiple Function Kits found under workspace/function-kits.");
+  console.error("[starter] Fix: pass --source <dir> to choose the kit you want to rename.");
+  console.error("[starter] Found:");
+  for (const candidate of candidates) {
+    console.error(`  - ${candidate}`);
+  }
+  process.exit(2);
+}
+
 const sourceDir = path.join(functionKitsRoot, sourceDirName);
 if (!(await pathExists(sourceDir, "dir"))) {
   console.error(`[starter] Source starter directory not found: ${sourceDir}`);
@@ -190,6 +305,24 @@ if (await pathExists(packageJsonPath, "file")) {
     defaultKitId: nextKitId,
   };
   await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n", "utf8");
+}
+
+const workspaceReadmePath = path.join(packageRoot, "README.md");
+let shouldRewriteWorkspaceReadme = true;
+if (await pathExists(workspaceReadmePath, "file")) {
+  try {
+    const existing = await fs.readFile(workspaceReadmePath, "utf8");
+    shouldRewriteWorkspaceReadme =
+      existing.includes(workspaceReadmeMarker) ||
+      existing.includes("# Function Kit Starter Template") ||
+      existing.includes("npm pack @keyflow2/function-kit-template-petite-vue");
+  } catch {
+    shouldRewriteWorkspaceReadme = true;
+  }
+}
+
+if (shouldRewriteWorkspaceReadme) {
+  await fs.writeFile(workspaceReadmePath, makeWorkspaceReadme({ kitId: nextKitId, name }), "utf8");
 }
 
 await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2) + "\n", "utf8");

@@ -35,7 +35,7 @@ mkdir starter-demo
 cd starter-demo
 
 npm pack @keyflow2/function-kit-template-petite-vue
-tar -xf keyflow2-function-kit-template-petite-vue-0.1.0.tgz
+tar -xf keyflow2-function-kit-template-petite-vue-*.tgz
 cd .\package
 
 git clone https://github.com/hc-tec/kitstudio.git ..\kit-studio

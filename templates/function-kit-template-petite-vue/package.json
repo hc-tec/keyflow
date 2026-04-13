@@ -1,6 +1,6 @@
 {
   "name": "@keyflow2/function-kit-template-petite-vue",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Starter workspace for Keyflow Function Kits with vendored runtime.js, petite-vue, shadcn-style CSS, and KitStudio launch helpers.",
   "license": "Apache-2.0",
   "type": "module",

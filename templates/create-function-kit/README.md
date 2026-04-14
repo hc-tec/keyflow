@@ -26,6 +26,16 @@ cd .\my-launchpad
 npm run open:kitstudio
 ```
 
+如果你看到 `[starter] Could not locate KitStudio.`，说明脚本没找到你的 KitStudio 仓库位置。你可以：
+
+- 把 KitStudio clone 到工作区同级目录：`..\kit-studio`
+- 或设置环境变量（一次性 / 长期都行）：
+
+```powershell
+$env:KITSTUDIO_ROOT = "D:\dev\kit-studio"
+npm run open:kitstudio
+```
+
 如果你已经有可用的 KitStudio，也可以创建完成后直接打开：
 
 ```powershell

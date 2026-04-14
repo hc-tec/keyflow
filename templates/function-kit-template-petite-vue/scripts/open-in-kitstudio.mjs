@@ -106,7 +106,7 @@ async function resolveDefaultKitId() {
   return { kitId: "", candidates };
 }
 
-async function resolveKitStudioRoot(explicitRoot) {
+function listKitStudioRootCandidates(explicitRoot) {
   const candidates = [
     explicitRoot,
     process.env.KITSTUDIO_ROOT,
@@ -115,13 +115,23 @@ async function resolveKitStudioRoot(explicitRoot) {
     path.resolve(packageRoot, "..", "TODO", "ime-research", "repos", "kit-studio"),
     path.resolve(packageRoot, "..", "..", "TODO", "ime-research", "repos", "kit-studio"),
   ];
-
   const seen = new Set();
+  const resolvedCandidates = [];
   for (const candidate of candidates) {
     const resolved = safeText(candidate);
     if (!resolved || seen.has(resolved)) continue;
     seen.add(resolved);
+    resolvedCandidates.push(resolved);
+  }
+  return resolvedCandidates;
+}
+
+async function resolveKitStudioRoot(explicitRoot) {
+  const candidates = listKitStudioRootCandidates(explicitRoot);
+  for (const resolved of candidates) {
+    // eslint-disable-next-line no-await-in-loop
     if (!(await pathExists(path.join(resolved, "package.json"), "file"))) continue;
+    // eslint-disable-next-line no-await-in-loop
     if (!(await pathExists(path.join(resolved, "src", "server.mjs"), "file"))) continue;
     return resolved;
   }
@@ -211,16 +221,31 @@ const kitResolution = await resolveDefaultKitId();
 const defaultKitId = kitResolution.kitId;
 const kitCandidates = kitResolution.candidates;
 
+const kitStudioRootCandidates = listKitStudioRootCandidates(args.get("kit-studio-root"));
 const kitStudioRoot = await resolveKitStudioRoot(args.get("kit-studio-root"));
 if (!kitStudioRoot) {
-  console.error("[starter] Could not locate KitStudio.");
-  console.error("[starter] Expected one of:");
-  console.error("  - KITSTUDIO_ROOT env");
-  console.error(`  - ${path.resolve(packageRoot, "..", "kit-studio")}`);
-  console.error(`  - ${path.resolve(packageRoot, "..", "..", "kit-studio")}`);
-  console.error("");
-  console.error("[starter] Recommended setup:");
-  console.error(`  git clone https://github.com/hc-tec/kitstudio.git "${path.resolve(packageRoot, "..", "kit-studio")}"`);
+  console.log("[starter] Could not locate KitStudio.");
+  console.log("[starter] Expected one of:");
+  console.log("  - --kit-studio-root <path>");
+  console.log("  - KITSTUDIO_ROOT env");
+  for (const candidate of kitStudioRootCandidates) {
+    console.log(`  - ${candidate}`);
+  }
+  console.log("");
+  console.log("[starter] Recommended setup:");
+  console.log(`  git clone https://github.com/hc-tec/kitstudio.git "${path.resolve(packageRoot, "..", "kit-studio")}"`);
+
+  if (dryRun) {
+    const placeholderRoot = kitStudioRootCandidates[0] ? kitStudioRootCandidates[0] : "<KITSTUDIO_ROOT>";
+    console.log("");
+    console.log("[starter] Dry run command:");
+    console.log(`  ${process.execPath} ${path.join(placeholderRoot, "src", "server.mjs")}`);
+    console.log("");
+    console.log("[starter] NOTE: Set KITSTUDIO_FUNCTION_KITS_ROOT to mount this workspace:");
+    console.log(`  KITSTUDIO_FUNCTION_KITS_ROOT=${functionKitsRoot}`);
+    process.exit(0);
+  }
+
   process.exit(2);
 }
 
@@ -231,9 +256,13 @@ if (!(await pathExists(path.join(functionKitsRoot, kitIdForChecks, "manifest.jso
 }
 
 if (!(await pathExists(path.join(kitStudioRoot, "node_modules"), "dir"))) {
-  console.error(`[starter] KitStudio dependencies are not installed: ${kitStudioRoot}`);
-  console.error(`[starter] Run: cd "${kitStudioRoot}" && npm install`);
-  process.exit(2);
+  const msg = `[starter] KitStudio dependencies are not installed: ${kitStudioRoot}\n[starter] Run: cd "${kitStudioRoot}" && npm install`;
+  if (!dryRun) {
+    console.error(msg);
+    process.exit(2);
+  } else {
+    console.log(msg);
+  }
 }
 
 const env = {

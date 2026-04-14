@@ -65,6 +65,8 @@ npm run open:kitstudio
 npm run open:kitstudio -- --dry-run
 ```
 
+`--dry-run` 不要求你已经把 KitStudio clone 到本机；它会打印脚本尝试的路径，以及你需要设置的环境变量。
+
 ## 改成你自己的 kit
 
 模板默认 kitId 是 `starter-showcase`。先跑一遍 rename 脚本，再开始写业务：

@@ -184,31 +184,190 @@ function Compare-StringSets {
     return $true
 }
 
-function Get-ReleaseAssetName {
+function Get-ApkAbiFromFileName {
+    param([Parameter(Mandatory = $true)][string]$FileName)
+
+    foreach ($candidate in @('arm64-v8a', 'armeabi-v7a', 'x86_64', 'x86', 'universal')) {
+        if ($FileName -match ('(^|-)({0})(-|\\.)' -f [regex]::Escape($candidate))) {
+            return $candidate
+        }
+    }
+    return 'universal'
+}
+
+function Get-VariantSlug {
     param(
-        [Parameter(Mandatory = $true)][string]$OriginalFileName,
-        [Parameter(Mandatory = $true)][string]$ReleaseAssetPrefix,
-        [Parameter(Mandatory = $true)][string]$SourceApkPrefix,
+        [string]$VariantName,
         [Parameter(Mandatory = $true)][string]$SigningMode
     )
 
-    $renamedFile = $OriginalFileName
-    $sourcePrefixPattern = '^{0}-' -f [regex]::Escape($SourceApkPrefix)
-    if ($renamedFile -like "$ReleaseAssetPrefix-*") {
-        $renamedFile = $renamedFile
-    } elseif ($renamedFile -match $sourcePrefixPattern) {
-        $renamedFile = [regex]::Replace($renamedFile, $sourcePrefixPattern, "$ReleaseAssetPrefix-")
+    if (-not $VariantName) {
+        return ''
+    }
+
+    $normalized = $VariantName.Trim()
+    if (-not $normalized) {
+        return ''
+    }
+
+    $suffix = if ($SigningMode -eq 'formal') { 'release' } else { 'debug' }
+    $normalizedLower = $normalized.ToLowerInvariant()
+    if (-not $normalizedLower.EndsWith($suffix)) {
+        return ''
+    }
+
+    $prefix = $normalized.Substring(0, $normalized.Length - $suffix.Length)
+    if (-not $prefix) {
+        return ''
+    }
+
+    return $prefix.Substring(0, 1).ToLowerInvariant() + $prefix.Substring(1)
+}
+
+function Get-ApkArtifactsFromMetadata {
+    param(
+        [Parameter(Mandatory = $true)][string]$SearchRoot,
+        [string]$ApkVersion,
+        [Parameter(Mandatory = $true)][string]$SigningMode
+    )
+
+    $expectedSuffix = if ($SigningMode -eq 'formal') { 'release' } else { 'debug' }
+    $artifacts = @()
+    $metadataFiles = Get-ChildItem $SearchRoot -Recurse -Filter 'output-metadata.json' -File | Sort-Object FullName
+    foreach ($metadataFile in $metadataFiles) {
+        $metadata = Get-Content -Encoding UTF8 $metadataFile.FullName | ConvertFrom-Json
+        $variantName = [string]$metadata.variantName
+        $variantNameLower = $variantName.ToLowerInvariant()
+        if ($variantNameLower.Contains('androidtest')) {
+            continue
+        }
+        if (-not $variantNameLower.EndsWith($expectedSuffix)) {
+            continue
+        }
+
+        $variantSlug = Get-VariantSlug -VariantName $variantName -SigningMode $SigningMode
+        $metadataDirectory = Split-Path -Parent $metadataFile.FullName
+        foreach ($element in @($metadata.elements)) {
+            $versionName = [string]$element.versionName
+            if ($ApkVersion -and $versionName -and $versionName -ne $ApkVersion) {
+                continue
+            }
+
+            $outputFile = [string]$element.outputFile
+            if (-not $outputFile) {
+                continue
+            }
+
+            $apkPath = Join-Path $metadataDirectory $outputFile
+            if (-not (Test-Path $apkPath)) {
+                continue
+            }
+
+            $abiFilter = @($element.filters) | Where-Object { $_.filterType -eq 'ABI' } | Select-Object -First 1
+            $abi = if ($abiFilter -and $abiFilter.value) { [string]$abiFilter.value } else { 'universal' }
+            $artifacts += [pscustomobject]@{
+                File = Get-Item $apkPath
+                VariantName = $variantName
+                VariantSlug = $variantSlug
+                Abi = $abi
+                VersionName = $versionName
+            }
+        }
+    }
+
+    $flavoredArtifacts = @($artifacts | Where-Object { $_.VariantSlug })
+    if ($flavoredArtifacts.Count -gt 0) {
+        return $flavoredArtifacts
+    }
+    return $artifacts
+}
+
+function Get-ApkArtifacts {
+    param(
+        [Parameter(Mandatory = $true)][string]$ApkDirectory,
+        [string]$ApkVersion,
+        [Parameter(Mandatory = $true)][string]$SigningMode
+    )
+
+    $artifacts = @(Get-ApkArtifactsFromMetadata -SearchRoot $ApkDirectory -ApkVersion $ApkVersion -SigningMode $SigningMode)
+    if ($artifacts.Count -gt 0) {
+        return $artifacts
+    }
+
+    $apkFiles = Get-ChildItem $ApkDirectory -Filter '*.apk' -Recurse | Sort-Object Name
+    return @(
+        $apkFiles | ForEach-Object {
+            [pscustomobject]@{
+                File = $_
+                VariantName = ''
+                VariantSlug = ''
+                Abi = Get-ApkAbiFromFileName -FileName $_.Name
+                VersionName = ''
+            }
+        }
+    )
+}
+
+function Get-ReleaseAssetName {
+    param(
+        [Parameter(Mandatory = $true)][string]$ReleaseAssetPrefix,
+        [Parameter(Mandatory = $true)][string]$ApkVersion,
+        [Parameter(Mandatory = $true)][string]$Abi,
+        [string]$VariantSlug,
+        [Parameter(Mandatory = $true)][string]$SigningMode
+    )
+
+    $segments = @($ReleaseAssetPrefix, $ApkVersion)
+    if ($VariantSlug) {
+        $segments += $VariantSlug
+    }
+    $segments += $Abi
+    $segments += 'release'
+
+    if ($SigningMode -eq 'debug') {
+        $segments += 'debug'
+    }
+
+    return (($segments -join '-') + '.apk')
+}
+
+function Find-FirstAssetName {
+    param(
+        [Parameter(Mandatory = $true)][string[]]$AssetNames,
+        [Parameter(Mandatory = $true)][string[]]$RequiredTokens
+    )
+
+    foreach ($assetName in $AssetNames) {
+        $matchesAll = $true
+        foreach ($token in $RequiredTokens) {
+            if ($assetName -notmatch ('(^|-)({0})(-|\\.)' -f [regex]::Escape($token))) {
+                $matchesAll = $false
+                break
+            }
+        }
+        if ($matchesAll) {
+            return $assetName
+        }
+    }
+    return $null
+}
+
+function Add-RecommendedAssetLine {
+    param(
+        [Parameter(Mandatory = $true)]$Lines,
+        [string]$Label,
+        [string]$AssetName
+    )
+
+    if (-not $AssetName) {
+        return
+    }
+
+    if ($Label) {
+        $Lines.Add(('- {0}：`{1}`' -f $Label, $AssetName))
     } else {
-        $renamedFile = '{0}-{1}' -f $ReleaseAssetPrefix, $renamedFile
+        $Lines.Add(('- `{0}`' -f $AssetName))
     }
-
-    if ($SigningMode -eq 'debug' -and $renamedFile -like '*.apk' -and $renamedFile -notlike '*-debug.apk') {
-        $baseName = [System.IO.Path]::GetFileNameWithoutExtension($renamedFile)
-        $extension = [System.IO.Path]::GetExtension($renamedFile)
-        $renamedFile = '{0}-debug{1}' -f $baseName, $extension
-    }
-
-    return $renamedFile
 }
 
 function Get-GitHubCredential {
@@ -327,41 +486,52 @@ function Build-DownloadGuide {
         return ''
     }
 
+    $standardVariant = Find-FirstAssetName -AssetNames $apkNames -RequiredTokens @('standard')
+    $voiceVariant = Find-FirstAssetName -AssetNames $apkNames -RequiredTokens @('voice')
     $hasUniversal = $apkNames | Where-Object { $_ -match '(^|-)universal(-|\\.)' } | Select-Object -First 1
     $hasArm64 = $apkNames | Where-Object { $_ -match '(^|-)arm64-v8a(-|\\.)' } | Select-Object -First 1
     $hasArm32 = $apkNames | Where-Object { $_ -match '(^|-)armeabi-v7a(-|\\.)' } | Select-Object -First 1
     $hasX8664 = $apkNames | Where-Object { $_ -match '(^|-)x86_64(-|\\.)' } | Select-Object -First 1
     $hasX86 = $apkNames | Where-Object { $_ -match '(^|-)x86(-|\\.)' } | Select-Object -First 1
 
-    $lines = @(
-        '## 下载哪个 APK？',
-        '',
-        '按设备 CPU 架构选择：'
-    )
+    $lines = New-Object 'System.Collections.Generic.List[string]'
+    $lines.Add('## 下载哪个 APK？')
+    $lines.Add('')
 
-    if ($hasUniversal) {
-        $lines += ('- 优先推荐：`keyflow-{0}-universal-release.apk`（体积更大，但兼容性最好）' -f $ApkVersion)
-    } elseif ($hasArm64) {
-        $lines += ('- 大多数安卓手机/平板：`keyflow-{0}-arm64-v8a-release.apk`' -f $ApkVersion)
+    if ($standardVariant -and $voiceVariant) {
+        $lines.Add('先选功能包：')
+        $lines.Add('- `voice`：内置离线语音输入与模型，包体更大。')
+        $lines.Add('- `standard`：不含内置语音，包体更小。')
+        $lines.Add('')
+        $lines.Add('再按设备 CPU 架构选择：')
+        Add-RecommendedAssetLine -Lines $lines -Label '大多数安卓手机/平板（语音版）' -AssetName (Find-FirstAssetName -AssetNames $apkNames -RequiredTokens @('voice', 'arm64-v8a'))
+        Add-RecommendedAssetLine -Lines $lines -Label '大多数安卓手机/平板（标准版）' -AssetName (Find-FirstAssetName -AssetNames $apkNames -RequiredTokens @('standard', 'arm64-v8a'))
+    } else {
+        $lines.Add('按设备 CPU 架构选择：')
+        if ($hasUniversal) {
+            Add-RecommendedAssetLine -Lines $lines -Label '优先推荐（兼容性最好）' -AssetName (Find-FirstAssetName -AssetNames $apkNames -RequiredTokens @('universal'))
+        } elseif ($hasArm64) {
+            Add-RecommendedAssetLine -Lines $lines -Label '大多数安卓手机/平板' -AssetName (Find-FirstAssetName -AssetNames $apkNames -RequiredTokens @('arm64-v8a'))
+        }
     }
 
     if ($hasArm64) {
-        $lines += ('- `arm64-v8a`：主流安卓手机（2018+ 基本都是 64 位）' )
+        $lines.Add('- `arm64-v8a`：主流安卓手机（2018+ 基本都是 64 位）')
     }
     if ($hasArm32) {
-        $lines += ('- `armeabi-v7a`：较老的 32 位设备' )
+        $lines.Add('- `armeabi-v7a`：较老的 32 位设备')
     }
     if ($hasX8664) {
-        $lines += ('- `x86_64`：大多数 Android 模拟器 / 部分 x86_64 设备' )
+        $lines.Add('- `x86_64`：大多数 Android 模拟器 / 部分 x86_64 设备')
     }
     if ($hasX86) {
-        $lines += ('- `x86`：较老的 x86 模拟器 / 设备' )
+        $lines.Add('- `x86`：较老的 x86 模拟器 / 设备')
     }
 
-    $lines += ''
-    $lines += '不确定架构时：'
-    $lines += '- 电脑连接手机后执行：`adb shell getprop ro.product.cpu.abi`'
-    $lines += '- 或在手机上用 CPU-Z / DevCheck 查看 ABI'
+    $lines.Add('')
+    $lines.Add('不确定架构时：')
+    $lines.Add('- 电脑连接手机后执行：`adb shell getprop ro.product.cpu.abi`')
+    $lines.Add('- 或在手机上用 CPU-Z / DevCheck 查看 ABI')
 
     return ($lines -join "`n")
 }
@@ -446,21 +616,22 @@ $sourceRepoUrl = 'https://github.com/{0}' -f $SourceRepoSlug
 $sourceCommitUrl = '{0}/commit/{1}' -f $sourceRepoUrl, $SourceCommit
 $sourceArchiveUrl = '{0}/archive/{1}.tar.gz' -f $sourceRepoUrl, $SourceCommit
 if (-not $ApkDirectory) {
-    $ApkDirectory = Join-Path $androidRepoPath 'app\build\outputs\apk\release'
+    $ApkDirectory = Join-Path $androidRepoPath 'app\build\outputs\apk'
 }
 if (-not (Test-Path $ApkDirectory)) {
     throw "APK directory not found: $ApkDirectory"
 }
 
-$apkFiles = Get-ChildItem $ApkDirectory -Filter '*.apk' | Sort-Object Name
-if (-not $apkFiles) {
+$apkArtifacts = @(Get-ApkArtifacts -ApkDirectory $ApkDirectory -ApkVersion $ApkVersion -SigningMode $SigningMode)
+if (-not $apkArtifacts) {
     throw "No APK files found under $ApkDirectory"
 }
 
 $bundledKitIds = @()
 if (-not $SkipBundledKitVerification) {
     $expectedKitIds = @($ExpectedBundledKitIds | Sort-Object -Unique)
-    foreach ($apkFile in $apkFiles) {
+    foreach ($apkArtifact in $apkArtifacts) {
+        $apkFile = $apkArtifact.File
         $actualKitIds = Get-ApkBundledKitIds -ApkPath $apkFile.FullName
         if (-not (Compare-StringSets -Actual $actualKitIds -Expected $expectedKitIds)) {
             throw ("Bundled kit mismatch in {0}. Expected [{1}] but found [{2}]." -f $apkFile.Name, ($expectedKitIds -join ', '), ($actualKitIds -join ', '))
@@ -473,7 +644,8 @@ if (-not $SkipBundledKitVerification) {
 
 $apksignerPath = Resolve-ApkSignerPath -AndroidRepoPath $androidRepoPath
 $signerDigest = $null
-foreach ($apkFile in $apkFiles) {
+foreach ($apkArtifact in $apkArtifacts) {
+    $apkFile = $apkArtifact.File
     $currentDigest = Get-ApkSignerDigest -ApkSignerPath $apksignerPath -ApkPath $apkFile.FullName
     if (-not $signerDigest) {
         $signerDigest = $currentDigest
@@ -498,12 +670,14 @@ if ($SigningMode -eq 'formal') {
 $artifactRoot = Join-Path $resolvedWorkspaceRoot ("tmp\release\{0}" -f $Tag)
 New-Item -ItemType Directory -Force -Path $artifactRoot | Out-Null
 $stagedApkPaths =
-    foreach ($apkFile in $apkFiles) {
+    foreach ($apkArtifact in $apkArtifacts) {
+        $apkFile = $apkArtifact.File
         $releaseAssetName =
             Get-ReleaseAssetName `
-                -OriginalFileName $apkFile.Name `
                 -ReleaseAssetPrefix $ReleaseAssetPrefix `
-                -SourceApkPrefix $SourceApkPrefix `
+                -ApkVersion $ApkVersion `
+                -Abi $apkArtifact.Abi `
+                -VariantSlug $apkArtifact.VariantSlug `
                 -SigningMode $SigningMode
         $stagedPath = Join-Path $artifactRoot $releaseAssetName
         Copy-Item -Force $apkFile.FullName $stagedPath
@@ -519,7 +693,7 @@ Write-Utf8File -Path $sha256Path -Content (($sha256Lines -join [Environment]::Ne
 $signingDescription = if ($SigningMode -eq 'formal') { 'formal release keystore' } else { 'local debug.keystore' }
 $assetPaths = @($stagedApkPaths) + $sha256Path
 $assetNames = $assetPaths | ForEach-Object { [System.IO.Path]::GetFileName($_) }
-$assetNamesToReplace = (@($apkFiles.Name) + @($assetNames)) | Sort-Object -Unique
+$assetNamesToReplace = (@($apkArtifacts | ForEach-Object { $_.File.Name }) + @($assetNames)) | Sort-Object -Unique
 $releaseNotes = Read-Utf8TextFileOrEmpty -Path $ReleaseNotesPath
 if (-not $effectivePreRelease -and -not $releaseNotes) {
     if ($AllowEmptyReleaseNotes.IsPresent) {

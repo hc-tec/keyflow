@@ -70,6 +70,9 @@ npm test
 - Android APK assets 的文件名前缀统一使用 `keyflow-`，例如：
   - 正式签名：`keyflow-<apkVersion>-<abi>-release.apk`
   - debug keystore 测试包：`keyflow-<apkVersion>-<abi>-release-debug.apk`
+  - 如果一个 release 同时发布多个包型，请保留包型 slug：
+    - `keyflow-<apkVersion>-standard-<abi>-release.apk`
+    - `keyflow-<apkVersion>-voice-<abi>-release.apk`
 - 正式签名 keystore 的本地生成与保存流程见 [docs/RELEASING.md](docs/RELEASING.md) 与 `scripts/release/`。
 - 具体流程见 [docs/RELEASING.md](docs/RELEASING.md)。
 

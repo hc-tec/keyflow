@@ -7,11 +7,11 @@ These scripts standardize how the workspace creates and uses the formal Android 
 - `new-android-release-keystore.ps1`
   - one-time keystore generation into `.local-secrets/android-release/`
 - `build-fcitx5-android-release.ps1`
-  - loads `SIGN_KEY_*` from `signing.env` and runs `:app:assembleRelease`
+  - loads `SIGN_KEY_*` from `signing.env` and runs `:app:assembleRelease` (which will aggregate all configured release flavors)
 - `export-android-signing-env.ps1`
   - prints the current signing env block, optionally including `SIGN_KEY_BASE64`
 - `publish-keyflow-android-release.ps1`
-  - creates or updates the `keyflow` Android GitHub Release, verifies signer + bundled kits, rewrites uploaded APK asset names to the `keyflow-` prefix, writes source/license metadata, uploads APKs and `SHA256SUMS.txt`
+  - creates or updates the `keyflow` Android GitHub Release, verifies signer + bundled kits, scans AGP `output-metadata.json` to collect all matching APK variants, rewrites uploaded APK asset names to the `keyflow-` prefix, writes source/license metadata, uploads APKs and `SHA256SUMS.txt`
 
 ## Recommended Flow
 
@@ -36,6 +36,9 @@ These scripts standardize how the workspace creates and uses the formal Android 
    Uploaded APK assets will be renamed like:
    - `keyflow-0.1.3-arm64-v8a-release.apk`
    - `keyflow-0.1.3-arm64-v8a-release-debug.apk`
+   - if multiple package variants are built in the same release:
+     - `keyflow-0.1.3-standard-arm64-v8a-release.apk`
+     - `keyflow-0.1.3-voice-arm64-v8a-release.apk`
 
    The release note will include:
    - source repo URL

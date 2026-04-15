@@ -29,6 +29,9 @@ Use this when publishing installable `fcitx5-android` builds through `keyflow`.
 - Uploaded APK asset names:
   - Formal signing: `keyflow-<apkVersion>-<abi>-release.apk`
   - Debug keystore / test build: `keyflow-<apkVersion>-<abi>-release-debug.apk`
+  - When publishing multiple package variants in one release, keep the variant slug in the asset name:
+    - Formal signing: `keyflow-<apkVersion>-standard-<abi>-release.apk`, `keyflow-<apkVersion>-voice-<abi>-release.apk`
+    - Debug keystore / test build: `keyflow-<apkVersion>-standard-<abi>-release-debug.apk`, `keyflow-<apkVersion>-voice-<abi>-release-debug.apk`
 
 ## Required Metadata
 
@@ -98,6 +101,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\release\build-fcitx5-android-
 ```
 
 The helper reads `.local-secrets/android-release/signing.env`, exports `SIGN_KEY_*` for the build process, adds `gettext` to `PATH` on Windows when available, and runs `:app:assembleRelease` in `fcitx5-android`.
+If the Android host defines multiple release flavors, `:app:assembleRelease` will build all of them (for example `standardRelease` + `voiceRelease`).
 
 ### Publish The Android Release
 
@@ -113,6 +117,7 @@ The publisher script will:
 - create or update the target GitHub Release by tag
 - verify that all APKs have the same signer SHA-256 digest
 - verify bundled Function Kits against the expected release set (`kit-store` + `shared` by default)
+- scan `app/build/outputs/apk/` recursively, read AGP `output-metadata.json`, and collect every matching release/debug APK variant
 - stage renamed APK assets with the `keyflow-` prefix before upload
 - write Android source metadata into the release note:
   - source repo URL
@@ -122,7 +127,7 @@ The publisher script will:
 - generate `SHA256SUMS.txt`
 - upload all ABI APKs plus `SHA256SUMS.txt`
 - append release notes (`## 更新内容`) from `-ReleaseNotesPath`
-- append an APK download guide (`## 下载哪个 APK？`) based on uploaded assets
+- append an APK download guide (`## 下载哪个 APK？`) based on uploaded assets; if multiple package variants are attached, the guide will explain both `standard` and `voice`
 
 For the current fork, the Android APK source-of-truth is:
 

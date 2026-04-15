@@ -370,14 +370,11 @@ function Add-RecommendedAssetLine {
     }
 }
 
-function Get-GitHubCredential {
-    $query = "protocol=https`nhost=github.com`n`n"
-    $response = $query | git credential fill
-    if ($LASTEXITCODE -ne 0) {
-        throw 'Unable to resolve GitHub credentials from git credential helper.'
-    }
+function Convert-CredentialResponseToMap {
+    param([string]$Response)
+
     $map = @{}
-    foreach ($line in ($response -split "`r?`n")) {
+    foreach ($line in ($Response -split "`r?`n")) {
         if (-not $line) {
             continue
         }
@@ -389,10 +386,28 @@ function Get-GitHubCredential {
         $value = $line.Substring($separator + 1)
         $map[$key] = $value
     }
-    if (-not $map.username -or -not $map.password) {
-        throw 'GitHub credential helper returned incomplete credentials.'
-    }
     return $map
+}
+
+function Get-GitHubCredential {
+    $query = "protocol=https`nhost=github.com`n`n"
+    $response = $query | git credential-manager get 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        $map = Convert-CredentialResponseToMap -Response ($response -join [Environment]::NewLine)
+        if ($map.username -and $map.password) {
+            return $map
+        }
+    }
+
+    $response = $query | git credential fill 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        $map = Convert-CredentialResponseToMap -Response ($response -join [Environment]::NewLine)
+        if ($map.username -and $map.password) {
+            return $map
+        }
+    }
+
+    throw 'Unable to resolve GitHub credentials from git credential helper.'
 }
 
 function New-GitHubHeaders {

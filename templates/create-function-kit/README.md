@@ -26,6 +26,25 @@ cd .\my-launchpad
 npm run open:kitstudio
 ```
 
+生成后的项目还会自带这些命令：
+
+```powershell
+npm run doctor
+npm run pack:zip
+npm run pack:npm -- --scope yourscope
+npm run publish:npm -- --scope yourscope --dry-run
+npm run catalog:entry -- --scope yourscope
+```
+
+也就是说，开发者不需要先 clone `keyflow` 仓库，当前工作区自己就带着：
+
+- KitStudio 启动脚本
+- 本地自检脚本
+- ZIP / npm 打包脚本
+- npm 发布脚本
+- catalog 提交片段生成脚本
+- 平台差异说明文档
+
 如果你看到 `[starter] Could not locate KitStudio.`，说明脚本没找到你的 KitStudio 仓库位置。你可以：
 
 - 把 KitStudio clone 到工作区同级目录：`..\kit-studio`
@@ -51,6 +70,23 @@ npx @keyflow2/create-function-kit my-launchpad --kit-id yourscope.launchpad --na
 - `--kit-studio-root <path>`：配合 `--open` 使用，显式指定 KitStudio 仓库目录
 - `--force`：覆盖已存在的目标目录
 - `--dry-run`：只打印计划动作，不落盘
+
+## 生成后建议顺序
+
+```powershell
+cd .\my-launchpad
+npm run open:kitstudio
+npm run doctor
+npm run pack:zip
+```
+
+确认真机闭环后，再继续：
+
+```powershell
+npm run pack:npm -- --scope yourscope
+npm run publish:npm -- --scope yourscope --dry-run
+npm run catalog:entry -- --scope yourscope
+```
 
 ## 维护者本地开发
 

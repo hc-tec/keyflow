@@ -18,6 +18,7 @@
 - Starter 模板（npm 包 + KitStudio 一键预览）：`TODO/function-kits/STARTER_TEMPLATE.md`
 - 开发者平台缺口与优先级：`TODO/function-kits/DEVELOPER_PLATFORM_GAPS.md`
 - 功能件开发者手册（WebView 约束/打包/导包/Bindings/结果呈现/生命周期）：`TODO/function-kits/DEVELOPER_GUIDE.md`
+- 平台差异短表（给 starter / 外部开发者看的简版）：`templates/function-kit-template-petite-vue/docs/PLATFORM_COMPATIBILITY.md`
 - 总手册（做什么/怎么做/怎么验收/怎么推广/怎么维护 SDK 文档）：`TODO/function-kits/PLAYBOOK.md`
 - Bindings 调研与方案（解决“入口与结果呈现”的矛盾）：`TODO/function-kits/BINDINGS_UX_RESEARCH.md`
 - 场景与选题库（用于选下一件做什么）：`TODO/function-kits/IDEA_BANK.md`

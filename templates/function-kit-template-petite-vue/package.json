@@ -1,10 +1,12 @@
 {
   "name": "@keyflow2/function-kit-template-petite-vue",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Starter workspace for Keyflow Function Kits with vendored runtime.js, petite-vue, shadcn-style CSS, and KitStudio launch helpers.",
   "license": "Apache-2.0",
   "type": "module",
   "files": [
+    ".gitignore",
+    "docs",
     "workspace",
     "scripts",
     "README.md"
@@ -22,8 +24,14 @@
     "ime"
   ],
   "scripts": {
+    "setup:kitstudio": "node ./scripts/setup-kitstudio.mjs",
     "open:kitstudio": "node ./scripts/open-in-kitstudio.mjs",
-    "rename:starter": "node ./scripts/rename-starter.mjs"
+    "rename:starter": "node ./scripts/rename-starter.mjs",
+    "doctor": "node ./scripts/doctor.mjs",
+    "pack:zip": "node ./scripts/pack-kit-zip.mjs",
+    "pack:npm": "node ./scripts/pack-kit-npm.mjs",
+    "publish:npm": "node ./scripts/publish-kit-npm.mjs",
+    "catalog:entry": "node ./scripts/generate-catalog-entry.mjs"
   },
   "repository": {
     "type": "git",

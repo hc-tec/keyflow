@@ -93,6 +93,39 @@ npm run rename:starter -- --kit-id yourscope.launchpad --name "Launchpad"
 - `workspace/function-kits/yourscope.launchpad/ui/app/main.js`
 - `workspace/function-kits/yourscope.launchpad/ui/app/styles.css`
 
+## 自检、打包、发布
+
+这个 starter 不只是“能开起来”，也把最基础的开发者闭环带进来了：
+
+- `npm run doctor`
+- `npm run pack:zip`
+- `npm run pack:npm`
+- `npm run publish:npm`
+- `npm run catalog:entry`
+
+推荐顺序：
+
+```powershell
+npm run doctor
+npm run pack:zip
+npm run pack:npm -- --scope yourscope
+npm run publish:npm -- --scope yourscope --dry-run
+npm run catalog:entry -- --scope yourscope
+```
+
+这些命令的作用：
+
+- `doctor`：检查 `manifest`、入口文件、图标、vendored 资源、`runtimePermissions`
+- `pack:zip`：生成给 Android Host / 下载中心用的 ZIP 安装包
+- `pack:npm`：生成 npm tarball 与 metadata
+- `publish:npm`：把当前 kit 发布到 npm
+- `catalog:entry`：生成官方 catalog 提交流程需要的 JSON / Markdown 片段
+
+详细说明见：
+
+- `docs/WORKFLOW.md`
+- `docs/PLATFORM_COMPATIBILITY.md`
+
 ## 目录说明
 
 ```text
@@ -127,5 +160,7 @@ workspace/
 
 1. 先在 KitStudio 里确认 starter 展示和 runtime 动作都正常。
 2. 把 `starter-showcase` 重命名成自己的 kitId。
-3. 删掉不需要的营销文案，保留你需要的 runtime 调用样板。
-4. 再决定要不要把 vendored 资源切回 shared/workspace 版本。
+3. 每次改动后先跑 `npm run doctor`。
+4. 删掉不需要的营销文案，保留你需要的 runtime 调用样板。
+5. 再决定要不要把 vendored 资源切回 shared/workspace 版本。
+6. 发布前至少再用真实 Android Host 验一次核心路径，不要只看 KitStudio。

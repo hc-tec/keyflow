@@ -91,6 +91,39 @@ npm run rename:starter -- --kit-id yourscope.launchpad --name "Launchpad"
 
 这意味着 rename 完以后，`npm run open:kitstudio` 仍然能继续工作，不会再卡在旧的 `starter-showcase` 路径。
 
+### 3.4 拿到 starter 之后，能不能不 clone keyflow 直接走完发布？
+
+现在可以。
+
+starter 工作区已经自带：
+
+- `npm run doctor`
+- `npm run pack:zip`
+- `npm run pack:npm`
+- `npm run publish:npm`
+- `npm run catalog:entry`
+
+以及本地文档：
+
+- `docs/WORKFLOW.md`
+- `docs/PLATFORM_COMPATIBILITY.md`
+
+这意味着一个外部开发者只靠：
+
+1. starter 包
+2. create CLI（可选）
+3. KitStudio
+
+就能完成：
+
+- 本地预览
+- 自检
+- ZIP 打包
+- npm 打包 / 发布
+- 生成官方 catalog 提交片段
+
+还不需要 clone `keyflow` 仓库。
+
 ## 4. 本仓库里如何构建 / 校验 / 发布
 
 在仓库根目录执行：
@@ -105,6 +138,11 @@ node scripts/npm/publish-starter-template.mjs --dry-run
 
 - tarball：`artifacts/npm/templates/function-kit-template-petite-vue/`
 - metadata：`artifacts/npm/templates/function-kit-template-petite-vue/starter-template.json`
+
+外部开发者的完整闭环见 starter 包内：
+
+- `templates/function-kit-template-petite-vue/docs/WORKFLOW.md`
+- `templates/function-kit-template-petite-vue/docs/PLATFORM_COMPATIBILITY.md`
 
 ## 5. 维护约定
 

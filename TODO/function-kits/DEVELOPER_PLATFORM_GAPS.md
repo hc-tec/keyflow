@@ -9,43 +9,24 @@
 - starter npm 包：`@keyflow2/function-kit-template-petite-vue`
 - starter 开箱预览：`templates/function-kit-template-petite-vue/scripts/open-in-kitstudio.mjs`
 - starter 重命名：`templates/function-kit-template-petite-vue/scripts/rename-starter.mjs`
+- developer doctor / validate：
+  - `templates/function-kit-template-petite-vue/scripts/doctor.mjs`
+  - 现在外部开发者不需要先回到仓库根目录找 verify 脚本
+- 外部开发者打包 / 发布闭环：
+  - `templates/function-kit-template-petite-vue/scripts/pack-kit-zip.mjs`
+  - `templates/function-kit-template-petite-vue/scripts/pack-kit-npm.mjs`
+  - `templates/function-kit-template-petite-vue/scripts/publish-kit-npm.mjs`
+  - `templates/function-kit-template-petite-vue/scripts/generate-catalog-entry.mjs`
+- 平台能力短文档：
+  - `templates/function-kit-template-petite-vue/docs/PLATFORM_COMPATIBILITY.md`
+  - `templates/function-kit-template-petite-vue/docs/WORKFLOW.md`
 - create CLI 包源码：`templates/create-function-kit/`
   - 目标是提供 `npx @keyflow2/create-function-kit ...` 这类入口
   - 当前源码已在仓库内，是否发布到 npm 由维护者单独执行
 
 ## P0：还应该优先补什么
 
-### 1. developer doctor / validate
-
-现状：
-
-- 维护者有 `build/verify` 脚本
-- kit 作者还没有一个“我这项目为什么跑不起来”的一键自检命令
-
-建议补：
-
-- `manifest.json` schema 校验
-- `runtimePermissions` 与常见 API 使用的缺项提醒
-- `entry.bundle.html` / `script` / `style` 路径存在性检查
-- starter vendored 依赖齐全性检查
-- Android Host / KitStudio 能力差异提示
-
-### 2. 平台能力兼容矩阵
-
-现状：
-
-- 事实散在 `DEVELOPER_GUIDE.md`
-- 开发者最容易误判的是“KitStudio 可跑 = Android Host 也都支持”
-
-建议补一张短表：
-
-- capability
-- KitStudio
-- Android Host
-- 当前限制
-- 推荐替代方案
-
-### 3. 官方模板矩阵
+### 1. 官方模板矩阵
 
 现状：
 
@@ -59,16 +40,7 @@
 
 ## P1：值得继续做，但不必先做
 
-### 4. 外部开发者发布闭环
-
-把“做完 kit 以后怎么发出去”继续产品化：
-
-- 一键 pack
-- 一键 publish
-- 一键生成 catalog entry
-- 最短官方 catalog 提交流程
-
-### 5. vendored 资产同步自动化
+### 2. vendored 资产同步自动化
 
 现状：
 
@@ -79,7 +51,7 @@
 - CI 检查 starter vendored 副本是否落后于事实来源
 - 必要时自动同步脚本
 
-### 6. 更多真实样例
+### 3. 更多真实样例
 
 除了 starter 本身，再挑几类“开发者最可能照抄”的官方样板继续整理成可直接 fork 的目录：
 
@@ -95,4 +67,4 @@
 > 一个第一次接触 Keyflow Function Kit 的开发者，能不能在 15 分钟内完成：
 > 创建项目 → 看见真实效果 → 改出自己的第一个动作 → 知道怎么继续发布
 
-只要这条链路上还有明显问号，上面的 P0 就还没做完。
+当前这条链路的基础闭环已经具备，但“更适合不同场景的官方 starter 模板”仍然没补齐。

@@ -1,0 +1,65 @@
+name: catalog-submission
+
+on:
+  pull_request:
+    paths:
+      - "catalog/official.packages.json"
+      - "scripts/npm/generate-catalog-from-registry.mjs"
+      - "scripts/npm/validate-official-catalog-submission.mjs"
+      - "scripts/npm/_lib.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Fetch base ref
+        if: github.event_name == 'pull_request'
+        shell: bash
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          git fetch origin "$BASE_REF" --depth=1
+
+      - name: Validate official catalog submission
+        shell: bash
+        env:
+          BASE_REF: ${{ github.base_ref || 'main' }}
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            node scripts/npm/validate-official-catalog-submission.mjs --base-ref "origin/$BASE_REF"
+          else
+            node scripts/npm/validate-official-catalog-submission.mjs
+          fi
+
+      - name: Append summary
+        if: always()
+        shell: bash
+        run: |
+          SUMMARY="artifacts/npm/catalog-submission/catalog-submission-summary.md"
+          if [ -f "$SUMMARY" ]; then
+            cat "$SUMMARY" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No catalog submission summary generated." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload catalog submission report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog-submission-report
+          path: artifacts/npm/catalog-submission/
+          if-no-files-found: warn

@@ -16,6 +16,7 @@
   - `templates/function-kit-template-petite-vue/scripts/pack-kit-zip.mjs`
   - `templates/function-kit-template-petite-vue/scripts/pack-kit-npm.mjs`
   - `templates/function-kit-template-petite-vue/scripts/publish-kit-npm.mjs`
+  - `templates/function-kit-template-petite-vue/scripts/catalog-check.mjs`
   - `templates/function-kit-template-petite-vue/scripts/generate-catalog-entry.mjs`
 - 平台能力短文档：
   - `templates/function-kit-template-petite-vue/docs/PLATFORM_COMPATIBILITY.md`

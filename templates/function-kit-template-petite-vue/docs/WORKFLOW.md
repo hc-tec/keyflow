@@ -90,7 +90,25 @@ npm run publish:npm -- --scope yourscope --token-file .\tmp\npm-token.txt
 npm run publish:npm -- --scope yourscope --dry-run
 ```
 
-### 2.4 生成官方 catalog 提交片段
+### 2.4 先做官方 catalog 提交前检查
+
+```powershell
+npm run catalog:check -- --scope yourscope
+```
+
+输出：
+
+- `artifacts/catalog/<kitId>.catalog-check.json`
+- `artifacts/catalog/<kitId>.catalog-entry.md`
+
+这一步会直接到 npm registry 检查：
+
+- 目标包和版本是否真的已发布
+- `dist.tarball` / `dist.integrity` 是否可用
+- tarball 里的 `manifest.json` / `package.json` 是否和本地 kit 对得上
+- bundle 文件和图标文件是否真的被打进包里
+
+### 2.5 生成官方 catalog 提交片段
 
 ```powershell
 npm run catalog:entry -- --scope yourscope
@@ -110,14 +128,15 @@ npm run catalog:entry -- --scope yourscope
 
 - 只想本机或小范围测试：优先 `pack:zip`
 - 想让用户通过 `npm:` 安装或做版本更新检查：用 `pack:npm` / `publish:npm`
-- 想进官方 catalog：先发布 npm，再跑 `catalog:entry`
+- 想进官方 catalog：先发布 npm，再跑 `catalog:check`，通过后再跑 `catalog:entry`
 
 如果你要给 Android 用户长期分发，通常顺序是：
 
 1. `npm run doctor`
 2. `npm run pack:zip` 做真机安装验收
 3. `npm run pack:npm` / `npm run publish:npm`
-4. `npm run catalog:entry`
+4. `npm run catalog:check`
+5. `npm run catalog:entry`
 
 ## 4. 版本管理提醒
 

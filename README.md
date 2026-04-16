@@ -58,6 +58,7 @@ npm run pack:zip
 - `npm run pack:zip`
 - `npm run pack:npm`
 - `npm run publish:npm`
+- `npm run catalog:check`
 - `npm run catalog:entry`
 
 也就是说，starter + KitStudio 已经覆盖：
@@ -66,6 +67,7 @@ npm run pack:zip
 - 本地自检
 - ZIP 打包
 - npm 打包 / 发布准备
+- 官方 catalog 提交前检查
 - 官方 catalog 提交片段生成
 
 当前官方 starter 方向：

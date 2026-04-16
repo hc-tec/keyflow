@@ -33,6 +33,7 @@ npm run doctor
 npm run pack:zip
 npm run pack:npm -- --scope keyflow2
 npm run publish:npm -- --scope keyflow2 --dry-run
+npm run catalog:check -- --scope keyflow2
 npm run catalog:entry -- --scope keyflow2
 ```
 
@@ -51,6 +52,7 @@ npm run doctor
 npm run pack:zip
 npm run pack:npm -- --scope keyflow2
 npm run publish:npm -- --scope keyflow2 --dry-run
+npm run catalog:check -- --scope keyflow2
 npm run catalog:entry -- --scope keyflow2
 ```
 

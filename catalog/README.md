@@ -63,11 +63,24 @@
 ### A. 提交 PR（推荐，自动化最好）
 
 1. 先把 kit 发布到 npm（你的包名通常类似：`@<your-scope>/keyflow-kit-<kitId>@<version>`）
-2. Fork 本仓库
-3. 在你的 PR 里只改一个文件：`catalog/official.packages.json`，新增一行包版本
-4. PR 描述里附上：kit 的简介、截图/录屏（可选）、以及 runtime permissions（让审核更快）
+2. 在你自己的 starter 工作区里先跑：
 
-维护者合并后，会按 `official.packages.json` 重新生成官方目录并发布到：`@keyflow2/keyflow-kit-catalog`
+   ```powershell
+   npm run catalog:check -- --scope yourscope
+   npm run catalog:entry -- --scope yourscope
+   ```
+
+3. Fork 本仓库
+4. 在你的 PR 里只改一个文件：`catalog/official.packages.json`，新增一行包版本
+5. 把 `artifacts/catalog/<kitId>.catalog-entry.md` 里的内容贴到 PR 描述里（权限 / 平台 / 说明会更完整）
+
+PR 会自动校验：
+
+- 新增/更新的 npm 包版本是否已存在
+- 生成官方 catalog 是否成功
+- 新条目的 `kitId` 是否和现有条目冲突
+
+维护者合并后，会按 `official.packages.json` 自动重新生成官方目录并发布到：`@keyflow2/keyflow-kit-catalog`
 
 ### B. 提交 Issue（更轻量，但需要人工补写）
 

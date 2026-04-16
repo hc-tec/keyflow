@@ -53,6 +53,7 @@ npm run doctor
 npm run pack:zip
 npm run pack:npm -- --scope yourscope
 npm run publish:npm -- --scope yourscope --dry-run
+npm run catalog:check -- --scope yourscope
 npm run catalog:entry -- --scope yourscope
 ```
 
@@ -63,6 +64,12 @@ npm run catalog:entry -- --scope yourscope
 - 误用 `localStorage/sessionStorage/indexedDB/document.cookie`
 - 外链 `<script src="https://...">`
 - 直接使用 `fetch/XMLHttpRequest/WebSocket/window.open/eval`
+
+发布 npm 之后，先跑：
+
+- `npm run catalog:check -- --scope yourscope`
+
+它会直接验证已发布包的 tarball / integrity / manifest 是否真的可用于官方 catalog 收录。
 
 完整流程见：
 

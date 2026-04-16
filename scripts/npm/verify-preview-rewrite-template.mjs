@@ -47,6 +47,7 @@ const required = [
   "package/scripts/pack-kit-zip.mjs",
   "package/scripts/pack-kit-npm.mjs",
   "package/scripts/publish-kit-npm.mjs",
+  "package/scripts/catalog-check.mjs",
   "package/scripts/generate-catalog-entry.mjs",
   "package/workspace/function-kits/preview-rewrite-starter/manifest.json",
   "package/workspace/function-kits/preview-rewrite-starter/ui/app/index.html",

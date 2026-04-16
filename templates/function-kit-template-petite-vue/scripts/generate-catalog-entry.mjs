@@ -54,8 +54,9 @@ const entry = {
   platforms: Array.isArray(kit.manifest.platforms) ? kit.manifest.platforms : [],
   nextSteps: [
     "1. Publish the npm package if you have not done so yet.",
-    "2. Submit this package name + version to the official catalog PR/Issue flow.",
-    "3. Keep kitId globally unique; recommended format is <npmScope>.<kitSlug>.",
+    "2. Run catalog:check and make sure the published tarball/manifest validation passes.",
+    "3. Submit this package name + version to the official catalog PR/Issue flow.",
+    "4. Keep kitId globally unique; recommended format is <npmScope>.<kitSlug>.",
   ],
   officialCatalogSubmission: {
     packagesJsonLine: packageName,

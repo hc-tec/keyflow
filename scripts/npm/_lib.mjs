@@ -4,6 +4,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+const semverPattern = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
+
 export function getRepoRoot() {
   const here = path.dirname(fileURLToPath(import.meta.url));
   return path.resolve(here, "..", "..");
@@ -188,4 +190,28 @@ export function resolvePackageName({ scope, prefix, kitId }) {
   if (!scope) return base;
   const s = scope.startsWith("@") ? scope : `@${scope}`;
   return `${s}/${base}`;
+}
+
+export function isSemverLike(value) {
+  return semverPattern.test(String(value ?? "").trim());
+}
+
+export function parsePackageSpec(spec) {
+  const value = String(spec ?? "").trim();
+  if (!value) {
+    throw new Error("[npm] Invalid package spec: empty value");
+  }
+  const versionSeparator = value.lastIndexOf("@");
+  if (versionSeparator <= 0 || versionSeparator === value.length - 1) {
+    throw new Error(`[npm] Invalid package spec (expected <name>@<version>): ${value}`);
+  }
+  const name = value.slice(0, versionSeparator).trim();
+  const version = value.slice(versionSeparator + 1).trim();
+  if (!name || !version) {
+    throw new Error(`[npm] Invalid package spec (expected <name>@<version>): ${value}`);
+  }
+  if (!isSemverLike(version)) {
+    throw new Error(`[npm] Invalid package spec version (expected exact semver): ${value}`);
+  }
+  return { spec: value, name, version };
 }

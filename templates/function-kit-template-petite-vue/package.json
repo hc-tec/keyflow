@@ -30,6 +30,7 @@
     "pack:zip": "node ./scripts/pack-kit-zip.mjs",
     "pack:npm": "node ./scripts/pack-kit-npm.mjs",
     "publish:npm": "node ./scripts/publish-kit-npm.mjs",
+    "catalog:check": "node ./scripts/catalog-check.mjs",
     "catalog:entry": "node ./scripts/generate-catalog-entry.mjs"
   },
   "repository": {

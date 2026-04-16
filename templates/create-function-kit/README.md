@@ -33,6 +33,7 @@ npm run doctor
 npm run pack:zip
 npm run pack:npm -- --scope yourscope
 npm run publish:npm -- --scope yourscope --dry-run
+npm run catalog:check -- --scope yourscope
 npm run catalog:entry -- --scope yourscope
 ```
 
@@ -42,6 +43,7 @@ npm run catalog:entry -- --scope yourscope
 - 本地自检脚本
 - ZIP / npm 打包脚本
 - npm 发布脚本
+- catalog 提交前检查脚本
 - catalog 提交片段生成脚本
 - 平台差异说明文档
 
@@ -105,6 +107,7 @@ npm run pack:zip
 ```powershell
 npm run pack:npm -- --scope yourscope
 npm run publish:npm -- --scope yourscope --dry-run
+npm run catalog:check -- --scope yourscope
 npm run catalog:entry -- --scope yourscope
 ```
 

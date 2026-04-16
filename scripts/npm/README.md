@@ -67,6 +67,18 @@ node scripts/npm/generate-catalog-from-registry.mjs --packages-file catalog/offi
 node scripts/npm/sync-official-catalog.mjs --packages-file catalog/official.packages.json --out-file catalog/official.catalog.json --catalog-name @keyflow2/keyflow-kit-catalog --token-file tmp/npm-token.txt
 ```
 
+维护者往 `catalog/official.packages.json` 里新增或更新包版本时，推荐不要手改 JSON，直接用：
+
+```bash
+node scripts/npm/add-official-package.mjs @your-scope/keyflow-kit-demo@0.1.0
+```
+
+本地想先模拟 PR 校验时可以跑：
+
+```bash
+node scripts/npm/validate-official-catalog-submission.mjs --base-ref origin/main
+```
+
 ## 4) 发布到 npm（需要 token）
 
 先在本机配置好 npm token（不要把 token 写进仓库）：
@@ -172,6 +184,7 @@ Starter 包源码在：
 - `scripts/pack-kit-zip.mjs`
 - `scripts/pack-kit-npm.mjs`
 - `scripts/publish-kit-npm.mjs`
+- `scripts/catalog-check.mjs`
 - `scripts/generate-catalog-entry.mjs`
 - `docs/WORKFLOW.md`
 - `docs/PLATFORM_COMPATIBILITY.md`
@@ -187,6 +200,7 @@ npm run doctor
 npm run pack:zip
 npm run pack:npm -- --scope yourscope
 npm run publish:npm -- --scope yourscope --dry-run
+npm run catalog:check -- --scope yourscope
 npm run catalog:entry -- --scope yourscope
 ```
 
@@ -232,6 +246,7 @@ npm run doctor
 npm run pack:zip
 npm run pack:npm -- --scope yourscope
 npm run publish:npm -- --scope yourscope --dry-run
+npm run catalog:check -- --scope yourscope
 npm run catalog:entry -- --scope yourscope
 ```
 

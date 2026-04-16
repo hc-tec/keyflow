@@ -101,6 +101,7 @@ npm run rename:starter -- --kit-id yourscope.launchpad --name "Launchpad"
 - `npm run pack:zip`
 - `npm run pack:npm`
 - `npm run publish:npm`
+- `npm run catalog:check`
 - `npm run catalog:entry`
 
 推荐顺序：
@@ -110,6 +111,7 @@ npm run doctor
 npm run pack:zip
 npm run pack:npm -- --scope yourscope
 npm run publish:npm -- --scope yourscope --dry-run
+npm run catalog:check -- --scope yourscope
 npm run catalog:entry -- --scope yourscope
 ```
 
@@ -119,6 +121,7 @@ npm run catalog:entry -- --scope yourscope
 - `pack:zip`：生成给 Android Host / 下载中心用的 ZIP 安装包
 - `pack:npm`：生成 npm tarball 与 metadata
 - `publish:npm`：把当前 kit 发布到 npm
+- `catalog:check`：到真实 npm registry 校验已发布包、tarball、integrity、manifest，并输出官方 catalog 提交前检查结果
 - `catalog:entry`：生成官方 catalog 提交流程需要的 JSON / Markdown 片段
 
 详细说明见：

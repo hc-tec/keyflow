@@ -192,6 +192,7 @@ function makeWorkspaceReadme({ kitId, name }) {
     "npm run pack:zip",
     "npm run pack:npm -- --scope yourscope",
     "npm run publish:npm -- --scope yourscope --dry-run",
+    "npm run catalog:check -- --scope yourscope",
     "npm run catalog:entry -- --scope yourscope",
     "```",
     "",

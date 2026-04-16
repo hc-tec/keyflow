@@ -73,7 +73,7 @@ npm run pack:zip
 当前官方 starter 方向：
 
 - `starter` / `petite-vue`：通用模板，适合大多数 panel/action/settings 类 kit
-- `preview-rewrite`：正文预览替换型 AI 模板，仓库内已准备、待 npm 发布，适合纠错 / 润色 / 翻译 / 摘要这类流程
+- `preview-rewrite`：正文预览替换型 AI 模板，适合纠错 / 润色 / 翻译 / 摘要这类流程
 
 更细的说明在生成项目内：
 

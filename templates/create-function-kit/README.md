@@ -74,7 +74,6 @@ npx @keyflow2/create-function-kit my-launchpad --kit-id yourscope.launchpad --na
 - `preview-rewrite`
   - 适合纠错 / 润色 / 翻译 / 摘要这类“先生成预览，再确认替换”的正文型 AI Function Kit
   - 对应 npm 包：`@keyflow2/function-kit-template-preview-rewrite`
-  - 当前仓库已准备好模板目录；npm 包发布前，维护者本地请先走 `--template-dir`
 
 查看当前内置别名：
 

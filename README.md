@@ -25,24 +25,34 @@ Android 宿主仓库在：
 
 ## Function Kits（功能件）开发入口
 
-如果你打开这个仓库是为了「写一个功能件」，从这几个入口开始最不容易迷路：
+### 开发者 5 分钟上手
 
-- 功能件索引（现有 kits + 下一步该做什么）：[TODO/function-kits/INDEX.md](TODO/function-kits/INDEX.md)
-- 从 0 创建一个 kit：`npx @keyflow2/create-function-kit <dir> --kit-id <scope>.<slug> --name "..."`（详见 [templates/create-function-kit/README.md](templates/create-function-kit/README.md)）
-- 开发手册（manifest / host bridge / lifecycle / 打包）：[TODO/function-kits/DEVELOPER_GUIDE.md](TODO/function-kits/DEVELOPER_GUIDE.md)
-- 选题与待办（不知道做什么就从这里挑）：[TODO/function-kits/IDEA_BANK.md](TODO/function-kits/IDEA_BANK.md)、[TODO/function-kits/DEVELOPER_PLATFORM_GAPS.md](TODO/function-kits/DEVELOPER_PLATFORM_GAPS.md)
-- 发布与上架（npm + 官方 catalog）：[scripts/npm/README.md](scripts/npm/README.md)、[catalog/README.md](catalog/README.md)
-
-如果你是外部开发者，不打算 clone `keyflow` 仓库，当前推荐路径就是：
+如果你只是想写一个 Function Kit，不需要先 clone `keyflow` 仓库。直接按这条路径走：
 
 ```powershell
+mkdir my-kits
+cd .\my-kits
+
+git clone https://github.com/hc-tec/kitstudio.git .\kit-studio
+cd .\kit-studio
+npm install
+cd ..
+
 npx @keyflow2/create-function-kit my-launchpad --kit-id yourscope.launchpad --name "Launchpad"
 cd .\my-launchpad
 npm run open:kitstudio
 npm run doctor
+npm run pack:zip
 ```
 
-生成后的工作区已经自带完整的本地入口：
+这条链路会给你：
+
+- starter 工作区
+- KitStudio 本地预览
+- 本地自检
+- ZIP 安装包
+
+生成后的工作区已经自带这些命令：
 
 - `npm run doctor`
 - `npm run pack:zip`
@@ -55,13 +65,23 @@ npm run doctor
 - 本地预览
 - 本地自检
 - ZIP 打包
-- npm 打包 / 发布
+- npm 打包 / 发布准备
 - 官方 catalog 提交片段生成
 
-对应说明在生成项目内的：
+更细的说明在生成项目内：
 
 - `docs/WORKFLOW.md`
 - `docs/PLATFORM_COMPATIBILITY.md`
+
+### 仓库内继续看哪里
+
+如果你打开这个仓库是为了看现有 kits、协议和深层文档，从这几个入口开始：
+
+- 功能件索引（现有 kits + 下一步该做什么）：[TODO/function-kits/INDEX.md](TODO/function-kits/INDEX.md)
+- 从 0 创建一个 kit：`npx @keyflow2/create-function-kit <dir> --kit-id <scope>.<slug> --name "..."`（详见 [templates/create-function-kit/README.md](templates/create-function-kit/README.md)）
+- 开发手册（manifest / host bridge / lifecycle / 打包）：[TODO/function-kits/DEVELOPER_GUIDE.md](TODO/function-kits/DEVELOPER_GUIDE.md)
+- 选题与待办（不知道做什么就从这里挑）：[TODO/function-kits/IDEA_BANK.md](TODO/function-kits/IDEA_BANK.md)、[TODO/function-kits/DEVELOPER_PLATFORM_GAPS.md](TODO/function-kits/DEVELOPER_PLATFORM_GAPS.md)
+- 发布与上架（npm + 官方 catalog）：[scripts/npm/README.md](scripts/npm/README.md)、[catalog/README.md](catalog/README.md)
 
 ## 快速开始（Runtime SDK）
 

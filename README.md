@@ -33,6 +33,36 @@ Android 宿主仓库在：
 - 选题与待办（不知道做什么就从这里挑）：[TODO/function-kits/IDEA_BANK.md](TODO/function-kits/IDEA_BANK.md)、[TODO/function-kits/DEVELOPER_PLATFORM_GAPS.md](TODO/function-kits/DEVELOPER_PLATFORM_GAPS.md)
 - 发布与上架（npm + 官方 catalog）：[scripts/npm/README.md](scripts/npm/README.md)、[catalog/README.md](catalog/README.md)
 
+如果你是外部开发者，不打算 clone `keyflow` 仓库，当前推荐路径就是：
+
+```powershell
+npx @keyflow2/create-function-kit my-launchpad --kit-id yourscope.launchpad --name "Launchpad"
+cd .\my-launchpad
+npm run open:kitstudio
+npm run doctor
+```
+
+生成后的工作区已经自带完整的本地入口：
+
+- `npm run doctor`
+- `npm run pack:zip`
+- `npm run pack:npm`
+- `npm run publish:npm`
+- `npm run catalog:entry`
+
+也就是说，starter + KitStudio 已经覆盖：
+
+- 本地预览
+- 本地自检
+- ZIP 打包
+- npm 打包 / 发布
+- 官方 catalog 提交片段生成
+
+对应说明在生成项目内的：
+
+- `docs/WORKFLOW.md`
+- `docs/PLATFORM_COMPATIBILITY.md`
+
 ## 快速开始（Runtime SDK）
 
 ```bash

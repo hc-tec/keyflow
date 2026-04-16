@@ -22,6 +22,24 @@ node scripts/npm/build-create-function-kit.mjs
 node scripts/npm/verify-create-function-kit.mjs
 ```
 
+如果你改动的是“外部开发者拿到 starter 以后”的体验，还要再补一轮生成项目 smoke：
+
+```bash
+node templates/create-function-kit/bin/create-function-kit.mjs artifacts/smoke/external-workflow --template-dir templates/function-kit-template-petite-vue --kit-id keyflow2.smoke --name "Smoke" --force
+cd artifacts/smoke/external-workflow
+npm run doctor
+npm run pack:zip
+npm run pack:npm -- --scope keyflow2
+npm run publish:npm -- --scope keyflow2 --dry-run
+npm run catalog:entry -- --scope keyflow2
+```
+
+这轮 smoke 不是可选装饰，它验证的是：
+
+- 生成后的项目 README / docs 是否对得上
+- Windows 下 `npm` / `powershell` 拉起是否正常
+- 外部开发者不 clone `keyflow` 仓库时，能不能自己完成打包 / 发布准备
+
 ## 开发环境（完整 workspace）
 
 如果你需要 KitStudio / Android IME 宿主一起联调，请先按 `docs/DEVELOPMENT.md` 搭好完整环境。

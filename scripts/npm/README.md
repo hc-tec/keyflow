@@ -168,10 +168,27 @@ Starter 包源码在：
 - `workspace/function-kits/starter-showcase/`
 - `scripts/open-in-kitstudio.mjs`
 - `scripts/rename-starter.mjs`
+- `scripts/doctor.mjs`
+- `scripts/pack-kit-zip.mjs`
+- `scripts/pack-kit-npm.mjs`
+- `scripts/publish-kit-npm.mjs`
+- `scripts/generate-catalog-entry.mjs`
+- `docs/WORKFLOW.md`
+- `docs/PLATFORM_COMPATIBILITY.md`
 
 Starter 的详细说明见：
 
 - `TODO/function-kits/STARTER_TEMPLATE.md`
+
+外部开发者生成项目以后，不需要再回到 `keyflow` 仓库根目录找脚本；生成出来的工作区自己就带着：
+
+```bash
+npm run doctor
+npm run pack:zip
+npm run pack:npm -- --scope yourscope
+npm run publish:npm -- --scope yourscope --dry-run
+npm run catalog:entry -- --scope yourscope
+```
 
 ## 9) 构建开发者 create CLI（把 starter 一键解到本地目录）
 

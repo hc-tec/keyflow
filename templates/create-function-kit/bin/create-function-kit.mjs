@@ -6,6 +6,20 @@ import os from "node:os";
 import path from "node:path";
 
 const defaultTemplatePackage = "@keyflow2/function-kit-template-petite-vue";
+const officialTemplatePackages = Object.freeze({
+  starter: {
+    packageName: "@keyflow2/function-kit-template-petite-vue",
+    description: "General petite-vue starter for standard panel/action kits.",
+  },
+  "petite-vue": {
+    packageName: "@keyflow2/function-kit-template-petite-vue",
+    description: "Alias of the default general-purpose starter.",
+  },
+  "preview-rewrite": {
+    packageName: "@keyflow2/function-kit-template-preview-rewrite",
+    description: "AI text preview starter for proofread/polish/translate/summary flows.",
+  },
+});
 const defaultWorkspaceNamePrefix = "function-kit-workspace-";
 const kitIdPattern = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/;
 
@@ -75,8 +89,9 @@ function usage() {
       "  npx @keyflow2/create-function-kit <target-dir> [--kit-id yourscope.launchpad] [--name \"Launchpad\"]",
       "",
       "Options:",
-      `  --template <npm-ref>       starter package to download (default: ${defaultTemplatePackage})`,
+      "  --template <name|npm-ref>  starter template alias or npm package",
       "  --template-dir <path>      use a local starter directory instead of npm (maintainers/dev only)",
+      "  --list-templates           show official starter aliases",
       "  --kit-id <id>              new manifest.id and kit directory name (defaults to target dir name)",
       "  --name <label>             display name shown in the starter UI",
       "  --description <text>       override starter description",
@@ -87,6 +102,14 @@ function usage() {
       "  --dry-run                  print planned actions only",
     ].join("\n")
   );
+}
+
+function printOfficialTemplates() {
+  console.log("Official starter aliases:");
+  for (const [name, info] of Object.entries(officialTemplatePackages)) {
+    console.log(`  - ${name.padEnd(16)} ${info.packageName}`);
+    console.log(`    ${info.description}`);
+  }
 }
 
 async function pathExists(targetPath, type = null) {
@@ -261,6 +284,29 @@ async function resolveTemplateRoot({ templateDir, templatePackage, tempRoot }) {
   return extractedRoot;
 }
 
+function resolveTemplatePackage(templateValue) {
+  const raw = safeText(templateValue);
+  if (!raw) {
+    return {
+      packageName: defaultTemplatePackage,
+      label: `starter -> ${defaultTemplatePackage}`,
+    };
+  }
+
+  const official = officialTemplatePackages[raw.toLowerCase()];
+  if (official) {
+    return {
+      packageName: official.packageName,
+      label: `${raw} -> ${official.packageName}`,
+    };
+  }
+
+  return {
+    packageName: raw,
+    label: raw,
+  };
+}
+
 async function runRenameScript({ targetDir, kitId, name, description, workspaceName }) {
   const renameScriptPath = path.join(targetDir, "scripts", "rename-starter.mjs");
   if (!(await pathExists(renameScriptPath, "file"))) {
@@ -315,6 +361,10 @@ if (args.get("help")) {
   usage();
   process.exit(0);
 }
+if (args.get("list-templates")) {
+  printOfficialTemplates();
+  process.exit(0);
+}
 
 const targetArg = safeText(args.get("dir")) || safeText(positional[0]);
 if (!targetArg) {
@@ -335,14 +385,15 @@ if (!kitId || !kitIdPattern.test(kitId)) {
 const name = safeText(args.get("name")) || toTitleCase(kitId);
 const description = safeText(args.get("description"));
 const workspaceName = safeText(args.get("workspace-name")) || toWorkspacePackageName(kitId);
-const templatePackage = safeText(args.get("template")) || defaultTemplatePackage;
+const templateSelection = resolveTemplatePackage(args.get("template"));
+const templatePackage = templateSelection.packageName;
 const templateDir = safeText(args.get("template-dir"));
 const force = args.get("force") === true;
 const dryRun = args.get("dry-run") === true;
 const shouldOpen = args.get("open") === true;
 
 console.log(`[create] targetDir     : ${targetDir}`);
-console.log(`[create] template      : ${templateDir ? path.resolve(process.cwd(), templateDir) : templatePackage}`);
+console.log(`[create] template      : ${templateDir ? path.resolve(process.cwd(), templateDir) : templateSelection.label}`);
 console.log(`[create] kitId         : ${kitId}`);
 console.log(`[create] name          : ${name}`);
 console.log(`[create] workspaceName : ${workspaceName}`);

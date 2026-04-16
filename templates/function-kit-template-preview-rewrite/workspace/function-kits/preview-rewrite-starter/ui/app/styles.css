@@ -1,0 +1,157 @@
+html,
+body {
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+
+.panel-shell {
+  height: 100%;
+  padding: var(--kit-space-2, 12px);
+  display: flex;
+  flex-direction: column;
+  background: hsl(var(--background));
+}
+
+.editor-screen,
+.preview-screen {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--kit-space-2, 12px);
+}
+
+.preview-screen {
+  overflow: hidden;
+}
+
+.preview-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--kit-space-2, 12px);
+  padding-right: 2px;
+}
+
+.editor-card {
+  flex: 1;
+  min-height: 180px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.editor-textarea {
+  height: 100%;
+  min-height: 100%;
+  resize: none;
+  border: 0;
+  box-shadow: none;
+  padding: 16px;
+  line-height: 1.6;
+  letter-spacing: 0;
+}
+
+.editor-textarea:disabled {
+  cursor: progress;
+}
+
+.feedback-line {
+  padding: 0 4px;
+  color: hsl(var(--muted-foreground));
+  font-size: 12px;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.feedback-line[data-kind="error"] {
+  color: hsl(var(--destructive));
+}
+
+.main-action {
+  width: 100%;
+  min-height: 44px;
+}
+
+.compare-card {
+  flex: 0 0 auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.compare-card--source {
+  opacity: 0.92;
+}
+
+.compare-card__head {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 12px 0;
+}
+
+.compare-card__body {
+  max-height: clamp(132px, 28vh, 220px);
+  overflow: auto;
+  padding: 8px 12px 14px;
+}
+
+.compare-card--result .compare-card__body {
+  max-height: clamp(164px, 34vh, 280px);
+}
+
+.compare-text {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  color: hsl(var(--foreground));
+  font-size: 16px;
+  line-height: 1.6;
+  letter-spacing: 0;
+}
+
+.diff-mark--original,
+.diff-mark--result {
+  padding: 0 1px;
+  border-radius: 4px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.diff-mark--original {
+  color: hsl(var(--destructive));
+  background: hsl(var(--destructive) / 0.12);
+}
+
+.diff-mark--result {
+  color: hsl(var(--foreground));
+  background: hsl(var(--primary) / 0.12);
+}
+
+.preview-actions {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.35fr);
+  gap: var(--kit-space-1, 8px);
+  padding-top: 2px;
+  background: hsl(var(--background));
+}
+
+.preview-actions .primary-wide,
+.preview-actions .secondary-wide {
+  min-height: 44px;
+}
+
+@media (max-width: 420px) {
+  .panel-shell {
+    padding: 12px;
+  }
+
+  .compare-card__body {
+    padding: 8px 10px 12px;
+  }
+}

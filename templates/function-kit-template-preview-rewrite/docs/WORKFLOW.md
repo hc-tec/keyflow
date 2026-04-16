@@ -34,7 +34,7 @@ npm run doctor
 如果你的工作区里有多个 kit，用 `--kit` 指定目标：
 
 ```powershell
-npm run doctor -- --kit yourscope.launchpad
+npm run doctor -- --kit yourscope.proofreader
 ```
 
 ## 2. 打包与分发

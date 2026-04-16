@@ -68,6 +68,11 @@ npm run pack:zip
 - npm 打包 / 发布准备
 - 官方 catalog 提交片段生成
 
+当前官方 starter 方向：
+
+- `starter` / `petite-vue`：通用模板，适合大多数 panel/action/settings 类 kit
+- `preview-rewrite`：正文预览替换型 AI 模板，仓库内已准备、待 npm 发布，适合纠错 / 润色 / 翻译 / 摘要这类流程
+
 更细的说明在生成项目内：
 
 - `docs/WORKFLOW.md`
@@ -79,6 +84,7 @@ npm run pack:zip
 
 - 功能件索引（现有 kits + 下一步该做什么）：[TODO/function-kits/INDEX.md](TODO/function-kits/INDEX.md)
 - 从 0 创建一个 kit：`npx @keyflow2/create-function-kit <dir> --kit-id <scope>.<slug> --name "..."`（详见 [templates/create-function-kit/README.md](templates/create-function-kit/README.md)）
+- 官方 starter 模板矩阵与本地用法：[templates/create-function-kit/README.md](templates/create-function-kit/README.md)
 - 开发手册（manifest / host bridge / lifecycle / 打包）：[TODO/function-kits/DEVELOPER_GUIDE.md](TODO/function-kits/DEVELOPER_GUIDE.md)
 - 选题与待办（不知道做什么就从这里挑）：[TODO/function-kits/IDEA_BANK.md](TODO/function-kits/IDEA_BANK.md)、[TODO/function-kits/DEVELOPER_PLATFORM_GAPS.md](TODO/function-kits/DEVELOPER_PLATFORM_GAPS.md)
 - 发布与上架（npm + 官方 catalog）：[scripts/npm/README.md](scripts/npm/README.md)、[catalog/README.md](catalog/README.md)

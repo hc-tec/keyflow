@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const packageRoot = path.resolve(__dirname, "..");
 const functionKitsRoot = path.join(packageRoot, "workspace", "function-kits");
-const defaultSourceDir = "starter-showcase";
+const defaultSourceDir = "preview-rewrite-starter";
 const kitIdPattern = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/;
 const workspaceReadmeMarker = "<!-- keyflow:function-kit-workspace-readme -->";
 
@@ -62,7 +62,7 @@ function usage() {
   console.log(
     [
       "Usage:",
-      "  npm run rename:starter -- --kit-id yourscope.launchpad --name \"Launchpad\"",
+      "  npm run rename:starter -- --kit-id yourscope.proofreader --name \"Proofreader\"",
       "",
       "Options:",
       "  --kit-id <id>         required; new manifest.id and directory name",
@@ -199,11 +199,12 @@ function makeWorkspaceReadme({ kitId, name }) {
     "",
     "- `docs/WORKFLOW.md`",
     "- `docs/PLATFORM_COMPATIBILITY.md`",
+    "- `docs/ANDROID_HOST_RUNBOOK.md`",
     "",
     "## 重命名（可选）",
     "",
     "```powershell",
-    'npm run rename:starter -- --kit-id yourscope.launchpad --name \"Launchpad\"',
+    'npm run rename:starter -- --kit-id yourscope.proofreader --name \"Proofreader\"',
     "```",
     "",
     "## 常改的文件",
@@ -266,7 +267,7 @@ if (sourceDir !== targetDir && (await pathExists(targetDir)) && !force) {
 const name = safeText(args.get("name")) || toTitleCase(nextKitId);
 const description =
   safeText(args.get("description")) ||
-  `A petite-vue starter for ${name}, bundled with vendored runtime assets and a KitStudio-ready landing-page preview.`;
+  `A Function Kit starter for ${name}: read current input, generate a preview, then replace only after confirmation.`;
 const workspaceName = safeText(args.get("workspace-name")) || toWorkspacePackageName(nextKitId);
 
 const manifestPath = path.join(sourceDir, "manifest.json");
@@ -335,7 +336,7 @@ if (await pathExists(packageJsonPath, "file")) {
   const packageJsonRaw = await fs.readFile(packageJsonPath, "utf8");
   const packageJson = JSON.parse(packageJsonRaw);
   packageJson.name = workspaceName;
-  packageJson.description = `Local workspace for ${name}, generated from the Keyflow Function Kit petite-vue starter.`;
+  packageJson.description = `Local workspace for ${name}, generated from the Keyflow preview-rewrite starter.`;
   packageJson.keyflow = {
     ...(packageJson.keyflow ?? {}),
     defaultKitId: nextKitId,
@@ -351,7 +352,9 @@ if (await pathExists(workspaceReadmePath, "file")) {
     shouldRewriteWorkspaceReadme =
       existing.includes(workspaceReadmeMarker) ||
       existing.includes("# Function Kit Starter Template") ||
-      existing.includes("npm pack @keyflow2/function-kit-template-petite-vue");
+      existing.includes("# Preview Rewrite Function Kit Starter") ||
+      existing.includes("npm pack @keyflow2/function-kit-template-petite-vue") ||
+      existing.includes("function-kit-template-preview-rewrite");
   } catch {
     shouldRewriteWorkspaceReadme = true;
   }

@@ -125,6 +125,7 @@ npm run catalog:entry -- --scope yourscope
 
 - `docs/WORKFLOW.md`
 - `docs/PLATFORM_COMPATIBILITY.md`
+- `docs/ANDROID_HOST_RUNBOOK.md`
 
 ## 目录说明
 

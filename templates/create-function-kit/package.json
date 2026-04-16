@@ -1,7 +1,7 @@
 {
   "name": "@keyflow2/create-function-kit",
   "version": "0.1.2",
-  "description": "CLI to scaffold a local Keyflow Function Kit workspace from the petite-vue starter.",
+  "description": "CLI to scaffold a local Keyflow Function Kit workspace from official starter templates.",
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
@@ -20,6 +20,7 @@
     "starter",
     "scaffold",
     "petite-vue",
+    "preview-rewrite",
     "kitstudio",
     "ime"
   ],

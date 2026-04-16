@@ -1,7 +1,7 @@
 {
-  "name": "@keyflow2/function-kit-template-petite-vue",
-  "version": "0.1.3",
-  "description": "Starter workspace for Keyflow Function Kits with vendored runtime.js, petite-vue, shadcn-style CSS, and KitStudio launch helpers.",
+  "name": "@keyflow2/function-kit-template-preview-rewrite",
+  "version": "0.1.0",
+  "description": "Starter workspace for Keyflow Function Kits that generate AI text previews before replacing input.",
   "license": "Apache-2.0",
   "type": "module",
   "files": [
@@ -19,6 +19,9 @@
     "function-kit",
     "starter",
     "template",
+    "preview",
+    "rewrite",
+    "ai",
     "petite-vue",
     "kitstudio",
     "ime"
@@ -42,7 +45,8 @@
   "homepage": "https://github.com/hc-tec/keyflow#readme",
   "keyflow": {
     "kind": "function-kit-starter",
-    "defaultKitId": "starter-showcase",
+    "template": "preview-rewrite",
+    "defaultKitId": "preview-rewrite-starter",
     "defaultMountRoot": "workspace/function-kits"
   }
 }

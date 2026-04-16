@@ -1,6 +1,6 @@
 # Create Function Kit
 
-一个面向开发者的脚手架命令：把 `@keyflow2/function-kit-template-petite-vue` 解到本地目录，并直接改成你自己的 kitId。
+一个面向开发者的脚手架命令：把官方 Function Kit starter 解到本地目录，并直接改成你自己的 kitId。
 
 ## 用法
 
@@ -61,12 +61,32 @@ npm run open:kitstudio
 npx @keyflow2/create-function-kit my-launchpad --kit-id yourscope.launchpad --name "Launchpad" --open
 ```
 
+## 官方 starter
+
+当前这条 CLI 主要面向两类 starter：
+
+- `starter` / `petite-vue`
+  - 默认模板
+  - 适合通用面板、动作型、设置型 Function Kit
+  - 对应 npm 包：`@keyflow2/function-kit-template-petite-vue`
+- `preview-rewrite`
+  - 适合纠错 / 润色 / 翻译 / 摘要这类“先生成预览，再确认替换”的正文型 AI Function Kit
+  - 对应 npm 包：`@keyflow2/function-kit-template-preview-rewrite`
+  - 当前仓库已准备好模板目录；npm 包发布前，维护者本地请先走 `--template-dir`
+
+查看当前内置别名：
+
+```powershell
+npx @keyflow2/create-function-kit --list-templates
+```
+
 ## 常用参数
 
 - `--kit-id <id>`：目标 kitId，推荐用全局唯一风格，例如 `yourscope.launchpad`
 - `--name <label>`：展示名称
 - `--description <text>`：覆盖 starter 默认描述
-- `--template <npm-ref>`：改用其它 starter 包，默认 `@keyflow2/function-kit-template-petite-vue`
+- `--template <name|npm-ref>`：改用官方模板别名或自定义 npm starter 包
+- `--list-templates`：列出官方 starter 别名
 - `--kit-studio-root <path>`：配合 `--open` 使用，显式指定 KitStudio 仓库目录
 - `--force`：覆盖已存在的目标目录
 - `--dry-run`：只打印计划动作，不落盘
@@ -88,6 +108,10 @@ npm run publish:npm -- --scope yourscope --dry-run
 npm run catalog:entry -- --scope yourscope
 ```
 
+如果你要做正文预览型 AI kit，后续发布前还应该再看：
+
+- `docs/ANDROID_HOST_RUNBOOK.md`
+
 ## 维护者本地开发
 
 如果你在 `keyflow` 仓库里调这个 CLI，不想真的从 npm 拉 starter，可以直接指向本地模板目录：
@@ -97,4 +121,13 @@ node .\templates\create-function-kit\bin\create-function-kit.mjs .\artifacts\smo
   --template-dir .\templates\function-kit-template-petite-vue `
   --kit-id keyflow2.launchpad `
   --name "Launchpad"
+```
+
+正文预览 starter 的本地路径用法：
+
+```powershell
+node .\templates\create-function-kit\bin\create-function-kit.mjs .\artifacts\smoke\proofreader `
+  --template-dir .\templates\function-kit-template-preview-rewrite `
+  --kit-id keyflow2.proofreader `
+  --name "Proofreader"
 ```

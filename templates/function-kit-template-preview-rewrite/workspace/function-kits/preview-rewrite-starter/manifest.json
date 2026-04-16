@@ -1,0 +1,117 @@
+{
+  "id": "preview-rewrite-starter",
+  "name": "Preview Rewrite Starter",
+  "version": "0.1.0",
+  "description": "A Function Kit starter for AI text preview flows: read input, generate a draft, then replace only after confirmation.",
+  "icons": {
+    "64": "icons/preview-rewrite-starter.svg"
+  },
+  "platforms": [
+    "windows",
+    "android"
+  ],
+  "entry": {
+    "type": "browser-app",
+    "bundle": {
+      "html": "ui/app/index.html",
+      "script": "ui/app/main.js",
+      "style": "ui/app/styles.css"
+    },
+    "surfaces": {
+      "windows": {
+        "preferred": "side-panel",
+        "fallback": "popup",
+        "minWidth": 360
+      },
+      "android": {
+        "preferred": "bottom-sheet",
+        "fallback": "full-screen",
+        "peekHeightDp": 340
+      }
+    }
+  },
+  "triggers": {
+    "manual": true,
+    "selectionRequired": false,
+    "contextTypes": [
+      "message-compose",
+      "generic-text"
+    ]
+  },
+  "bindings": [
+    {
+      "id": "preview.generate",
+      "title": "Preview rewrite",
+      "triggers": [
+        "manual",
+        "selection"
+      ],
+      "requestedPayloads": [
+        "selection.text"
+      ],
+      "categories": [
+        "starter",
+        "preview",
+        "rewrite"
+      ],
+      "preferredPresentation": "panel.preview",
+      "entry": {
+        "view": "preview"
+      }
+    }
+  ],
+  "discovery": {
+    "pinnable": true,
+    "recentEnabled": true,
+    "launchMode": "panel-first",
+    "slash": {
+      "enabled": true,
+      "commands": [
+        "preview"
+      ],
+      "aliases": [
+        "rewrite"
+      ],
+      "tags": [
+        "starter",
+        "preview",
+        "rewrite",
+        "ai"
+      ]
+    }
+  },
+  "ai": {
+    "executionMode": "direct-model",
+    "backendHints": {
+      "preferredBackendClass": "text-generation",
+      "requiredCapabilities": [
+        "text"
+      ],
+      "latencyTier": "interactive",
+      "latencyBudgetMs": 12000,
+      "allowFallbacks": true,
+      "allowBackgroundPreparation": false,
+      "requireStructuredJson": false,
+      "maxToolCalls": 0,
+      "maxReasoningSteps": 1,
+      "notes": [
+        "This starter requests response.type=text and expects a single replacement preview."
+      ]
+    }
+  },
+  "network": {
+    "mode": "disabled",
+    "allowAbsoluteUrls": false
+  },
+  "permissions": {
+    "needsActiveInputContext": true,
+    "needsPersonaContext": false,
+    "needsNetwork": false,
+    "needsAiAccess": true
+  },
+  "runtimePermissions": [
+    "context.read",
+    "input.replace",
+    "ai.request"
+  ]
+}

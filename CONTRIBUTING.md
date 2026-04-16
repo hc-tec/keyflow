@@ -18,6 +18,8 @@ npm test
 ```bash
 node scripts/npm/build-starter-template.mjs
 node scripts/npm/verify-starter-template.mjs
+node scripts/npm/build-preview-rewrite-template.mjs
+node scripts/npm/verify-preview-rewrite-template.mjs --tgz artifacts/npm/templates/function-kit-template-preview-rewrite/*.tgz
 node scripts/npm/build-create-function-kit.mjs
 node scripts/npm/verify-create-function-kit.mjs
 ```
@@ -40,6 +42,18 @@ npm run catalog:entry -- --scope keyflow2
 - Windows 下 `npm` / `powershell` 拉起是否正常
 - 外部开发者不 clone `keyflow` 仓库时，能不能自己完成打包 / 发布准备
 
+如果你改的是 `preview-rewrite` starter，还要再补一轮对应 smoke：
+
+```bash
+node templates/create-function-kit/bin/create-function-kit.mjs artifacts/smoke/preview-rewrite --template-dir templates/function-kit-template-preview-rewrite --kit-id keyflow2.proofreader --name "Proofreader" --force
+cd artifacts/smoke/preview-rewrite
+npm run doctor
+npm run pack:zip
+npm run pack:npm -- --scope keyflow2
+npm run publish:npm -- --scope keyflow2 --dry-run
+npm run catalog:entry -- --scope keyflow2
+```
+
 ## 开发环境（完整 workspace）
 
 如果你需要 KitStudio / Android IME 宿主一起联调，请先按 `docs/DEVELOPMENT.md` 搭好完整环境。
@@ -48,6 +62,11 @@ npm run catalog:entry -- --scope keyflow2
 
 ```bash
 cd templates/function-kit-template-petite-vue
+npm run open:kitstudio -- --dry-run
+```
+
+```bash
+cd templates/function-kit-template-preview-rewrite
 npm run open:kitstudio -- --dry-run
 ```
 

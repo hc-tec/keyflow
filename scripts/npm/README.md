@@ -190,6 +190,53 @@ npm run publish:npm -- --scope yourscope --dry-run
 npm run catalog:entry -- --scope yourscope
 ```
 
+## 8.1) 构建 preview-rewrite Starter 模板包
+
+```bash
+node scripts/npm/build-preview-rewrite-template.mjs
+```
+
+输出：
+
+- `artifacts/npm/templates/function-kit-template-preview-rewrite/*.tgz`
+- `artifacts/npm/templates/function-kit-template-preview-rewrite/preview-rewrite-template.json`
+
+校验 tarball：
+
+```bash
+node scripts/npm/verify-preview-rewrite-template.mjs --tgz artifacts/npm/templates/function-kit-template-preview-rewrite/*.tgz
+```
+
+## 8.2) 发布 preview-rewrite Starter 模板包到 npm
+
+```bash
+node scripts/npm/publish-preview-rewrite-template.mjs --dry-run
+node scripts/npm/publish-preview-rewrite-template.mjs --token-file tmp/npm-token.txt
+```
+
+Starter 包源码在：
+
+- `templates/function-kit-template-preview-rewrite/`
+
+它面向：
+
+- 纠错 / 校对
+- 润色 / 改写
+- 翻译
+- 摘要 / 提炼
+
+和默认 starter 一样，生成后的工作区也会自带：
+
+```bash
+npm run doctor
+npm run pack:zip
+npm run pack:npm -- --scope yourscope
+npm run publish:npm -- --scope yourscope --dry-run
+npm run catalog:entry -- --scope yourscope
+```
+
+> 发布顺序建议：先发布 `@keyflow2/function-kit-template-preview-rewrite`，再发布引用该别名的 `@keyflow2/create-function-kit` 版本。
+
 ## 9) 构建开发者 create CLI（把 starter 一键解到本地目录）
 
 包源码：
@@ -216,3 +263,8 @@ node scripts/npm/publish-create-function-kit.mjs --token-file tmp/npm-token.txt
 ```
 
 create CLI 会下载 starter 包并调用 starter 自带的 `rename-starter`，所以这两条链路必须一起维护。
+
+当前 CLI 约定的官方 starter 别名：
+
+- `starter` / `petite-vue` -> `@keyflow2/function-kit-template-petite-vue`
+- `preview-rewrite` -> `@keyflow2/function-kit-template-preview-rewrite`

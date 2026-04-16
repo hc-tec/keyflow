@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Preview Rewrite Starter</title>
+    <link rel="stylesheet" href="../vendor/kit-shadcn.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main id="app" class="panel-shell" v-cloak>
+      <section class="editor-screen" v-if="screen === 'editor'">
+        <div class="editor-card card">
+          <textarea
+            class="field__control field__control--textarea editor-textarea"
+            :value="sourceText"
+            :disabled="busy"
+            @input="updateSource($event.target.value)"
+            placeholder="Paste text here, or open this kit from an active input field."
+          ></textarea>
+        </div>
+
+        <div class="feedback-line" v-if="feedbackText" :data-kind="feedbackKind">{{ feedbackText }}</div>
+
+        <button class="primary-wide main-action" type="button" @click="generatePreview" :disabled="!canGenerate">
+          {{ busy ? "Generating..." : "Generate preview" }}
+        </button>
+      </section>
+
+      <section class="preview-screen" v-else :key="previewRevision">
+        <div class="preview-scroll">
+          <article class="compare-card compare-card--result card">
+            <div class="compare-card__head">
+              <span class="badge">Preview</span>
+            </div>
+            <div class="compare-card__body">
+              <div class="compare-text">
+                <span
+                  v-for="(segment, index) in resultSegments"
+                  :key="`result-${index}`"
+                  :class="segment.className"
+                >
+                  {{ segment.text }}
+                </span>
+              </div>
+            </div>
+          </article>
+
+          <article class="compare-card compare-card--source card">
+            <div class="compare-card__head">
+              <span class="badge badge--muted">Original</span>
+            </div>
+            <div class="compare-card__body">
+              <div class="compare-text">
+                <span
+                  v-for="(segment, index) in originalSegments"
+                  :key="`original-${index}`"
+                  :class="segment.className"
+                >
+                  {{ segment.text }}
+                </span>
+              </div>
+            </div>
+          </article>
+
+          <div class="feedback-line" v-if="feedbackText" :data-kind="feedbackKind">{{ feedbackText }}</div>
+        </div>
+
+        <div class="preview-actions">
+          <button class="secondary-wide" type="button" @click="backToEditor" :disabled="busy">Cancel</button>
+          <button class="primary-wide" type="button" @click="confirmReplace" :disabled="!canReplace">
+            {{ hasChanges ? "Replace input" : "No changes" }}
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <script src="../vendor/function-kit-runtime.js"></script>
+    <script src="../vendor/petite-vue.iife.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>

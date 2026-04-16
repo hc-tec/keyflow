@@ -26,10 +26,14 @@ npm run doctor
 `doctor` 会检查：
 
 - `manifest.json` 是否和目录名一致
+- `manifest.name/version/description/entry.type/platforms` 是否完整
 - `entry.bundle.html/script/style` 是否存在
 - 图标路径是否存在
 - vendored `ui/vendor/*` 资源是否齐全
 - `runtimePermissions` 是否遗漏了常见 API 对应权限
+- 是否误用了 `localStorage/sessionStorage/indexedDB/document.cookie`
+- 是否加载了外链 `<script src="https://...">`
+- 是否直接用了 `fetch/XMLHttpRequest/WebSocket/window.open/eval`
 
 如果你的工作区里有多个 kit，用 `--kit` 指定目标：
 

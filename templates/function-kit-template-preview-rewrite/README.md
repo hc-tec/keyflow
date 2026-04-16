@@ -56,6 +56,14 @@ npm run publish:npm -- --scope yourscope --dry-run
 npm run catalog:entry -- --scope yourscope
 ```
 
+`doctor` 不只是检查文件缺失；它还会提示：
+
+- `manifest` 关键信息缺失
+- 漏声明 `runtimePermissions`
+- 误用 `localStorage/sessionStorage/indexedDB/document.cookie`
+- 外链 `<script src="https://...">`
+- 直接使用 `fetch/XMLHttpRequest/WebSocket/window.open/eval`
+
 完整流程见：
 
 - `docs/WORKFLOW.md`

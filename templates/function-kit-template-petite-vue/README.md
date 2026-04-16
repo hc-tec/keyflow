@@ -115,7 +115,7 @@ npm run catalog:entry -- --scope yourscope
 
 这些命令的作用：
 
-- `doctor`：检查 `manifest`、入口文件、图标、vendored 资源、`runtimePermissions`
+- `doctor`：检查 `manifest`、入口文件、图标、vendored 资源、`runtimePermissions`，并拦截 DOM Storage / 外链脚本 / 直连浏览器 API 这类常见坑
 - `pack:zip`：生成给 Android Host / 下载中心用的 ZIP 安装包
 - `pack:npm`：生成 npm tarball 与 metadata
 - `publish:npm`：把当前 kit 发布到 npm

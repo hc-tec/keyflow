@@ -1,14 +1,77 @@
 {
   "kind": "keyflow.npm.catalog.v0",
-  "generatedAt": "2026-04-16T11:21:38.126Z",
+  "generatedAt": "2026-04-17T18:39:08.872Z",
   "registry": "https://registry.npmjs.org/",
   "packages": [
+    {
+      "kitId": "keyflow2.inline-translate",
+      "name": "翻译",
+      "description": "在当前输入框内翻译中文或英文短句，预览译文后可直接替换原文或插入到原文后方。",
+      "version": "0.1.0",
+      "downloads_last_week": null,
+      "npm": {
+        "name": "@keyflow2/inline-translate",
+        "version": "0.1.0",
+        "scope": "keyflow2",
+        "keywords": [
+          "keyflow",
+          "function-kit",
+          "ime",
+          "webview"
+        ],
+        "publisher": "ncu-titto",
+        "maintainers": [
+          "ncu-titto"
+        ],
+        "publishedAt": "2026-04-17T18:22:52.134Z"
+      },
+      "platforms": [
+        "windows",
+        "android"
+      ],
+      "runtimePermissions": [
+        "context.read",
+        "input.insert",
+        "input.replace",
+        "ai.request"
+      ],
+      "categories": [
+        "translation",
+        "preview",
+        "inline"
+      ],
+      "tag": "translation",
+      "tags": [
+        "translation",
+        "preview",
+        "inline",
+        "ai"
+      ],
+      "icons": {
+        "128": "icons/keyflow2.inline-translate/icons/icon-128.png"
+      },
+      "icon": "icons/keyflow2.inline-translate/icons/icon-128.png",
+      "bindingCount": 1,
+      "links": {
+        "homepage": null,
+        "repository": null,
+        "bugs": null
+      },
+      "dist": {
+        "tarball": "https://registry.npmjs.org/@keyflow2/inline-translate/-/inline-translate-0.1.0.tgz",
+        "integrity": "sha512-ZNK4FKsDi4Vfa9UKEYnMs/oXRMmodM/rROHlIhFZyBmskv1p4ZrQY8EX3zTn1Ug+3U+D5uWulvQN0PIeWpthrQ==",
+        "sha256": "548b9688a52375ae45f7df59c941fd0dfd93d691a2a08694a79d64b9694ab24c",
+        "sizeBytes": 95569,
+        "unpackedSize": 237160,
+        "fileCount": 15
+      }
+    },
     {
       "kitId": "tone-rewrite",
       "name": "语气改写",
       "description": "一键把聊天内容改成更短、更长、更礼貌、更口语，或加上合适 emoji。",
       "version": "0.2.1",
-      "downloads_last_week": 189,
+      "downloads_last_week": 188,
       "npm": {
         "name": "@keyflow2/keyflow-kit-tone-rewrite",
         "version": "0.2.1",

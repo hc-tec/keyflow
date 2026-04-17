@@ -23,6 +23,7 @@ function usage() {
       "",
       "Purpose:",
       "  Verify that the published npm package is ready for official catalog submission.",
+      "  The package must already exist on the real npm registry; dry-run output is not enough.",
       "",
       "Output:",
       "  artifacts/catalog/<kitId>.catalog-check.json",
@@ -126,6 +127,12 @@ function makeMarkdown({ kit, packageName, version, registry, meta, publishedMani
     "",
     `- failures: ${failures}`,
     `- warnings: ${warnings}`,
+    "",
+    "## Official PR Scope",
+    "",
+    "- Change only `catalog/official.packages.json` in the official repository.",
+    "- Add the npm package spec string below to that JSON array.",
+    "- Do not commit local `artifacts/catalog/*.json` files or this Markdown file.",
     "",
     "## Add To official.packages.json",
     "",
@@ -290,7 +297,11 @@ async function main() {
 
   printResults(results);
   console.log(`[starter] catalog check file: ${outputPath}`);
-  if (publishedManifest && meta) console.log(`[starter] catalog entry md : ${markdownPath}`);
+  if (publishedManifest && meta) {
+    console.log(`[starter] catalog entry md : ${markdownPath}`);
+    console.log("[starter] official PR file  : catalog/official.packages.json");
+    console.log(`[starter] add JSON string   : ${JSON.stringify(`${packageName}@${version}`)}`);
+  }
 
   process.exit(status === "fail" ? 1 : 0);
 }

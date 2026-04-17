@@ -124,10 +124,18 @@ npm run publish:npm -- --token-file .\tmp\npm-token.txt
 npm run publish:npm -- --dry-run
 ```
 
-### 2.4 先做官方 catalog 提交前检查
+### 2.4 发布后做官方 catalog 提交前检查
 
 ```powershell
 npm run catalog:check
+```
+
+这一步只能在 npm 包已经真实发布后才算通过。`pack:npm` 和 `publish:npm --dry-run` 只能证明本地包结构大致可发布，不能证明官方 catalog 能从 npm registry 拉到它。
+
+如果你发布的是 scoped 包，先确认当前 npm 账号真的有该 scope 的发布权限，并在检查时传同一个真实包名：
+
+```powershell
+npm run catalog:check -- --package-name <真实 npm 包名> --version <version>
 ```
 
 输出：
@@ -142,11 +150,15 @@ npm run catalog:check
 - tarball 里的 `manifest.json` / `package.json` 是否和本地 kit 对得上
 - bundle 文件和图标文件是否真的被打进包里
 
-### 2.5 生成官方 catalog 提交片段
+`catalog:check` 通过后，优先把 `artifacts/catalog/<kitId>.catalog-entry.md` 贴到官方 PR 描述或 Kit Submission Issue。这个 Markdown 也会写清应该加入 `catalog/official.packages.json` 的 npm package spec 字符串。
+
+### 2.5 生成官方 catalog PR / Issue 辅助信息
 
 ```powershell
 npm run catalog:entry
 ```
+
+`catalog:entry` 只生成本地辅助 JSON，不会访问 npm registry，也不能替代 `catalog:check`。如果 npm 包还没真实发布，这个文件只能当草稿。
 
 输出：
 
@@ -154,23 +166,31 @@ npm run catalog:entry
 
 这个文件会给出：
 
-- npm 包名与版本
+- npm package spec（`<真实 npm 包名>@<version>`）
 - `runtimePermissions`
-- 官方 catalog PR / Issue 可直接复制的 Markdown 片段
+- 官方 PR 目标文件：`catalog/official.packages.json`
+- 官方 catalog PR / Issue 可复制的描述字段
+
+不要把 `artifacts/catalog/*.json` 提交到官方仓库。官方 PR 的真实 diff 只应该是在 `catalog/official.packages.json` 的 JSON 数组里新增一条字符串，例如：
+
+```json
+"<真实 npm 包名>@<version>"
+```
 
 ## 3. 什么时候用 ZIP，什么时候用 npm
 
 - 只想本机或小范围测试：优先 `pack:zip`
 - 想让用户通过 `npm:` 安装或做版本更新检查：用 `pack:npm` / `publish:npm`
-- 想进官方 catalog：先发布 npm，再跑 `catalog:check`，通过后再跑 `catalog:entry`
+- 想进官方 catalog：先真实发布 npm，再确认 `npm view <package>@<version>` 能查到包，跑 `catalog:check` 通过后，再用 `catalog:entry` 或 `catalog:check` 生成的 Markdown 准备 PR / Issue
 
 如果你要给 Android 用户长期分发，通常顺序是：
 
 1. `npm run doctor`
 2. `npm run pack:zip` 做真机安装验收
 3. `npm run pack:npm` / `npm run publish:npm`
-4. `npm run catalog:check`
-5. `npm run catalog:entry`
+4. `npm view <package>@<version>`
+5. `npm run catalog:check`
+6. `npm run catalog:entry`
 
 ## 4. 版本管理提醒
 

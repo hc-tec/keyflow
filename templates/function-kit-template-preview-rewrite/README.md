@@ -88,6 +88,8 @@ npm run publish:npm -- --dry-run
 
 它会直接验证已发布包的 tarball / integrity / manifest 是否真的可用于官方 catalog 收录。
 
+官方 catalog 提交不要提交本地 `artifacts/catalog/*.json`。正确顺序是：真实发布 npm 包，确认 `npm view <package>@<version>` 能查到，`catalog:check` 通过后，在官方仓库 PR 里只改 `catalog/official.packages.json`，新增一条 `"<真实 npm 包名>@<version>"` 字符串；`catalog:entry` 生成的 JSON 只是本地 PR / Issue 辅助信息。
+
 完整流程见：
 
 - `docs/WORKFLOW.md`

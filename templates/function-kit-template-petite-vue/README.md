@@ -140,13 +140,15 @@ npm run publish:npm -- --dry-run
 - `pack:npm`：生成 npm tarball 与 metadata
 - `publish:npm`：把当前 kit 发布到 npm
 - `catalog:check`：到真实 npm registry 校验已发布包、tarball、integrity、manifest，并输出官方 catalog 提交前检查结果
-- `catalog:entry`：生成官方 catalog 提交流程需要的 JSON / Markdown 片段
+- `catalog:entry`：生成本地 PR / Issue 辅助 JSON；它不是官方仓库要提交的文件
 
 详细说明见：
 
 - `docs/WORKFLOW.md`
 - `docs/PLATFORM_COMPATIBILITY.md`
 - `docs/ANDROID_HOST_RUNBOOK.md`
+
+官方 catalog 提交不要提交本地 `artifacts/catalog/*.json`。正确顺序是：真实发布 npm 包，确认 `npm view <package>@<version>` 能查到，`catalog:check` 通过后，在官方仓库 PR 里只改 `catalog/official.packages.json`，新增一条 `"<真实 npm 包名>@<version>"` 字符串；`catalog:entry` 生成的 JSON 只是本地 PR / Issue 辅助信息。
 
 ## 目录说明
 

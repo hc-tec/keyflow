@@ -54,6 +54,8 @@ npm run publish:npm -- --dry-run
 
 `npm whoami` 通过只代表当前机器有认证。默认不传 `--scope` 时，starter 会生成 unscoped 包名 `keyflow-kit-<kitId>`；如果你已经有 npm 组织，后面再改成 `--scope myorg` 或 `--package-name @myorg/my-kit` 即可。
 
+官方 catalog 上架不是提交 starter 生成的 JSON。真实顺序是：先把 kit 发布到 npm，确认 `npm view <package>@<version>` 能查到，再跑 `npm run catalog:check`。通过后，如果走 PR，只在官方仓库的 `catalog/official.packages.json` 增加一条 `"<真实 npm 包名>@<version>"` 字符串；`npm run catalog:entry` 生成的 JSON 只是 PR / Issue 描述辅助信息，不要提交到官方仓库。
+
 也就是说，开发者不需要先 clone `keyflow` 仓库，当前工作区自己就带着：
 
 - KitStudio 启动脚本
@@ -126,6 +128,8 @@ npm run publish:npm -- --dry-run
 npm run catalog:check
 npm run catalog:entry
 ```
+
+这里的 `catalog:check` 依赖已发布到真实 npm registry 的包；`publish:npm --dry-run` 或 `pack:npm` 通过，不代表可以提交官方 catalog。
 
 如果你已经有 npm 组织，想发 `@myorg/...` 包，再额外使用：
 

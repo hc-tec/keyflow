@@ -67,6 +67,9 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add catalog/official.catalog.json
+          git add -A catalog/official.catalog.json
+          if [ -e catalog/official.catalog.assets ]; then
+            git add -A catalog/official.catalog.assets
+          fi
           git commit -m "chore: update official catalog [skip ci]"
           git push

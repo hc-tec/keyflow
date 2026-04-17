@@ -1,3 +1,4 @@
 [
-  "@keyflow2/keyflow-kit-tone-rewrite@0.2.1"
+  "@keyflow2/keyflow-kit-tone-rewrite@0.2.1",
+  "@keyflow2/inline-translate@0.1.0"
 ]

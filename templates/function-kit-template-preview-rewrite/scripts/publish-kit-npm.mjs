@@ -4,7 +4,6 @@ import {
   artifactsRoot,
   buildNpmKitStage,
   parseArgs,
-  quotePowerShellLiteral,
   resolveKitTarget,
   run,
   safeText,
@@ -63,6 +62,35 @@ const stage = await buildNpmKitStage({
   outRoot,
 });
 
+async function verifyPublishAuth() {
+  if (dryRun) {
+    return;
+  }
+  try {
+    const result = await run("npm", ["whoami", "--registry", registry], { cwd: stage.buildDir });
+    const username = safeText(result.stdout);
+    console.log(`[starter] npm auth        : ${username || "verified"}`);
+    if (stage.packageName.startsWith("@")) {
+      const packageScope = stage.packageName.split("/")[0];
+      console.log(`[starter] publish scope    : ${packageScope} (account must already have publish rights)`);
+    }
+  } catch (error) {
+    throw new Error(
+      [
+        `[starter] npm auth check failed before publishing ${stage.packageName}@${stage.version}.`,
+        "[starter] Publishing is not open to any random account.",
+        "[starter] You still need:",
+        "[starter]   1. an npm account",
+        "[starter]   2. publish rights on the target package / scope",
+        "[starter]   3. one of: --token-file, NPM_TOKEN, NODE_AUTH_TOKEN, or npm login",
+        `[starter] Registry: ${registry}`,
+        "",
+        String(error?.message || error),
+      ].join("\n")
+    );
+  }
+}
+
 const publishArgs = ["publish", "--registry", registry];
 if (stage.packageName.startsWith("@")) {
   publishArgs.push("--access", "public");
@@ -91,6 +119,7 @@ try {
     console.warn("[starter] NOTE: token not provided; relying on existing npm login (~/.npmrc).");
   }
 
+  await verifyPublishAuth();
   console.log(`[starter] publish package : ${stage.packageName}@${stage.version}`);
   console.log(`[starter] registry        : ${registry}`);
   await run("npm", publishArgs, { cwd: stage.buildDir, stdio: "inherit" });

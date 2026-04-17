@@ -2,6 +2,13 @@
 
 一个面向开发者的脚手架命令：把官方 Function Kit starter 解到本地目录，并直接改成你自己的 kitId。
 
+## 先看前置条件
+
+- `open:kitstudio` 需要你本机已经有 `kit-studio` 仓库；默认找目标项目同级目录 `../kit-studio`，也可以改用 `KITSTUDIO_ROOT`，必要时再配 `KITSTUDIO_HOST` / `KITSTUDIO_PORT`
+- `publish:npm` 不是“生成项目后任何人都能直接发包”；你仍然需要 npm 账号、目标 package 或 scope 的发布权限，以及 `--token-file` / `NPM_TOKEN` / `NODE_AUTH_TOKEN` / `npm login` 之一
+- 生成后的 starter 默认不会附带 `.env` 来配置 AI provider；`ai.request` 的真实 `Base URL / API key / model` 是在 KitStudio 或 Android Host 的共享 AI 配置里完成的
+- 如果你只想先做本地或真机验收，不需要先配 npm；先走 `doctor -> pack:zip -> Android Host` 就够了
+
 ## 用法
 
 ```powershell
@@ -36,6 +43,15 @@ npm run publish:npm -- --scope yourscope --dry-run
 npm run catalog:check -- --scope yourscope
 npm run catalog:entry -- --scope yourscope
 ```
+
+真正发布到 npm 前，建议先单独确认：
+
+```powershell
+npm whoami
+npm run publish:npm -- --scope yourscope --dry-run
+```
+
+`npm whoami` 通过只代表当前机器有认证；它不等于你一定拥有目标 `@scope` 的发布权限。
 
 也就是说，开发者不需要先 clone `keyflow` 仓库，当前工作区自己就带着：
 

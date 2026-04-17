@@ -2,6 +2,14 @@
 
 这个工作区已经把“开发一个可运行的 Keyflow Function Kit”最容易缺的本地工具带进来了。你不需要先 clone `keyflow` 仓库，直接在当前目录就能走完开发、自检、打包、发布的主流程。
 
+## 0. 先决条件
+
+- `open:kitstudio` 依赖本机已有 `kit-studio` 仓库；默认找当前项目同级目录 `../kit-studio`
+- 如果默认路径不对，用 `KITSTUDIO_ROOT` 指向你的 KitStudio 根目录；如需改监听地址，再设置 `KITSTUDIO_HOST` / `KITSTUDIO_PORT`
+- `publish:npm` 不会绕过 npm 权限模型；你仍然需要 npm 账号、目标 package 或 scope 的发布权限，以及 `--token-file` / `NPM_TOKEN` / `NODE_AUTH_TOKEN` / `npm login` 之一
+- 当前 starter 默认不创建 `.env` 来配置运行期能力；如果你的 kit 依赖 `ai.request`，真实的 `Base URL / API key / model` 要在 KitStudio 或 Android Host 的共享 AI 设置里完成
+- 如果你现在只是要做本地闭环，不需要先准备 npm 发布凭据；先走 `doctor -> pack:zip -> Android Host` 即可
+
 ## 1. 推荐工作流
 
 ### 1.1 本地预览
@@ -14,6 +22,14 @@ npm run open:kitstudio
 
 ```powershell
 $env:KITSTUDIO_ROOT = "D:\dev\kit-studio"
+npm run open:kitstudio
+```
+
+如果你还要改本机监听地址，可以一起设置：
+
+```powershell
+$env:KITSTUDIO_HOST = "127.0.0.1"
+$env:KITSTUDIO_PORT = "39001"
 npm run open:kitstudio
 ```
 
@@ -76,6 +92,15 @@ PowerShell 下建议写 `--scope keyflow2`，不要直接裸写 `@keyflow2`。
 
 ### 2.3 发布到 npm
 
+真正发布前，建议先单独确认两件事：
+
+```powershell
+npm whoami
+npm run publish:npm -- --scope yourscope --dry-run
+```
+
+`npm whoami` 通过只代表当前机器已有认证；如果目标包是 `@scope/...`，当前账号还必须已经拥有该 scope 的发布权限。
+
 先准备 npm token，推荐放到本地临时文件：
 
 ```powershell
@@ -83,6 +108,8 @@ npm run publish:npm -- --scope yourscope --token-file .\tmp\npm-token.txt
 ```
 
 也可以使用已有的 `NPM_TOKEN` / `NODE_AUTH_TOKEN` 环境变量，或本机 `~/.npmrc` 登录态。
+
+现在 `publish:npm` 在非 `--dry-run` 下会先跑一次 `npm whoami` 预检；如果认证缺失，会在真正 `npm publish` 前直接失败，并明确提示需要补齐账号、权限和 token/login。
 
 先演练不真正发布：
 

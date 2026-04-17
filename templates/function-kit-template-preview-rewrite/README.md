@@ -11,6 +11,13 @@
 
 ## 快速开始
 
+先确认这几个前提：
+
+- `npm run open:kitstudio` 需要本机已有 `kit-studio`；默认找同级 `../kit-studio`，也可以通过 `KITSTUDIO_ROOT` 指定，必要时再配 `KITSTUDIO_HOST` / `KITSTUDIO_PORT`
+- `npm run publish:npm` 不是开箱即发；你仍然需要 npm 账号、目标 package 或 scope 的发布权限，以及 `--token-file` / `NPM_TOKEN` / `NODE_AUTH_TOKEN` / `npm login` 之一
+- 这个 starter 默认不带 `.env` 来配置 AI provider；`ai.request` 的真实 `Base URL / API key / model` 是在 KitStudio 或 Android Host 的共享 AI 配置里完成的
+- 如果你只是先做功能闭环，先跑 `doctor`、`pack:zip` 和 Android Host 验收，不需要先准备 npm 发布凭据
+
 这个 starter 已经在仓库里就绪；对外 npm 包发布后，就可以通过 create CLI 直接使用：
 
 ```powershell
@@ -56,6 +63,15 @@ npm run publish:npm -- --scope yourscope --dry-run
 npm run catalog:check -- --scope yourscope
 npm run catalog:entry -- --scope yourscope
 ```
+
+真正发布前，建议先单独确认：
+
+```powershell
+npm whoami
+npm run publish:npm -- --scope yourscope --dry-run
+```
+
+`npm whoami` 通过只代表当前机器已有认证；如果目标包是 `@scope/...`，当前账号还必须已经拥有该 scope 的发布权限。
 
 `doctor` 不只是检查文件缺失；它还会提示：
 

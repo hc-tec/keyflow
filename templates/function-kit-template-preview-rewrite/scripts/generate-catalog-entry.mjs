@@ -15,10 +15,13 @@ function usage() {
   console.log(
     [
       "Usage:",
-      "  npm run catalog:entry -- [--kit <kitId>] [--scope yourscope] [--package-name @scope/name]",
+      "  npm run catalog:entry -- [--kit <kitId>] [--scope myorg] [--package-name @myorg/my-kit]",
       "",
       "Purpose:",
       "  Generate a local JSON/Markdown snippet for official catalog PR/Issue submission.",
+      "",
+      "Default:",
+      "  If --scope and --package-name are omitted, packageName becomes keyflow-kit-<kitId>.",
     ].join("\n")
   );
 }

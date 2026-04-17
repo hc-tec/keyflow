@@ -86,7 +86,7 @@ function usage() {
   console.log(
     [
       "Usage:",
-      "  npx @keyflow2/create-function-kit <target-dir> [--kit-id yourscope.launchpad] [--name \"Launchpad\"]",
+      "  npx @keyflow2/create-function-kit <target-dir> [--kit-id myname.launchpad] [--name \"Launchpad\"]",
       "",
       "Options:",
       "  --template <name|npm-ref>  starter template alias or npm package",
@@ -378,7 +378,7 @@ const inferredKitId = deriveKitIdFromName(targetBaseName);
 const kitId = safeText(args.get("kit-id")) || inferredKitId;
 if (!kitId || !kitIdPattern.test(kitId)) {
   console.error(`[create] Invalid kitId: ${kitId || "<empty>"}`);
-  console.error("[create] Pass a valid --kit-id such as yourscope.launchpad");
+  console.error("[create] Pass a valid --kit-id such as myname.launchpad");
   process.exit(2);
 }
 

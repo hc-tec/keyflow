@@ -15,9 +15,10 @@ function usage() {
   console.log(
     [
       "Usage:",
-      "  npm run publish:npm -- [--kit <kitId>] [--scope yourscope] [--package-name @scope/name] [--registry https://registry.npmjs.org/] [--token-file tmp/npm-token.txt]",
+      "  npm run publish:npm -- [--kit <kitId>] [--scope myorg] [--package-name @myorg/my-kit] [--registry https://registry.npmjs.org/] [--token-file tmp/npm-token.txt]",
       "",
       "Notes:",
+      "  - If --scope and --package-name are omitted, packageName defaults to keyflow-kit-<kitId>.",
       "  - Publishing still requires an npm account and token/login.",
       "  - Scoped packages will be published with --access public.",
     ].join("\n")

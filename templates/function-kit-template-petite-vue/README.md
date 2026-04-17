@@ -14,13 +14,15 @@
 先确认这几个前提：
 
 - `npm run open:kitstudio` 需要本机已有 `kit-studio`；默认找同级 `../kit-studio`，也可以通过 `KITSTUDIO_ROOT` 指定，必要时再配 `KITSTUDIO_HOST` / `KITSTUDIO_PORT`
-- `npm run publish:npm` 不是开箱即发；你仍然需要 npm 账号、目标 package 或 scope 的发布权限，以及 `--token-file` / `NPM_TOKEN` / `NODE_AUTH_TOKEN` / `npm login` 之一
+- `npm run publish:npm` 默认不要求你先有 npm 组织；不传 `--scope` 时会生成 unscoped 包名 `keyflow-kit-<kitId>`，只有你真的要发 `@org/...` 时才需要那个 scope 的发布权限
 - 这个 starter 默认不带 `.env` 来配置运行期能力；如果你的 kit 依赖 `ai.request`，真实 `Base URL / API key / model` 还是要在 KitStudio 或 Android Host 的共享 AI 配置里完成
+- `kitId` 推荐写成 `myname.launchpad` 这种全局唯一前缀；这里的 `myname` 只是 kitId 命名空间，不是 npm scope
 - 如果你只是先做功能闭环，先跑 `doctor`、`pack:zip` 和 Android Host 验收，不需要先准备 npm 发布凭据
 
 开发者要拿的东西分 3 个来源：
 
-- 最短入口：`npx @keyflow2/create-function-kit my-launchpad --kit-id yourscope.launchpad --name "Launchpad"`
+- 最短入口：`npx @keyflow2/create-function-kit my-launchpad --kit-id myname.launchpad --name "Launchpad"`
+- 最短入口：`npx @keyflow2/create-function-kit my-launchpad --kit-id myname.launchpad --name "Launchpad"`
 - starter 包：从 npm 拉 `@keyflow2/function-kit-template-petite-vue`
 - KitStudio：从 GitHub clone `https://github.com/hc-tec/kitstudio.git`
 - starter 源码：如果要看模板原始实现，去 `https://github.com/hc-tec/keyflow/tree/main/templates/function-kit-template-petite-vue`
@@ -28,7 +30,7 @@
 如果你只是想最快开始做 kit，优先用 create CLI：
 
 ```powershell
-npx @keyflow2/create-function-kit my-launchpad --kit-id yourscope.launchpad --name "Launchpad"
+npx @keyflow2/create-function-kit my-launchpad --kit-id myname.launchpad --name "Launchpad"
 cd .\my-launchpad
 npm run open:kitstudio
 ```
@@ -79,7 +81,7 @@ npm run open:kitstudio -- --dry-run
 模板默认 kitId 是 `starter-showcase`。先跑一遍 rename 脚本，再开始写业务：
 
 ```powershell
-npm run rename:starter -- --kit-id yourscope.launchpad --name "Launchpad"
+npm run rename:starter -- --kit-id myname.launchpad --name "Launchpad"
 ```
 
 这会同步更新：
@@ -95,10 +97,10 @@ npm run rename:starter -- --kit-id yourscope.launchpad --name "Launchpad"
 
 然后重点改这些文件：
 
-- `workspace/function-kits/yourscope.launchpad/manifest.json`
-- `workspace/function-kits/yourscope.launchpad/ui/app/index.html`
-- `workspace/function-kits/yourscope.launchpad/ui/app/main.js`
-- `workspace/function-kits/yourscope.launchpad/ui/app/styles.css`
+- `workspace/function-kits/myname.launchpad/manifest.json`
+- `workspace/function-kits/myname.launchpad/ui/app/index.html`
+- `workspace/function-kits/myname.launchpad/ui/app/main.js`
+- `workspace/function-kits/myname.launchpad/ui/app/styles.css`
 
 ## 自检、打包、发布
 
@@ -116,20 +118,20 @@ npm run rename:starter -- --kit-id yourscope.launchpad --name "Launchpad"
 ```powershell
 npm run doctor
 npm run pack:zip
-npm run pack:npm -- --scope yourscope
-npm run publish:npm -- --scope yourscope --dry-run
-npm run catalog:check -- --scope yourscope
-npm run catalog:entry -- --scope yourscope
+npm run pack:npm
+npm run publish:npm -- --dry-run
+npm run catalog:check
+npm run catalog:entry
 ```
 
 真正发布前，建议先单独确认：
 
 ```powershell
 npm whoami
-npm run publish:npm -- --scope yourscope --dry-run
+npm run publish:npm -- --dry-run
 ```
 
-`npm whoami` 通过只代表当前机器已有认证；如果目标包是 `@scope/...`，当前账号还必须已经拥有该 scope 的发布权限。
+`npm whoami` 通过只代表当前机器已有认证。默认不传 `--scope` 时，starter 会生成 unscoped 包名；如果你已经有 npm 组织，后面再改成 `--scope myorg` 或 `--package-name @myorg/my-launchpad` 即可。
 
 这些命令的作用：
 

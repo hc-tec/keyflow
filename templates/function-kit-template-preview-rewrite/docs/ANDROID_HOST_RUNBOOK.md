@@ -22,7 +22,7 @@
 ## 2. 先决条件
 
 - 你的工作区已经完成至少一次重命名：
-  - `npm run rename:starter -- --kit-id yourscope.proofreader --name "Proofreader"`
+  - `npm run rename:starter -- --kit-id myname.proofreader --name "Proofreader"`
 - 已通过本地自检：
   - `npm run doctor`
 - 设备上已经安装带下载中心的 Keyflow Android Host

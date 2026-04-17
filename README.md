@@ -38,12 +38,14 @@ cd .\kit-studio
 npm install
 cd ..
 
-npx @keyflow2/create-function-kit my-launchpad --kit-id yourscope.launchpad --name "Launchpad"
+npx @keyflow2/create-function-kit my-launchpad --kit-id myname.launchpad --name "Launchpad"
 cd .\my-launchpad
 npm run open:kitstudio
 npm run doctor
 npm run pack:zip
 ```
+
+这里的 `myname.launchpad` 只是 kitId 命名空间，不是 npm scope。默认不传 `--scope` 也可以继续 `pack:npm / publish:npm`，只有你真的要发 `@org/...` 包时才需要 npm 组织。
 
 这条链路会给你：
 
@@ -85,7 +87,7 @@ npm run pack:zip
 如果你打开这个仓库是为了看现有 kits、协议和深层文档，从这几个入口开始：
 
 - 功能件索引（现有 kits + 下一步该做什么）：[TODO/function-kits/INDEX.md](TODO/function-kits/INDEX.md)
-- 从 0 创建一个 kit：`npx @keyflow2/create-function-kit <dir> --kit-id <scope>.<slug> --name "..."`（详见 [templates/create-function-kit/README.md](templates/create-function-kit/README.md)）
+- 从 0 创建一个 kit：`npx @keyflow2/create-function-kit <dir> --kit-id <namespace>.<slug> --name "..."`（这里的 `<namespace>` 只是 kitId 命名空间，不是 npm scope；详见 [templates/create-function-kit/README.md](templates/create-function-kit/README.md)）
 - 官方 starter 模板矩阵与本地用法：[templates/create-function-kit/README.md](templates/create-function-kit/README.md)
 - 开发手册（manifest / host bridge / lifecycle / 打包）：[TODO/function-kits/DEVELOPER_GUIDE.md](TODO/function-kits/DEVELOPER_GUIDE.md)
 - 选题与待办（不知道做什么就从这里挑）：[TODO/function-kits/IDEA_BANK.md](TODO/function-kits/IDEA_BANK.md)、[TODO/function-kits/DEVELOPER_PLATFORM_GAPS.md](TODO/function-kits/DEVELOPER_PLATFORM_GAPS.md)

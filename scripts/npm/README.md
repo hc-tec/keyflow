@@ -198,11 +198,13 @@ Starter 的详细说明见：
 ```bash
 npm run doctor
 npm run pack:zip
-npm run pack:npm -- --scope yourscope
-npm run publish:npm -- --scope yourscope --dry-run
-npm run catalog:check -- --scope yourscope
-npm run catalog:entry -- --scope yourscope
+npm run pack:npm
+npm run publish:npm -- --dry-run
+npm run catalog:check
+npm run catalog:entry
 ```
+
+默认不传 `--scope` 时，starter 会生成 unscoped 包名 `keyflow-kit-<kitId>`。如果开发者已经有 npm 组织，后面再改成 `--scope myorg` 或 `--package-name @myorg/my-kit` 即可。
 
 ## 8.1) 构建 preview-rewrite Starter 模板包
 
@@ -244,10 +246,10 @@ Starter 包源码在：
 ```bash
 npm run doctor
 npm run pack:zip
-npm run pack:npm -- --scope yourscope
-npm run publish:npm -- --scope yourscope --dry-run
-npm run catalog:check -- --scope yourscope
-npm run catalog:entry -- --scope yourscope
+npm run pack:npm
+npm run publish:npm -- --dry-run
+npm run catalog:check
+npm run catalog:entry
 ```
 
 > 发布顺序建议：先发布 `@keyflow2/function-kit-template-preview-rewrite`，再发布引用该别名的 `@keyflow2/create-function-kit` 版本。

@@ -19,7 +19,7 @@ function usage() {
   console.log(
     [
       "Usage:",
-      "  npm run catalog:check -- [--kit <kitId>] [--scope yourscope] [--package-name @scope/name] [--version 0.1.0]",
+      "  npm run catalog:check -- [--kit <kitId>] [--scope myorg] [--package-name @myorg/my-kit] [--version 0.1.0]",
       "",
       "Purpose:",
       "  Verify that the published npm package is ready for official catalog submission.",
@@ -27,6 +27,9 @@ function usage() {
       "Output:",
       "  artifacts/catalog/<kitId>.catalog-check.json",
       "  artifacts/catalog/<kitId>.catalog-entry.md",
+      "",
+      "Default:",
+      "  If --scope and --package-name are omitted, packageName becomes keyflow-kit-<kitId>.",
     ].join("\n")
   );
 }

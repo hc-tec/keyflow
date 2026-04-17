@@ -31,10 +31,10 @@ node templates/create-function-kit/bin/create-function-kit.mjs artifacts/smoke/e
 cd artifacts/smoke/external-workflow
 npm run doctor
 npm run pack:zip
-npm run pack:npm -- --scope keyflow2
-npm run publish:npm -- --scope keyflow2 --dry-run
-npm run catalog:check -- --scope keyflow2
-npm run catalog:entry -- --scope keyflow2
+npm run pack:npm
+npm run publish:npm -- --dry-run
+npm run catalog:check
+npm run catalog:entry
 ```
 
 这轮 smoke 不是可选装饰，它验证的是：
@@ -50,10 +50,10 @@ node templates/create-function-kit/bin/create-function-kit.mjs artifacts/smoke/p
 cd artifacts/smoke/preview-rewrite
 npm run doctor
 npm run pack:zip
-npm run pack:npm -- --scope keyflow2
-npm run publish:npm -- --scope keyflow2 --dry-run
-npm run catalog:check -- --scope keyflow2
-npm run catalog:entry -- --scope keyflow2
+npm run pack:npm
+npm run publish:npm -- --dry-run
+npm run catalog:check
+npm run catalog:entry
 ```
 
 ## 开发环境（完整 workspace）

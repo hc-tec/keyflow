@@ -18,12 +18,15 @@ function usage() {
   console.log(
     [
       "Usage:",
-      "  npm run pack:npm -- [--kit <kitId>] [--scope yourscope] [--prefix keyflow-kit-] [--package-name @scope/name] [--dry-run]",
+      "  npm run pack:npm -- [--kit <kitId>] [--scope myorg] [--prefix keyflow-kit-] [--package-name @myorg/my-kit] [--dry-run]",
       "",
       "Output:",
       "  artifacts/npm/build/<kitId>/",
       "  artifacts/npm/tarballs/<kitId>/*.tgz",
       "  artifacts/npm/kit-packages.json",
+      "",
+      "Default:",
+      "  If --scope and --package-name are omitted, packageName becomes keyflow-kit-<kitId>.",
     ].join("\n")
   );
 }

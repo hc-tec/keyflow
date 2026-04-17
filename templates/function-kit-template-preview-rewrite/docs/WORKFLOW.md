@@ -6,8 +6,9 @@
 
 - `open:kitstudio` 依赖本机已有 `kit-studio` 仓库；默认找当前项目同级目录 `../kit-studio`
 - 如果默认路径不对，用 `KITSTUDIO_ROOT` 指向你的 KitStudio 根目录；如需改监听地址，再设置 `KITSTUDIO_HOST` / `KITSTUDIO_PORT`
-- `publish:npm` 不会绕过 npm 权限模型；你仍然需要 npm 账号、目标 package 或 scope 的发布权限，以及 `--token-file` / `NPM_TOKEN` / `NODE_AUTH_TOKEN` / `npm login` 之一
+- `publish:npm` 默认不要求你先有 npm 组织；不传 `--scope` 时会生成 unscoped 包名 `keyflow-kit-<kitId>`，只有你真的要发 `@org/...` scoped 包时，才额外需要那个 scope 的发布权限
 - 当前 starter 默认不创建 `.env` 来配置 AI provider；如果你的 kit 依赖 `ai.request`，真实的 `Base URL / API key / model` 要在 KitStudio 或 Android Host 的共享 AI 设置里完成
+- `kitId` 建议用全局唯一前缀，例如 `myname.proofreader`；这里的 `myname` 只是 kitId 命名空间，不是 npm scope
 - 如果你现在只是要做本地闭环，不需要先准备 npm 发布凭据；先走 `doctor -> pack:zip -> Android Host` 即可
 
 ## 1. 推荐工作流
@@ -54,7 +55,7 @@ npm run doctor
 如果你的工作区里有多个 kit，用 `--kit` 指定目标：
 
 ```powershell
-npm run doctor -- --kit yourscope.proofreader
+npm run doctor -- --kit myname.proofreader
 ```
 
 ## 2. 打包与分发
@@ -79,7 +80,7 @@ npm run pack:zip
 ### 2.2 生成 npm 包 tarball
 
 ```powershell
-npm run pack:npm -- --scope yourscope
+npm run pack:npm
 ```
 
 输出：
@@ -88,7 +89,13 @@ npm run pack:npm -- --scope yourscope
 - `artifacts/npm/tarballs/<kitId>/*.tgz`
 - `artifacts/npm/kit-packages.json`
 
-PowerShell 下建议写 `--scope keyflow2`，不要直接裸写 `@keyflow2`。
+默认不传 `--scope` 时，包名会自动生成为 `keyflow-kit-<kitId>`。如果你已经有 npm 组织，后面再加：
+
+```powershell
+npm run pack:npm -- --scope myorg
+```
+
+PowerShell 下如果你真的要传 scope，建议写 `--scope keyflow2`，不要直接裸写 `@keyflow2`。
 
 ### 2.3 发布到 npm
 
@@ -96,15 +103,15 @@ PowerShell 下建议写 `--scope keyflow2`，不要直接裸写 `@keyflow2`。
 
 ```powershell
 npm whoami
-npm run publish:npm -- --scope yourscope --dry-run
+npm run publish:npm -- --dry-run
 ```
 
-`npm whoami` 通过只代表当前机器已有认证；如果目标包是 `@scope/...`，当前账号还必须已经拥有该 scope 的发布权限。
+`npm whoami` 通过只代表当前机器已有认证。默认不传 `--scope` 时，starter 会发布 unscoped 包；如果目标包是 `@scope/...`，当前账号还必须已经拥有该 scope 的发布权限。
 
 先准备 npm token，推荐放到本地临时文件：
 
 ```powershell
-npm run publish:npm -- --scope yourscope --token-file .\tmp\npm-token.txt
+npm run publish:npm -- --token-file .\tmp\npm-token.txt
 ```
 
 也可以使用已有的 `NPM_TOKEN` / `NODE_AUTH_TOKEN` 环境变量，或本机 `~/.npmrc` 登录态。
@@ -114,13 +121,13 @@ npm run publish:npm -- --scope yourscope --token-file .\tmp\npm-token.txt
 先演练不真正发布：
 
 ```powershell
-npm run publish:npm -- --scope yourscope --dry-run
+npm run publish:npm -- --dry-run
 ```
 
 ### 2.4 先做官方 catalog 提交前检查
 
 ```powershell
-npm run catalog:check -- --scope yourscope
+npm run catalog:check
 ```
 
 输出：
@@ -138,7 +145,7 @@ npm run catalog:check -- --scope yourscope
 ### 2.5 生成官方 catalog 提交片段
 
 ```powershell
-npm run catalog:entry -- --scope yourscope
+npm run catalog:entry
 ```
 
 输出：

@@ -7,7 +7,7 @@
 1. 先运行 `npm run open:kitstudio`
 2. 看看页面里的 runtime 动作是否正常：`Refresh context` / `Insert pitch` / `Replace draft`
 3. 改完之后先运行 `npm run doctor`
-4. 再运行 `npm run rename:starter -- --kit-id yourscope.launchpad --name "Launchpad"`
+4. 再运行 `npm run rename:starter -- --kit-id myname.launchpad --name "Launchpad"`
 5. rename 之后可以继续直接运行 `npm run open:kitstudio`
 6. 准备发布时回到工作区根目录，用 `npm run pack:zip` / `npm run pack:npm`
 

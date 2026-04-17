@@ -5,14 +5,15 @@
 ## 先看前置条件
 
 - `open:kitstudio` 需要你本机已经有 `kit-studio` 仓库；默认找目标项目同级目录 `../kit-studio`，也可以改用 `KITSTUDIO_ROOT`，必要时再配 `KITSTUDIO_HOST` / `KITSTUDIO_PORT`
-- `publish:npm` 不是“生成项目后任何人都能直接发包”；你仍然需要 npm 账号、目标 package 或 scope 的发布权限，以及 `--token-file` / `NPM_TOKEN` / `NODE_AUTH_TOKEN` / `npm login` 之一
+- `publish:npm` 不是“生成项目后任何人都能直接发包”；你仍然需要 npm 账号，以及 `--token-file` / `NPM_TOKEN` / `NODE_AUTH_TOKEN` / `npm login` 之一；只有当你真的要发 `@org/...` scoped 包时，才额外需要那个 org/scope 的发布权限
 - 生成后的 starter 默认不会附带 `.env` 来配置 AI provider；`ai.request` 的真实 `Base URL / API key / model` 是在 KitStudio 或 Android Host 的共享 AI 配置里完成的
+- `--kit-id` 推荐用全局唯一前缀，例如 `myname.launchpad`；这里的 `myname` 只是 kitId 命名空间，不是 npm scope / 组织名
 - 如果你只想先做本地或真机验收，不需要先配 npm；先走 `doctor -> pack:zip -> Android Host` 就够了
 
 ## 用法
 
 ```powershell
-npx @keyflow2/create-function-kit my-launchpad --kit-id yourscope.launchpad --name "Launchpad"
+npx @keyflow2/create-function-kit my-launchpad --kit-id myname.launchpad --name "Launchpad"
 ```
 
 执行后会：
@@ -38,20 +39,20 @@ npm run open:kitstudio
 ```powershell
 npm run doctor
 npm run pack:zip
-npm run pack:npm -- --scope yourscope
-npm run publish:npm -- --scope yourscope --dry-run
-npm run catalog:check -- --scope yourscope
-npm run catalog:entry -- --scope yourscope
+npm run pack:npm
+npm run publish:npm -- --dry-run
+npm run catalog:check
+npm run catalog:entry
 ```
 
 真正发布到 npm 前，建议先单独确认：
 
 ```powershell
 npm whoami
-npm run publish:npm -- --scope yourscope --dry-run
+npm run publish:npm -- --dry-run
 ```
 
-`npm whoami` 通过只代表当前机器有认证；它不等于你一定拥有目标 `@scope` 的发布权限。
+`npm whoami` 通过只代表当前机器有认证。默认不传 `--scope` 时，starter 会生成 unscoped 包名 `keyflow-kit-<kitId>`；如果你已经有 npm 组织，后面再改成 `--scope myorg` 或 `--package-name @myorg/my-kit` 即可。
 
 也就是说，开发者不需要先 clone `keyflow` 仓库，当前工作区自己就带着：
 
@@ -76,7 +77,7 @@ npm run open:kitstudio
 如果你已经有可用的 KitStudio，也可以创建完成后直接打开：
 
 ```powershell
-npx @keyflow2/create-function-kit my-launchpad --kit-id yourscope.launchpad --name "Launchpad" --open
+npx @keyflow2/create-function-kit my-launchpad --kit-id myname.launchpad --name "Launchpad" --open
 ```
 
 ## 官方 starter
@@ -99,7 +100,7 @@ npx @keyflow2/create-function-kit --list-templates
 
 ## 常用参数
 
-- `--kit-id <id>`：目标 kitId，推荐用全局唯一风格，例如 `yourscope.launchpad`
+- `--kit-id <id>`：目标 kitId，推荐用全局唯一风格，例如 `myname.launchpad`
 - `--name <label>`：展示名称
 - `--description <text>`：覆盖 starter 默认描述
 - `--template <name|npm-ref>`：改用官方模板别名或自定义 npm starter 包
@@ -120,10 +121,17 @@ npm run pack:zip
 确认真机闭环后，再继续：
 
 ```powershell
-npm run pack:npm -- --scope yourscope
-npm run publish:npm -- --scope yourscope --dry-run
-npm run catalog:check -- --scope yourscope
-npm run catalog:entry -- --scope yourscope
+npm run pack:npm
+npm run publish:npm -- --dry-run
+npm run catalog:check
+npm run catalog:entry
+```
+
+如果你已经有 npm 组织，想发 `@myorg/...` 包，再额外使用：
+
+```powershell
+npm run pack:npm -- --scope myorg
+npm run publish:npm -- --scope myorg --dry-run
 ```
 
 如果你要做正文预览型 AI kit，后续发布前还应该再看：
@@ -137,7 +145,7 @@ npm run catalog:entry -- --scope yourscope
 ```powershell
 node .\templates\create-function-kit\bin\create-function-kit.mjs .\artifacts\smoke\launchpad `
   --template-dir .\templates\function-kit-template-petite-vue `
-  --kit-id keyflow2.launchpad `
+  --kit-id myname.launchpad `
   --name "Launchpad"
 ```
 
@@ -146,6 +154,6 @@ node .\templates\create-function-kit\bin\create-function-kit.mjs .\artifacts\smo
 ```powershell
 node .\templates\create-function-kit\bin\create-function-kit.mjs .\artifacts\smoke\proofreader `
   --template-dir .\templates\function-kit-template-preview-rewrite `
-  --kit-id keyflow2.proofreader `
+  --kit-id myname.proofreader `
   --name "Proofreader"
 ```
